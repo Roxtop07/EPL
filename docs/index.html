@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPL - English Programming Language</title>
+    <meta name="description" content="Write code the way you think. EPL is a production-grade programming language where every keyword is natural English.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-base: #050505;
+            --bg-surface: #111111;
+            --bg-surface-hover: #1a1a1a;
+            --text-primary: #ededed;
+            --text-secondary: #a1a1aa;
+            --accent: #2563eb;
+            --accent-glow: rgba(37, 99, 235, 0.4);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --gradient-1: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+            --glass-bg: rgba(17, 17, 17, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Abstract Background Glow */
+        .glow-bg {
+            position: absolute;
+            top: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 400px;
+            background: var(--accent);
+            filter: blur(150px);
+            opacity: 0.15;
+            z-index: -1;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* Navbar */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .btn-primary {
+            background: var(--text-primary);
+            color: var(--bg-base);
+            padding: 0.6rem 1.2rem;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255,255,255,0.15);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1.2rem;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-surface-hover);
+            border-color: var(--text-secondary);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 8rem 2rem 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            margin-bottom: 1.5rem;
+            max-width: 900px;
+        }
+
+        .hero h1 span {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-bottom: 3rem;
+            font-weight: 400;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 4rem;
+        }
+
+        /* Terminal Window */
+        .terminal {
+            width: 100%;
+            max-width: 800px;
+            background: #0d0d0d;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+            overflow: hidden;
+            text-align: left;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .terminal-header {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: #1a1a1a;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot.red { background: #ff5f56; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #27c93f; }
+
+        .terminal-title {
+            flex: 1;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+            margin-right: 44px; /* to balance the dots */
+        }
+
+        .terminal-body {
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        .code-keyword { color: #3b82f6; font-weight: 500; }
+        .code-string { color: #22c55e; }
+        .code-comment { color: #6b7280; font-style: italic; }
+        .code-var { color: #eab308; }
+
+        /* Install Command Box */
+        .install-box {
+            display: inline-flex;
+            align-items: center;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem 0.5rem 0.5rem 1.2rem;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .install-box code {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .copy-btn {
+            background: var(--bg-surface-hover);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #2a2a2a;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            letter-spacing: -1px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Installation Section */
+        .getting-started {
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 5rem 2rem;
+        }
+
+        .getting-started-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 1.25rem;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .hero-cta {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="glow-bg"></div>
+
+    <nav>
+        <a href="/" class="logo">EPL</a>
+        <div class="nav-links">
+            <a href="https://github.com/abneeshsingh21/EPL/blob/main/docs/language-reference.md">Documentation</a>
+            <a href="https://pypi.org/project/eplang/"><i class="fa-brands fa-python"></i> PyPI</a>
+            <a href="https://marketplace.visualstudio.com/publishers/epl-lang"><i class="fa-solid fa-code"></i> VS Code</a>
+            <a href="https://github.com/abneeshsingh21/EPL" class="btn-outline"><i class="fa-brands fa-github"></i> GitHub</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="install-box">
+            <code id="install-cmd">pip install eplang</code>
+            <button class="copy-btn" onclick="copyInstall()" title="Copy to clipboard">
+                <i class="fa-regular fa-copy" id="copy-icon"></i>
+            </button>
+        </div>
+
+        <h1>Write code the way <span>you think.</span></h1>
+        <p>EPL is a production-grade programming language where every keyword is natural English. Build web servers, APIs, Android apps, and native tools without cryptic syntax.</p>
+
+        <div class="hero-cta">
+            <a href="https://github.com/abneeshsingh21/EPL#quick-start" class="btn-primary">Get Started in 5 min</a>
+            <a href="https://github.com/abneeshsingh21/EPL" class="btn-outline">View Source code</a>
+        </div>
+
+        <div class="terminal">
+            <div class="terminal-header">
+                <div class="terminal-dots">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                </div>
+                <div class="terminal-title">hello.epl</div>
+            </div>
+            <div class="terminal-body">
+                <div><span class="code-comment">-- A simple HTTP Server in plain English</span></div>
+                <br>
+                <div><span class="code-keyword">Start server on port</span> <span class="code-var">3000</span></div>
+                <div style="padding-left: 2rem;"><span class="code-keyword">Route GET</span> <span class="code-string">"/api/greet"</span></div>
+                <div style="padding-left: 4rem;"><span class="code-keyword">Set</span> <span class="code-var">name</span> <span class="code-keyword">to</span> Get Query Param <span class="code-string">"name"</span></div>
+                <div style="padding-left: 4rem;"><span class="code-keyword">If</span> <span class="code-var">name</span> <span class="code-keyword">is empty then</span></div>
+                <div style="padding-left: 6rem;"><span class="code-keyword">Set</span> <span class="code-var">name</span> <span class="code-keyword">to</span> <span class="code-string">"World"</span></div>
+                <div style="padding-left: 4rem;"><span class="code-keyword">End If</span></div>
+                <div style="padding-left: 4rem;"><span class="code-keyword">Send JSON</span> { <span class="code-string">"message"</span>: <span class="code-string">"Hello, "</span> + <span class="code-var">name</span> }</div>
+                <div style="padding-left: 2rem;"><span class="code-keyword">End Route</span></div>
+                <div><span class="code-keyword">End Server</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <h2 class="section-title">Zero logic translations. Just code.</h2>
+        <div class="grid">
+            <div class="card">
+                <div class="card-icon"><i class="fa-solid fa-language"></i></div>
+                <h3>100% English Syntax</h3>
+                <p>No semicolons. No curly braces. Replace arbitrary symbols with words you already know. <code>Repeat 5 times</code> instead of <code>for(let i=0;i<5;i++)</code>.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon"><i class="fa-solid fa-microchip"></i></div>
+                <h3>Lightning Fast</h3>
+                <p>EPL comes with a high-performance tree-walking interpreter, an optimized Bytecode VM, and a native LLVM compiler for raw metal execution speed.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon"><i class="fa-brands fa-android"></i></div>
+                <h3>Build Anything</h3>
+                <p>Compile your EPL code to native binaries (Windows/Mac/Linux), transpile to Android (Kotlin), or run it in the browser via WebAssembly (WASM).</p>
+            </div>
+            <div class="card">
+                <div class="card-icon"><i class="fa-solid fa-server"></i></div>
+                <h3>Production Web Built-in</h3>
+                <p>Forget setting up Express, Flask, or Spring. EPL has a production-grade ASGI web server, router, and SQLite ORM baked right into the standard library.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <h3>Military-grade Security</h3>
+                <p>Secure by design. Strict recursion limits, a sandboxed Foreign Function Interface (FFI), and safe serialization mean your enterprise apps stay safe.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon"><i class="fa-solid fa-bolt"></i></div>
+                <h3>Modern Tooling</h3>
+                <p>Complete with an official LSP server, a VS Code extension, a built-in test framework, code formatter, linter, and a smart package manager.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="getting-started">
+        <div class="getting-started-content">
+            <h2 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem;">Ready to write English code?</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Join the revolution of readable code. It takes literally seconds to start.</p>
+            
+            <a href="https://github.com/abneeshsingh21/EPL" class="btn-primary" style="font-size: 1.1rem; padding: 0.8rem 2rem;">Read the Documentation</a>
+        </div>
+    </section>
+
+    <footer>
+        <p>Copyright &copy; 2024-2026 <strong>Abneesh Singh</strong>. All rights reserved.</p>
+        <p style="margin-top: 0.5rem;">"EPL" and "English Programming Language" are trademarks of Abneesh Singh.</p>
+        
+        <div class="footer-links">
+            <a href="https://github.com/abneeshsingh21/EPL" title="GitHub"><i class="fa-brands fa-github"></i></a>
+            <a href="https://pypi.org/project/eplang/" title="PyPI"><i class="fa-brands fa-python"></i></a>
+            <a href="mailto:singhabneesh250@gmail.com" title="Email"><i class="fa-solid fa-envelope"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        function copyInstall() {
+            const cmd = document.getElementById('install-cmd').innerText;
+            navigator.clipboard.writeText(cmd).then(() => {
+                const icon = document.getElementById('copy-icon');
+                icon.className = 'fa-solid fa-check';
+                icon.style.color = '#22c55e';
+                
+                setTimeout(() => {
+                    icon.className = 'fa-regular fa-copy';
+                    icon.style.color = '';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
