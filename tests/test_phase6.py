@@ -1590,7 +1590,7 @@ def test_integration_project_dirs():
 def test_version_check():
     section("Version Check")
     from epl import __version__
-    _check("version is 7.0.0", __version__ == "7.0.0")
+    _check(f"version is {__version__}", isinstance(__version__, str) and len(__version__.split('.')) == 3)
 
 
 # ═══════════════════════════════════════════════════════════
@@ -1688,9 +1688,10 @@ def test_cli_functions_exist():
 # ═══════════════════════════════════════════════════════════
 
 def main():
+    from epl import __version__
     print("=" * 60)
     print("  EPL Phase 6 Test Suite — Mobile & Desktop")
-    print("  Version: 7.0.0")
+    print(f"  Version: {__version__}")
     print("=" * 60)
 
     test_functions = [

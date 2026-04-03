@@ -116,13 +116,14 @@ def run_suite():
     # ━━━ 1. Health Check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     print("--- Health Check ---")
     try:
+        from epl import __version__
         resp = urlopen(f"{BASE}/_health", timeout=5)
         data = json.loads(resp.read())
         check("Health returns 200", resp.status == 200)
         check("Status is healthy", data["status"] == "healthy")
         check("Has wsgi flag", data.get("wsgi") is True)
         check("Has uptime", "uptime_seconds" in data)
-        check("Version is 7.0.0", data.get("version") == "7.0.0")
+        check(f"Version is {__version__}", data.get("version") == __version__)
     except Exception as e:
         check("Health check", False, str(e))
     

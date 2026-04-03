@@ -17,6 +17,7 @@ from unittest import mock
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from epl.cli import cli_main
+from epl import __version__ as EPL_VERSION
 from epl.package_manager import load_manifest, save_manifest
 from epl.packager import BuildConfig
 
@@ -79,11 +80,13 @@ class TestCLIProduction(unittest.TestCase):
             Path("src/main.epl").write_text('Say "Hello build"\n', encoding="utf-8")
             _write_manifest(tmpdir, entry="src/main.epl")
 
-            with mock.patch("epl.cli._legacy_dispatch", return_value=0) as legacy_dispatch:
+            with mock.patch("epl.cli._legacy_dispatch") as legacy_dispatch, \
+                 mock.patch("main.compile_file", return_value=True) as compile_file:
                 exit_code = cli_main(["build"])
 
             self.assertEqual(exit_code, 0)
-            legacy_dispatch.assert_called_once_with(["build", "src/main.epl"])
+            legacy_dispatch.assert_not_called()
+            compile_file.assert_called_once_with("src/main.epl", opt_level=2, static=True, target=None)
         finally:
             os.chdir(old_cwd)
             shutil.rmtree(tmpdir, ignore_errors=True)
@@ -97,14 +100,30 @@ class TestCLIProduction(unittest.TestCase):
             Path("src/main.epl").write_text('Say "Hello build flags"\n', encoding="utf-8")
             _write_manifest(tmpdir, entry="src/main.epl")
 
-            with mock.patch("epl.cli._legacy_dispatch", return_value=0) as legacy_dispatch:
+            with mock.patch("epl.cli._legacy_dispatch") as legacy_dispatch, \
+                 mock.patch("main.compile_file", return_value=True) as compile_file:
                 exit_code = cli_main(["build", "--no-static"])
 
             self.assertEqual(exit_code, 0)
-            legacy_dispatch.assert_called_once_with(["build", "src/main.epl", "--no-static"])
+            legacy_dispatch.assert_not_called()
+            compile_file.assert_called_once_with("src/main.epl", opt_level=2, static=False, target=None)
         finally:
             os.chdir(old_cwd)
             shutil.rmtree(tmpdir, ignore_errors=True)
+
+    def test_compile_command_uses_direct_native_compiler_path(self):
+        with mock.patch("epl.cli._legacy_dispatch") as legacy_dispatch, \
+             mock.patch("main.compile_file", return_value=True) as compile_file:
+            exit_code = cli_main(["compile", "program.epl", "--opt", "3", "--static", "--target", "linux-x64"])
+
+        self.assertEqual(exit_code, 0)
+        legacy_dispatch.assert_not_called()
+        compile_file.assert_called_once_with(
+            "program.epl",
+            opt_level=3,
+            static=True,
+            target="linux-x64",
+        )
 
     def test_legacy_build_returns_nonzero_on_native_compile_failure(self):
         import main as main_module
@@ -144,6 +163,15 @@ class TestCLIProduction(unittest.TestCase):
             finally:
                 os.chdir(old_cwd)
 
+    def test_init_command_uses_package_manager_without_legacy_dispatch(self):
+        with mock.patch("epl.cli._legacy_dispatch") as legacy_dispatch, \
+             mock.patch("epl.package_manager.init_project") as init_project:
+            exit_code = cli_main(["init", "workspace"])
+
+        self.assertEqual(exit_code, 0)
+        legacy_dispatch.assert_not_called()
+        init_project.assert_called_once_with("workspace")
+
     def test_new_project_web_template_uses_supported_packages(self):
         with tempfile.TemporaryDirectory(prefix="epl_cli_new_web_") as tmpdir:
             old_cwd = os.getcwd()
@@ -154,7 +182,7 @@ class TestCLIProduction(unittest.TestCase):
 
                 self.assertEqual(exit_code, 0)
                 manifest = load_manifest(Path(tmpdir, "webapp"))
-                self.assertEqual(manifest["dependencies"]["epl-web"], "^7.0.0")
+                self.assertEqual(manifest["dependencies"]["epl-web"], f"^{EPL_VERSION}")
                 self.assertEqual(manifest["scripts"]["serve"], "epl serve src/main.epl")
 
                 source = Path(tmpdir, "webapp", "src", "main.epl").read_text(encoding="utf-8")
@@ -173,7 +201,7 @@ class TestCLIProduction(unittest.TestCase):
 
                 self.assertEqual(exit_code, 0)
                 manifest = load_manifest(Path(tmpdir, "mylib"))
-                self.assertEqual(manifest["dependencies"]["epl-test"], "^7.0.0")
+                self.assertEqual(manifest["dependencies"]["epl-test"], f"^{EPL_VERSION}")
 
                 test_source = Path(tmpdir, "mylib", "tests", "test_main.epl").read_text(encoding="utf-8")
                 self.assertIn('Import "src/main.epl"', test_source)
@@ -203,23 +231,23 @@ class TestCLIProduction(unittest.TestCase):
         with mock.patch("epl.cli._legacy_dispatch") as legacy_dispatch, \
              mock.patch(
                  "epl.package_manager.list_packages",
-                 return_value=[("epl-web", "7.0.0", "Supported web facade")],
+                 return_value=[("epl-web", EPL_VERSION, "Supported web facade")],
              ), \
              redirect_stdout(stdout):
             exit_code = cli_main(["packages"])
 
         self.assertEqual(exit_code, 0)
         legacy_dispatch.assert_not_called()
-        self.assertIn("epl-web @ 7.0.0", stdout.getvalue())
+        self.assertIn(f"epl-web @ {EPL_VERSION}", stdout.getvalue())
 
     def test_add_dependency_uses_package_manager_without_legacy_dispatch(self):
         with mock.patch("epl.cli._legacy_dispatch") as legacy_dispatch, \
              mock.patch("epl.package_manager.add_dependency", return_value=True) as add_dependency:
-            exit_code = cli_main(["add", "epl-web", "^7.0.0", "--dev"])
+            exit_code = cli_main(["add", "epl-web", f"^{EPL_VERSION}", "--dev"])
 
         self.assertEqual(exit_code, 0)
         legacy_dispatch.assert_not_called()
-        add_dependency.assert_called_once_with("epl-web", "^7.0.0", path=".", dev=True)
+        add_dependency.assert_called_once_with("epl-web", f"^{EPL_VERSION}", path=".", dev=True)
 
     def test_remove_dependency_uses_package_manager_without_legacy_dispatch(self):
         with mock.patch("epl.cli._legacy_dispatch") as legacy_dispatch, \
@@ -435,6 +463,62 @@ class TestCLIProduction(unittest.TestCase):
         legacy_dispatch.assert_not_called()
         server_cls.return_value.start_tcp.assert_called_once_with(2099)
 
+    def test_playground_command_uses_direct_server_without_legacy_dispatch(self):
+        with mock.patch("epl.cli._legacy_dispatch") as legacy_dispatch, \
+             mock.patch("epl.playground.start_playground") as start_playground:
+            exit_code = cli_main(["playground", "--port", "8088"])
+
+        self.assertEqual(exit_code, 0)
+        legacy_dispatch.assert_not_called()
+        start_playground.assert_called_once_with(port=8088)
+
+    def test_notebook_command_uses_direct_server_without_legacy_dispatch(self):
+        with mock.patch("epl.cli._legacy_dispatch") as legacy_dispatch, \
+             mock.patch("epl.notebook.start_notebook") as start_notebook:
+            exit_code = cli_main(["notebook", "--port", "8899"])
+
+        self.assertEqual(exit_code, 0)
+        legacy_dispatch.assert_not_called()
+        start_notebook.assert_called_once_with(port=8899)
+
+    def test_blocks_command_uses_direct_server_without_legacy_dispatch(self):
+        with mock.patch("epl.cli._legacy_dispatch") as legacy_dispatch, \
+             mock.patch("epl.block_editor.start_block_editor") as start_block_editor:
+            exit_code = cli_main(["blocks", "--port", "8099"])
+
+        self.assertEqual(exit_code, 0)
+        legacy_dispatch.assert_not_called()
+        start_block_editor.assert_called_once_with(port=8099)
+
+    def test_copilot_web_mode_uses_direct_server_without_legacy_dispatch(self):
+        with mock.patch("epl.cli._legacy_dispatch") as legacy_dispatch, \
+             mock.patch("epl.copilot.start_copilot_web") as start_copilot_web:
+            exit_code = cli_main(["copilot", "--web", "--port", "8105"])
+
+        self.assertEqual(exit_code, 0)
+        legacy_dispatch.assert_not_called()
+        start_copilot_web.assert_called_once_with(port=8105)
+
+    def test_copilot_one_shot_uses_direct_generator_without_legacy_dispatch(self):
+        stdout = StringIO()
+        with mock.patch("epl.cli._legacy_dispatch") as legacy_dispatch, \
+             mock.patch("epl.copilot.generate_from_description", return_value='Display "Hello"\n'), \
+             redirect_stdout(stdout):
+            exit_code = cli_main(["copilot", "make", "hello", "world"])
+
+        self.assertEqual(exit_code, 0)
+        legacy_dispatch.assert_not_called()
+        self.assertIn('Display "Hello"', stdout.getvalue())
+
+    def test_copilot_interactive_uses_direct_runtime_without_legacy_dispatch(self):
+        with mock.patch("epl.cli._legacy_dispatch") as legacy_dispatch, \
+             mock.patch("epl.copilot.run_copilot_interactive") as run_copilot_interactive:
+            exit_code = cli_main(["copilot"])
+
+        self.assertEqual(exit_code, 0)
+        legacy_dispatch.assert_not_called()
+        run_copilot_interactive.assert_called_once_with()
+
     def test_js_and_node_transpilers_use_direct_cli_paths(self):
         with tempfile.TemporaryDirectory(prefix="epl_cli_transpile_js_") as tmpdir:
             old_cwd = os.getcwd()
@@ -626,6 +710,15 @@ class TestCLIProduction(unittest.TestCase):
                 self.assertIn("passed", stdout.getvalue())
             finally:
                 os.chdir(old_cwd)
+
+    def test_repl_uses_direct_runtime_without_legacy_dispatch(self):
+        with mock.patch("epl.cli._legacy_dispatch") as legacy_dispatch, \
+             mock.patch("main.run_repl") as run_repl:
+            exit_code = cli_main(["repl"])
+
+        self.assertEqual(exit_code, 0)
+        legacy_dispatch.assert_not_called()
+        run_repl.assert_called_once_with()
 
     def test_gui_command_uses_direct_runtime_without_legacy_dispatch(self):
         fake_program = object()

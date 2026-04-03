@@ -1,6 +1,6 @@
 [project]
 name = "epl-db"
-version = "7.0.0"
+version = "7.0.1"
 description = "Supported EPL database facade package"
 author = "EPL Team"
 entry = "src/main.epl"

@@ -441,8 +441,8 @@ def test_cli_consistency():
         found = f"'{cmd}'" in cli_src
         check(f"CLI has '{cmd}' command", found)
 
-    # T14: _delegate function exists
-    check("_delegate function in cli.py", 'def _delegate' in cli_src)
+    # T14: legacy package delegate removed; package commands live directly in cli.py
+    check("Legacy _delegate removed from cli.py", 'def _delegate' not in cli_src)
 
     # T15: install handles no-args (install all deps)
     check("Install handles no-args", '_pkg_install' in cli_src)

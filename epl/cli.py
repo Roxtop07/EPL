@@ -232,17 +232,6 @@ def _resolve_target_args(args):
     return None
 
 
-_GLOBAL_FLAG_ORDER = (
-    '--strict',
-    '--sandbox',
-    '--interpret',
-    '--json',
-    '--no-color',
-    '--verbose',
-    '--quiet',
-)
-
-
 def _resolve_main_module():
     """Resolve the source-checkout main module without re-importing when possible."""
     main_mod = sys.modules.get('main')
@@ -259,12 +248,6 @@ def _resolve_main_module():
 def _legacy_dispatch(argv):
     """Run a legacy command through the compatibility dispatcher in main.py."""
     return _resolve_main_module().legacy_main(list(argv))
-
-
-def _append_global_flags(argv, flags):
-    if not flags:
-        return list(argv)
-    return list(argv) + [flag for flag in _GLOBAL_FLAG_ORDER if flag in flags]
 
 
 # ─── Command Dispatch ─────────────────────────────────────
@@ -556,7 +539,7 @@ def _project_template(name, template):
 
     if template == 'web':
         description = f"{name} — EPL web application"
-        dependencies = {"epl-web": "^7.0.0"}
+        dependencies = {"epl-web": f"^{__version__}"}
         scripts["serve"] = "epl serve src/main.epl"
         main_source = (
             f'Note: {name} web app template\n'
@@ -588,7 +571,7 @@ def _project_template(name, template):
         )
     elif template == 'api':
         description = f"{name} — EPL API service"
-        dependencies = {"epl-web": "^7.0.0", "epl-db": "^7.0.0"}
+        dependencies = {"epl-web": f"^{__version__}", "epl-db": f"^{__version__}"}
         scripts["serve"] = "epl serve src/main.epl"
         main_source = (
             f'Note: {name} API template\n'
@@ -648,7 +631,7 @@ def _project_template(name, template):
         )
     elif template == 'lib':
         description = f"{name} — EPL library package"
-        dependencies = {"epl-test": "^7.0.0"}
+        dependencies = {"epl-test": f"^{__version__}"}
         main_source = (
             f'Note: {name} library template\n\n'
             'Define Function greet Takes name\n'
@@ -743,8 +726,50 @@ def _build(args, flags, command='build'):
     if not args:
         print(f"{_red('Error:')} No file specified and no epl.toml/epl.json project was found.")
         return 1
+    filename = args[0]
+    opt_level = 2
+    static_link = command == 'build'
+    target = None
 
-    return _legacy_dispatch(_append_global_flags([command] + args, flags))
+    i = 1
+    while i < len(args):
+        arg = args[i]
+        if arg == '--opt' and i + 1 < len(args):
+            opt_level = int(args[i + 1])
+            i += 2
+            continue
+        if arg.startswith('--opt='):
+            opt_level = int(arg.split('=', 1)[1])
+            i += 1
+            continue
+        if arg == '--static':
+            static_link = True
+            i += 1
+            continue
+        if arg == '--no-static':
+            static_link = False
+            i += 1
+            continue
+        if arg == '--target' and i + 1 < len(args):
+            target = args[i + 1]
+            i += 2
+            continue
+        if arg.startswith('--target='):
+            target = arg.split('=', 1)[1]
+            i += 1
+            continue
+        print(f"{_red('Error:')} Unknown {command} option: {arg}")
+        return 1
+
+    try:
+        main_mod = _resolve_main_module()
+        return 0 if main_mod.compile_file(filename, opt_level=opt_level, static=static_link, target=target) else 1
+    except FileNotFoundError:
+        print(f"{_red('Error:')} File not found: {filename}")
+        return 1
+    except Exception as exc:
+        print(f"{_red('Error:')} {exc}", file=sys.stderr)
+        return 1
 
 
 def _run_tests(args, flags):
@@ -796,7 +821,13 @@ def _run_tests(args, flags):
 
 
 def _run_repl(flags):
-    return _legacy_dispatch(_append_global_flags([], flags))
+    try:
+        main_mod = _resolve_main_module()
+        main_mod.run_repl()
+        return 0
+    except Exception as exc:
+        print(f"{_red('Error:')} {exc}", file=sys.stderr)
+        return 1
 
 
 def _pkg_install(args):
@@ -1181,11 +1212,14 @@ def _github(args):
 
 
 def _init_project(args):
-    name = args[0] if args else None
-    argv = ['init']
-    if name:
-        argv.append(name)
-    return _legacy_dispatch(argv)
+    from epl.package_manager import init_project
+
+    if len(args) > 1:
+        print(f"{_red('Error:')} Usage: epl init [name]")
+        return 1
+
+    init_project(args[0] if args else None)
+    return 0
 
 
 def _upgrade():
@@ -1223,11 +1257,6 @@ def _upgrade():
     print(f"  EPL is at v{__version__}. No update method available.")
     print("  To update manually: git pull  or  pip install --upgrade epl-lang")
     return 0
-
-
-def _delegate(command, args):
-    """Delegate a command to main.py for commands not yet ported to cli.py."""
-    return _legacy_dispatch([command] + list(args))
 
 
 def _read_epl_source(filepath):
@@ -2335,19 +2364,81 @@ def _site(args):
 
 
 def _playground(args):
-    return _legacy_dispatch(['playground'] + args)
+    from epl.playground import start_playground
+
+    port = 8080
+    i = 0
+    while i < len(args):
+        if args[i] == '--port' and i + 1 < len(args):
+            port = int(args[i + 1])
+            i += 2
+            continue
+        print(f"{_red('Error:')} Unknown playground option: {args[i]}")
+        return 1
+
+    start_playground(port=port)
+    return 0
 
 
 def _notebook(args):
-    return _legacy_dispatch(['notebook'] + args)
+    from epl.notebook import start_notebook
+
+    port = 8888
+    i = 0
+    while i < len(args):
+        if args[i] == '--port' and i + 1 < len(args):
+            port = int(args[i + 1])
+            i += 2
+            continue
+        print(f"{_red('Error:')} Unknown notebook option: {args[i]}")
+        return 1
+
+    start_notebook(port=port)
+    return 0
 
 
 def _blocks(args):
-    return _legacy_dispatch(['blocks'] + args)
+    from epl.block_editor import start_block_editor
+
+    port = 8090
+    i = 0
+    while i < len(args):
+        if args[i] == '--port' and i + 1 < len(args):
+            port = int(args[i + 1])
+            i += 2
+            continue
+        print(f"{_red('Error:')} Unknown blocks option: {args[i]}")
+        return 1
+
+    start_block_editor(port=port)
+    return 0
 
 
 def _copilot(args):
-    return _legacy_dispatch(['copilot'] + args)
+    from epl.copilot import generate_from_description, run_copilot_interactive, start_copilot_web
+
+    if '--web' in args:
+        port = 8095
+        i = 0
+        while i < len(args):
+            if args[i] == '--web':
+                i += 1
+                continue
+            if args[i] == '--port' and i + 1 < len(args):
+                port = int(args[i + 1])
+                i += 2
+                continue
+            print(f"{_red('Error:')} Unknown copilot option: {args[i]}")
+            return 1
+        start_copilot_web(port=port)
+        return 0
+
+    if args:
+        print(generate_from_description(' '.join(args)))
+        return 0
+
+    run_copilot_interactive()
+    return 0
 
 
 def _start_lsp(args):
