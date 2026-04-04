@@ -261,8 +261,8 @@ See [CONTRIBUTORS.md](CONTRIBUTORS.md) for the list of contributors.
 - [x] Android & Desktop transpilers
 - [x] PyPI release (`pip install eplang`)
 - [x] VS Code extension
-- [ ] Official documentation website
-- [ ] Online playground (try EPL in browser)
+- [x] Official documentation website
+- [x] Online playground (try EPL in browser)
 - [ ] Community package registry
 - [ ] iOS transpiler
 - [ ] EPL Notebook (Jupyter-style)
