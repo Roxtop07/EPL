@@ -215,6 +215,7 @@ epl upgrade               # Update EPL
 
 | Resource | Link |
 |----------|------|
+| Official Book (PDF)| [docs/epl_book.pdf](docs/epl_book.pdf) |
 | Language Reference | [docs/language-reference.md](docs/language-reference.md) |
 | Getting Started | [docs/getting-started.md](docs/getting-started.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
