@@ -8,6 +8,7 @@ __pycache__/
 .eggs/
 dist/
 build/
+site/
 *.so
 *.dylib
 
