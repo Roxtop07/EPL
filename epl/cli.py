@@ -464,10 +464,10 @@ def _new_project(args):
             return 1
         template = args[idx + 1].lower()
 
-    valid_templates = {'basic', 'web', 'api', 'cli', 'lib'}
+    valid_templates = {'basic', 'web', 'api', 'cli', 'lib', 'android', 'fullstack'}
     if template not in valid_templates:
         print(f"{_red('Error:')} Unknown template: {template}")
-        print("Available templates: basic, web, api, cli, lib")
+        print("Available templates: basic, web, api, cli, lib, android, fullstack")
         return 1
 
     # Validate project name
@@ -662,6 +662,100 @@ def _project_template(name, template):
                 "epl run src/main.epl",
             ],
             "Starter reusable EPL library with tests using the supported `epl-test` facade package.",
+        )
+    elif template == 'android':
+        description = f"{name} — EPL Android app"
+        scripts["android"] = f"epl android src/main.epl --name '{name}' --build"
+        main_source = (
+            f'Note: {name} — Android app template\n'
+            f'Note: Build with: epl android src/main.epl --name "{name}" --build\n\n'
+            f'Say "{name} Android App"\n\n'
+            'Define Function greet Takes username\n'
+            '    Return "Hello, " + username + " from " + "' + name + '" + "!"\n'
+            'End\n\n'
+            'Say greet("World")\n'
+        )
+        test_source = (
+            f'Note: Tests for {name}\n\n'
+            'Assert 1 + 1 == 2\n'
+            'Assert length("hello") == 5\n'
+            'Say "All tests passed!"\n'
+        )
+        readme_body = _template_readme(
+            name,
+            template,
+            [
+                "epl run",
+                f"epl android src/main.epl --name '{name}' --build",
+                "epl test tests/",
+            ],
+            "Starter Android app. Generates a Kotlin/Jetpack Compose project and builds an APK.",
+        )
+    elif template == 'fullstack':
+        description = f"{name} — EPL full-stack web app"
+        dependencies = {"epl-web": f"^{__version__}", "epl-db": f"^{__version__}"}
+        scripts["serve"] = "epl serve src/main.epl"
+        main_source = (
+            f'Note: {name} — Full-stack web app with database\n\n'
+            f'Create app called "{name}"\n\n'
+            'Note: ── Database setup ──\n'
+            'Set db to db_open("' + name + '.db")\n'
+            'Call db_create_table(db, "users", Map with '
+            'id = "INTEGER PRIMARY KEY AUTOINCREMENT" '
+            'and name = "TEXT NOT NULL" '
+            'and email = "TEXT UNIQUE" '
+            'and created_at = "TEXT DEFAULT CURRENT_TIMESTAMP")\n\n'
+            'Note: ── Home page ──\n'
+            'Page "/" renders\n'
+            f'    Title "{name}"\n'
+            f'    Heading "{name}"\n'
+            '    Paragraph "A full-stack EPL web application."\n'
+            '    Link "/users" shows "View Users"\n'
+            'End\n\n'
+            'Note: ── Users page ──\n'
+            'Page "/users" renders\n'
+            '    Title "Users"\n'
+            '    Heading "User List"\n'
+            '    Set users to db_query(db, "SELECT * FROM users")\n'
+            '    For Each user in users\n'
+            '        Paragraph get(user, "name") + " — " + get(user, "email")\n'
+            '    End\n'
+            '    Link "/" shows "Back to home"\n'
+            'End\n\n'
+            'Note: ── API endpoints ──\n'
+            'API GET "/api/users" responds with\n'
+            '    Set users to db_query(db, "SELECT * FROM users")\n'
+            '    Return Map with success = True and data = users\n'
+            'End\n\n'
+            'API POST "/api/users" responds with\n'
+            '    Set body to request_body()\n'
+            '    Call db_execute(db, "INSERT INTO users (name, email) VALUES (?, ?)", '
+            'List with get(body, "name") and get(body, "email"))\n'
+            '    Return Map with success = True and message = "User created"\n'
+            'End\n\n'
+            'API GET "/api/health" responds with\n'
+            '    Set count to db_query_one(db, "SELECT COUNT(*) as total FROM users")\n'
+            '    Return Map with status = "ok" and total_users = get(count, "total")\n'
+            'End\n\n'
+            'Note: ── Start ──\n'
+            'Start app on port 8000\n'
+        )
+        test_source = (
+            'Import "epl-test"\n\n'
+            'Call test("fullstack template smoke", Function()\n'
+            '    Call expect_true(True, "starter fullstack test")\n'
+            'End)\n\n'
+            'Call test_summary()\n'
+        )
+        readme_body = _template_readme(
+            name,
+            template,
+            [
+                "epl install",
+                "epl serve",
+                "epl run",
+            ],
+            "Full-stack web app with pages, REST API, SQLite database, and user management.",
         )
     else:
         main_source = (

@@ -36,7 +36,8 @@ epl hello.epl
 ```
 
 Output:
-```
+
+```text
 Hello, World!
 ```
 
@@ -118,6 +119,7 @@ epl repl
 ```
 
 Useful REPL commands:
+
 - `.vars` — show all defined variables
 - `.help` — show available commands
 - `.exit` — quit
@@ -139,6 +141,7 @@ End Server
 ```
 
 Run it:
+
 ```bash
 epl serve myapp.epl
 ```
@@ -180,7 +183,7 @@ No installation needed — try EPL instantly at:
 ## 9. Next Steps
 
 | Resource | Link |
-|----------|------|
+| -------- | ---- |
 | Official Book (PDF) | [epl_book.pdf](epl_book.pdf) |
 | Language Reference | [language-reference.md](language-reference.md) |
 | Tutorials | [tutorials.md](tutorials.md) |

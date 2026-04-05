@@ -1,0 +1,102 @@
+site_name: EPL — English Programming Language
+site_description: Write code the way you think. In plain English.
+site_author: Abneesh Singh
+site_url: https://abneeshsingh21.github.io/EPL/
+repo_url: https://github.com/abneeshsingh21/EPL
+repo_name: abneeshsingh21/EPL
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: en
+  palette:
+    - scheme: slate
+      primary: blue
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: blue
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/code-tags
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - toc.follow
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/abneeshsingh21/EPL
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/eplang/
+  generator: false
+
+extra_css:
+  - stylesheets/extra.css
+
+copyright: Copyright &copy; 2024–2026 Abneesh Singh
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started.md
+    - Tutorials: tutorials.md
+    - Playground: playground.md
+  - Language Reference:
+    - Syntax Reference: language-reference.md
+    - Language Specification: language-spec.md
+    - Standard Library: stdlib-reference.md
+  - Guides:
+    - Web Development: guides/web.md
+    - Database & ORM: guides/database.md
+    - Android Apps: guides/android.md
+    - Package Manager: package-manager.md
+    - Migration Guide: migration-guide.md
+  - Architecture:
+    - System Architecture: architecture.md
+    - Benchmarks: benchmarks.md
+    - Support Matrix: support-matrix.md
+  - Examples: examples.md
+  - Troubleshooting: troubleshooting.md
