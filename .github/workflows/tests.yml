@@ -1,0 +1,35 @@
+name: Tests
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'epl/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.9', '3.11', '3.12']
+        exclude:
+          - os: macos-latest
+            python-version: '3.9'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install EPL
+        run: pip install -e ".[dev]" 2>/dev/null || pip install -e .
+      - name: Run tests
+        run: python -m pytest tests/ -x --tb=short -q
+      - name: Verify CLI
+        run: |
+          epl --version
+          echo 'Say "Hello from CI"' > test_ci.epl
+          epl run test_ci.epl
