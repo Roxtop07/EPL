@@ -6,9 +6,24 @@ The actual implementations live in epl/stdlib.py (the monolith), and this
 package provides clean import boundaries for future gradual extraction.
 
 Usage:
-    from epl.stdlib_modules import http, db, datetime_funcs
-    from epl.stdlib_modules.registry import get_module_for_function
+    from epl.stdlib_modules import web, db, concurrency, math, collections
+    from epl.stdlib_modules.web import get_functions, describe
+    from epl.stdlib_modules import get_domain
 """
+
+# Lazy sub-module imports (only loaded when accessed)
+from importlib import import_module as _import_module
+
+
+def __getattr__(name):
+    """Lazy-load domain submodules on first access."""
+    _sub = {'web', 'db', 'concurrency', 'math', 'collections'}
+    if name in _sub:
+        mod = _import_module(f'epl.stdlib_modules.{name}')
+        globals()[name] = mod
+        return mod
+    raise AttributeError(f'module {__name__!r} has no attribute {name!r}')
+
 
 # Domain module map — which function belongs to which domain
 DOMAIN_MAP = {

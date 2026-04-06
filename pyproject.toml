@@ -30,7 +30,13 @@ llvm = ["llvmlite>=0.41.0"]
 ai = ["openai>=1.0.0"]
 server = ["waitress>=2.1.0"]
 redis = ["redis>=5.0.0"]
+repl = ["prompt_toolkit>=3.0.0", "pygments>=2.15.0"]
 dev = ["pytest>=7.0", "coverage>=7.0", "build>=1.0.0"]
+all = [
+    "waitress>=2.1.0",
+    "prompt_toolkit>=3.0.0",
+    "pygments>=2.15.0",
+]
 
 [project.scripts]
 epl = "epl.cli:main"

@@ -1,0 +1,95 @@
+# Number Guessing Game in EPL
+# Demonstrates: random, loops, input, conditionals, formatting
+#
+# Run:  epl run examples/guessing_game.epl
+
+Print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+Print "       🎯  Number Guessing Game  🎯"
+Print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+Print ""
+
+# Game settings
+Create secret as random(1, 100)
+Create max_attempts as 7
+Create attempts as 0
+Create won as false
+
+Print "I'm thinking of a number between 1 and 100."
+Print "You have " + to_text(max_attempts) + " attempts. Good luck!"
+Print ""
+
+Repeat
+    If attempts is greater than or equal to max_attempts
+        Print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        Print "  ❌  Game Over!"
+        Print "  The number was " + to_text(secret) + ". Better luck next time!"
+        Stop
+    End If
+
+    Create remaining as max_attempts - attempts
+    Create guess_text as ask("  Attempt " + to_text(attempts + 1) + "/" + to_text(max_attempts) + " → ")
+
+    Try
+        Create guess as to_integer(trim(guess_text))
+    Catch err
+        Print "  Please enter a valid number."
+        Continue
+    End Try
+
+    If guess is less than 1 or guess is greater than 100
+        Print "  Please guess between 1 and 100."
+        Continue
+    End If
+
+    Set attempts to attempts + 1
+
+    If guess equal to secret
+        Set won to true
+        Print ""
+        Print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        Print "  🎉  Correct! You got it in " + to_text(attempts) + " attempts!"
+
+        If attempts equal to 1
+            Print "  WOW — first try! You're a legend! 🏆"
+        Else If attempts is less than or equal to 3
+            Print "  Excellent! Very few guesses needed! ⭐"
+        Else If attempts is less than or equal to 5
+            Print "  Nice work! Right in the zone. 👍"
+        Else
+            Print "  Made it just in time! 😅"
+        End If
+
+        Stop
+    Else If guess is less than secret
+        Create diff as secret - guess
+        If diff is greater than 25
+            Print "  📉  Way too low! Try much higher."
+        Else If diff is greater than 10
+            Print "  📉  Too low! Go higher."
+        Else
+            Print "  🔥  Getting warm — a little higher!"
+        End If
+    Else
+        Create diff as guess - secret
+        If diff is greater than 25
+            Print "  📈  Way too high! Try much lower."
+        Else If diff is greater than 10
+            Print "  📈  Too high! Go lower."
+        Else
+            Print "  🔥  Getting warm — a little lower!"
+        End If
+    End If
+
+    Print "  (" + to_text(max_attempts - attempts) + " guesses left)"
+    Print ""
+
+End Repeat
+
+# Play again?
+Create again as ask("  Play again? (yes/no): ")
+If lowercase(trim(again)) equal to "yes" or lowercase(trim(again)) equal to "y"
+    Print ""
+    # Reload the game by running it again via import
+    Print "  Restarting..."
+    # In a real EPL project, use: Run "examples/guessing_game.epl"
+End If

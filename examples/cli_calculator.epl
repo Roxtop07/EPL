@@ -1,0 +1,116 @@
+# Calculator — Interactive CLI tool in EPL
+# Demonstrates: functions, loops, input, conditionals, error handling
+#
+# Run:  epl run examples/cli_calculator.epl
+
+Print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+Print "   EPL Calculator — Type 'help' or 'quit'"
+Print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+Print ""
+
+# History of calculations
+Create history as []
+
+Define Function evaluate_expression takes a, op, b
+    If op equal to "+"
+        Return a + b
+    End If
+    If op equal to "-"
+        Return a - b
+    End If
+    If op equal to "*"
+        Return a * b
+    End If
+    If op equal to "/"
+        If b equal to 0
+            Return "Error: Division by zero"
+        End If
+        Return a / b
+    End If
+    If op equal to "**"
+        Return a ** b
+    End If
+    If op equal to "%"
+        Return a % b
+    End If
+    Return "Error: Unknown operator"
+End Function
+
+Define Function show_history
+    If length(history) equal to 0
+        Print "  No calculations yet."
+    Else
+        Print "  Calculation history:"
+        For each item in history
+            Print "    " + item
+        End For
+    End If
+End Function
+
+Define Function show_help
+    Print "  Usage: <number> <operator> <number>"
+    Print "  Operators: + - * / ** %"
+    Print "  Commands:"
+    Print "    help     Show this help"
+    Print "    history  Show calculation history"
+    Print "    clear    Clear history"
+    Print "    quit     Exit calculator"
+    Print ""
+End Function
+
+# Main REPL loop
+Repeat
+    Create input_line as ask("calc> ")
+    Create trimmed as trim(input_line)
+
+    If trimmed equal to "quit" or trimmed equal to "exit"
+        Print "Goodbye!"
+        Stop
+    End If
+
+    If trimmed equal to "help"
+        Call show_help()
+        Continue
+    End If
+
+    If trimmed equal to "history"
+        Call show_history()
+        Continue
+    End If
+
+    If trimmed equal to "clear"
+        Set history to []
+        Print "  History cleared."
+        Continue
+    End If
+
+    If trimmed equal to ""
+        Continue
+    End If
+
+    # Parse "number operator number"
+    Try
+        Create parts as split(trimmed, " ")
+        If length(parts) is not equal to 3
+            Print "  Usage: <number> <op> <number>  (e.g. 5 + 3)"
+            Continue
+        End If
+
+        Create a  as to_decimal(parts[0])
+        Create op as trim(parts[1])
+        Create b  as to_decimal(parts[2])
+
+        Create result as evaluate_expression(a, op, b)
+
+        If type_of(result) equal to "text" and contains(result, "Error")
+            Print "  " + result
+        Else
+            Create line as trimmed + " = " + to_text(result)
+            Print "  = " + to_text(result)
+            Call append(history, line)
+        End If
+    Catch err
+        Print "  Invalid input: " + err
+    End Try
+
+End Repeat

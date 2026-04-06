@@ -521,96 +521,54 @@ def show_ir(filepath: str):
 
 
 def run_repl():
-    """Start the interactive EPL REPL with tab completion."""
-    print("=" * 55)
-    print(f"  EPL - English Programming Language v{VERSION}")
-    print("  Type EPL statements to execute them.")
-    print('  Type ".help" for commands, "exit" to leave.')
-    print("=" * 55)
-    print()
-
-    # Set up tab completion
-    _EPL_KEYWORDS = [
-        'Create', 'Set', 'Print', 'Display', 'If', 'Else', 'End',
-        'While', 'For', 'Each', 'Repeat', 'Function', 'Return',
-        'Class', 'Extends', 'Try', 'Catch', 'Finally', 'Throw',
-        'Match', 'When', 'Default', 'Import', 'From', 'Module',
-        'Async', 'Await', 'Yield', 'Assert', 'Constant', 'Enum',
-        'equal to', 'is greater than', 'is less than', 'not equal to',
-        'and', 'or', 'not', 'true', 'false', 'nothing',
-        'takes', 'returns', 'with', 'as', 'in', 'to',
-        'length', 'append', 'remove', 'contains', 'replace',
-        'uppercase', 'lowercase', 'split', 'join', 'trim',
-        'to_integer', 'to_text', 'to_decimal', 'type_of',
-        'read_file', 'write_file', 'file_exists',
-        'random', 'round', 'floor', 'ceil', 'absolute',
-        'max', 'min', 'sum', 'sort', 'reverse', 'unique',
-        'Map', 'List', 'keys', 'values',
-    ]
-    try:
-        import readline
-    except ImportError:
-        try:
-            import pyreadline3 as readline
-        except ImportError:
-            readline = None
-    if readline:
-        def _completer(text, state):
-            matches = [k for k in _EPL_KEYWORDS if k.lower().startswith(text.lower())]
-            return matches[state] if state < len(matches) else None
-        readline.set_completer(_completer)
-        readline.parse_and_bind('tab: complete')
-        # Persistent history
-        import pathlib as _pl
-        _hist_file = _pl.Path.home() / '.epl_history'
-        try:
-            readline.read_history_file(str(_hist_file))
-        except (FileNotFoundError, OSError):
-            pass
-        import atexit
-        atexit.register(lambda: readline.write_history_file(str(_hist_file)))
-
+    """Start the interactive EPL REPL (uses prompt_toolkit if available)."""
     interpreter = Interpreter()
-    history = []
-    session_lines = []  # all executed source lines this session
+    try:
+        from epl.repl import start_rich_repl
+        start_rich_repl(
+            run_source_fn=run_source,
+            count_open_blocks_fn=count_open_blocks,
+            handle_command_fn=_handle_repl_command,
+            interpreter=interpreter,
+        )
+    except Exception:
+        # Absolute last-resort fallback to bare REPL if import explodes
+        _bare_repl(interpreter)
 
+
+def _bare_repl(interpreter):
+    """Absolute fallback REPL — no deps, no color."""
+    print(f"  EPL REPL (plain mode) — type 'exit' to quit")
+    history, session_lines = [], []
     while True:
         try:
-            line = input("EPL> ")
+            line = input('EPL> ')
         except (EOFError, KeyboardInterrupt):
-            print("\nGoodbye!")
+            print('\nGoodbye!')
             break
-
         line = line.strip()
         if not line:
             continue
-
-        if line.lower() in ('exit', 'quit', 'exit.', 'quit.'):
-            print("Goodbye!")
+        if line.lower() in ('exit', 'quit'):
+            print('Goodbye!')
             break
-
-        # REPL commands (dot-prefixed)
         if line.startswith('.'):
             _handle_repl_command(line, history, session_lines, interpreter)
             continue
-
         source = line
-        open_blocks = count_open_blocks(source)
-
-        while open_blocks > 0:
+        open_b = count_open_blocks(source)
+        while open_b > 0:
             try:
-                continuation = input("...  ")
+                c = input('...  ')
             except (EOFError, KeyboardInterrupt):
-                print("\nInput cancelled.")
-                source = ""
+                source = ''
                 break
-            source += "\n" + continuation
-            open_blocks = count_open_blocks(source)
-
+            source += '\n' + c
+            open_b = count_open_blocks(source)
         if source:
             history.append(source)
             session_lines.append(source)
-            run_source(source, interpreter, "<repl>")
+            run_source(source, interpreter, '<repl>')
 
 
 def _handle_repl_command(cmd, history, session_lines, interpreter):

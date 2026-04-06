@@ -1,0 +1,58 @@
+Note: ═══════════════════════════════════════════════════════
+Note: SPARK — Idea Board — JSON API Backend
+Note: Run:  python epl/cli.py run examples/apps/spark_board.epl
+Note: Open: http://localhost:4000
+Note: ═══════════════════════════════════════════════════════
+
+Create db equal to real_db_connect("spark.db", "spark_db")
+real_db_execute(db, "CREATE TABLE IF NOT EXISTS ideas (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, body TEXT NOT NULL, category TEXT NOT NULL DEFAULT 'General', pinned INTEGER NOT NULL DEFAULT 0, created TEXT DEFAULT CURRENT_TIMESTAMP)")
+
+Define Function get_all_ideas
+    Return real_db_query(db, "SELECT id,title,body,category,pinned,created FROM ideas ORDER BY pinned DESC, id DESC")
+End
+
+Define Function get_ideas_by_cat takes cat
+    Return real_db_query(db, "SELECT id,title,body,category,pinned,created FROM ideas WHERE lower(category)=lower(?) ORDER BY pinned DESC, id DESC", [cat])
+End
+
+Create webapp app
+
+Route "/" responds with
+    Set html_out To read file "examples/apps/spark_board.html"
+    Send text html_out
+End
+
+Route "/api/ideas" responds with
+    Send json get_all_ideas()
+End
+
+Route "/api/ideas/{cat}" responds with
+    Send json get_ideas_by_cat(cat)
+End
+
+Route "/api/add" responds with
+    Set req_data To web_request_data()
+    Set title    To trim(req_data["title"])
+    Set content  To trim(req_data["body"])
+    Set category To trim(req_data["category"])
+    If length(title) is greater than 0 Then
+        real_db_execute(db, "INSERT INTO ideas (title,body,category) VALUES (?,?,?)", [title, content, category])
+    End
+    Send json Map with ok = 1
+End
+
+Route "/api/pin/{id}" responds with
+    real_db_execute(db, "UPDATE ideas SET pinned = CASE WHEN pinned=0 THEN 1 ELSE 0 END WHERE id=?", [to_integer(id)])
+    Send json Map with ok = 1
+End
+
+Route "/api/delete/{id}" responds with
+    real_db_execute(db, "DELETE FROM ideas WHERE id=?", [to_integer(id)])
+    Send json Map with ok = 1
+End
+
+Say "╔══════════════════════════════════╗"
+Say "║  Spark - Idea Board              ║"
+Say "║  http://localhost:4000           ║"
+Say "╚══════════════════════════════════╝"
+Start app on port 4000
