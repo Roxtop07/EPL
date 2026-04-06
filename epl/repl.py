@@ -132,15 +132,16 @@ def _build_prompt_toolkit_repl(run_source_fn, count_open_blocks_fn,
     )
 
     from epl import __version__ as _VER
+    _bar = '\u2501' * 55
     print_formatted_text(HTML(
-        f'\n<ansibrightblue>{'━' * 55}</ansibrightblue>\n'
-        f'  <b>EPL</b> – English Programming Language  '
-        f'<ansiyellow>v{_VER}</ansiyellow>\n'
-        f'  Type EPL code and press <b>Enter</b>.\n'
-        f'  <ansicyan>.help</ansicyan> for commands · '
-        f'<ansicyan>Tab</ansicyan> to complete · '
-        f'<ansired>exit</ansired> to quit\n'
-        f'<ansibrightblue>{'━' * 55}</ansibrightblue>\n'
+        '\n<ansibrightblue>' + _bar + '</ansibrightblue>\n'
+        '  <b>EPL</b> \u2013 English Programming Language  '
+        '<ansiyellow>v' + _VER + '</ansiyellow>\n'
+        '  Type EPL code and press <b>Enter</b>.\n'
+        '  <ansicyan>.help</ansicyan> for commands \u00b7 '
+        '<ansicyan>Tab</ansicyan> to complete \u00b7 '
+        '<ansired>exit</ansired> to quit\n'
+        '<ansibrightblue>' + _bar + '</ansibrightblue>\n'
     ))
 
     def _toolbar():
