@@ -5,13 +5,13 @@ Supported EPL web facade package.
 ## Install
 
 ```bash
-epl install epl-web
+epl use epl-web
 ```
 
 ## Use
 
 ```epl
-Import "epl-web"
+use "epl-web"
 
 Create app equal to create_app("demo")
 Call get_route(app, "/", Function()
