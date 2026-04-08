@@ -1,163 +1,250 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EPL - Interactive Playground</title>
     
     <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- CodeMirror (Editor) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material-ocean.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script> <!-- We use python syntax highlighting as base for EPL -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
 
     <!-- Pyodide (Python WebAssembly) -->
     <script src="https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.js"></script>
 
     <style>
         :root {
-            --bg-dark: #09090b;
-            --bg-panel: #18181b;
-            --border: #27272a;
-            --text-main: #f4f4f5;
-            --text-muted: #a1a1aa;
-            --primary: #3b82f6;
+            --bg: #09090b;
+            --surface: #18181b;
+            --border: #3f3f46;
+            --text: #f4f4f5;
+            --text-dim: #a1a1aa;
+            --accent: #ff4500;
+            --accent-hover: #ff571a;
             --success: #10b981;
             --error: #ef4444;
-        End
+        }
 
-        body {
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: var(--bg);
+            color: var(--text);
             height: 100vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-        End
+            /* Grid background for technical feel */
+            background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                              linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: -1px -1px;
+        }
 
-        /* Navbar */
+        /* BRUTALIST NAV */
         nav {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            background: var(--bg-panel);
-            border-bottom: 1px solid var(--border);
-        End
+            align-items: stretch;
+            background: var(--bg);
+            border-bottom: 2px solid var(--border);
+            height: 60px;
+            z-index: 10;
+        }
 
         .logo {
             font-size: 1.25rem;
-            font-weight: 700;
-            color: white;
+            font-weight: 800;
+            color: var(--text);
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-        End
+            padding: 0 1.5rem;
+            border-right: 2px solid var(--border);
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            background: var(--surface);
+        }
         
-        .logo i { color: var(--primary); End
+        .logo span {
+            color: var(--accent);
+            margin-right: 8px;
+        }
+
+        .controls {
+            display: flex;
+            align-items: stretch;
+        }
+
+        .status-box {
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            border-left: 2px solid var(--border);
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-weight: 600;
+            background: var(--bg);
+        }
 
         .btn-run {
-            background: var(--success);
-            color: white;
+            background: var(--accent);
+            color: #000;
             border: none;
-            padding: 0.5rem 1.5rem;
-            border-radius: 6px;
-            font-weight: 600;
+            border-left: 2px solid var(--border);
+            padding: 0 2rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 1rem;
+            text-transform: uppercase;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            transition: opacity 0.2s;
-        End
+            gap: 0.75rem;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-        .btn-run:hover { opacity: 0.9; End
-        .btn-run:disabled { opacity: 0.5; cursor: not-allowed; End
+        .btn-run:hover:not(:disabled) {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: -4px 4px 0px rgba(255, 69, 0, 0.3);
+        }
 
-        /* Main Workspace */
+        .btn-run:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .btn-run:disabled {
+            background: var(--surface);
+            color: var(--text-dim);
+            cursor: not-allowed;
+        }
+
+        /* 60/40 SPLIT WORKSPACE */
         .workspace {
             display: flex;
             flex: 1;
+            padding: 20px;
+            gap: 20px;
             overflow: hidden;
-        End
+        }
 
-        .editor-container, .output-container {
-            flex: 1;
+        .panel {
+            background: var(--surface);
+            border: 2px solid var(--border);
             display: flex;
             flex-direction: column;
-            border-right: 1px solid var(--border);
-        End
+            box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s;
+        }
+        
+        .panel:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.6);
+            border-color: #52525b;
+        }
+
+        .editor-container {
+            flex: 6;
+        }
+
+        .output-container {
+            flex: 4;
+        }
 
         .panel-header {
-            padding: 0.75rem 1rem;
-            background: var(--bg-panel);
-            border-bottom: 1px solid var(--border);
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-muted);
+            padding: 0.75rem 1.25rem;
+            background: var(--border);
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--text);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-        End
+            letter-spacing: 0.1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-        /* CodeMirror Overrides */
+        /* CODEMIRROR OVERRIDES */
         .CodeMirror {
             flex: 1;
-            height: 100%;
+            height: 100% !important;
             font-family: 'JetBrains Mono', monospace;
             font-size: 14px;
-            background-color: var(--bg-dark) !important;
-        End
+            line-height: 1.6;
+            background-color: var(--surface) !important;
+            padding-top: 10px;
+        }
+        .CodeMirror-gutters {
+            background-color: var(--surface) !important;
+            border-right: 1px solid var(--border) !important;
+        }
 
-        /* Output Terminal */
+        /* TERMINAL */
         .terminal {
             flex: 1;
             background: #000;
             color: #d4d4d8;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-            padding: 1rem;
+            padding: 1.5rem;
             overflow-y: auto;
             white-space: pre-wrap;
-        End
+            word-wrap: break-word;
+            font-size: 13px;
+            line-height: 1.5;
+        }
 
-        .system-msg { color: #3b82f6; End
-        .error-msg { color: #ef4444; End
+        .system-msg { color: var(--accent); }
+        .error-msg { color: var(--error); }
+        .success-msg { color: var(--success); }
 
-        /* Loading Spinner */
-        .spinner {
-            animation: spin 1s linear infinite;
-        End
-        @keyframes spin { 100% { transform: rotate(360deg); End End
+        /* ANIMATIONS */
+        .spinner { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        /* SCROLLBARS */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg); border-left: 1px solid var(--border); }
+        ::-webkit-scrollbar-thumb { background: var(--border); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
     </style>
 </head>
 <body>
 
     <nav>
         <a href="index.html" class="logo">
-            <i class="fa-solid fa-code"></i> EPL Playground
+            <span>&#9632;</span> EPL Playground
         </a>
-        <div style="display: flex; gap: 1rem; align-items: center;">
-            <span id="status-text" class="text-muted" style="font-size: 0.9rem; color: var(--text-muted);">
-                <i class="fa-solid fa-circle-notch spinner"></i> Initializing Environment...
-            </span>
+        <div class="controls">
+            <div id="status-text" class="status-box">
+                <i class="fa-solid fa-circle-notch spinner" style="margin-right:8px; color: var(--accent);"></i> Booting Engine
+            </div>
             <button id="run-btn" class="btn-run" disabled onclick="runCode()">
-                <i class="fa-solid fa-play"></i> Run Code
+                <i class="fa-solid fa-play"></i> Execute
             </button>
         </div>
     </nav>
 
     <div class="workspace">
-        <div class="editor-container">
-            <div class="panel-header">Input.epl</div>
+        <div class="panel editor-container">
+            <div class="panel-header">
+                <span><i class="fa-solid fa-code"></i> INPUT.EPL</span>
+                <span style="color:var(--text-dim); font-size:0.7rem">v7.4.1</span>
+            </div>
             <textarea id="code-editor">Note: Welcome to the EPL Interactive Playground!
-Note: This code runs entirely in your browser using WebAssembly.
+Note: This runs a full compiled interpreter directly in your browser.
 
 name = "Developer"
 Say "Hello, " + name + "!"
@@ -166,7 +253,6 @@ Repeat 3 times
     Say "Looping..."
 End
 
-Note: Try defining a function
 Function greet takes person
     Return "Nice to meet you, " + person
 End
@@ -175,36 +261,41 @@ Say greet("Abneesh")
 </textarea>
         </div>
         
-        <div class="output-container">
-            <div class="panel-header">Output</div>
-            <div id="terminal" class="terminal"><span class="system-msg">> Engine booting up... Please wait about 10 seconds for the WebAssembly backend to download...</span><br></div>
+        <div class="panel output-container">
+            <div class="panel-header">
+                <span><i class="fa-solid fa-terminal"></i> OUTPUT</span>
+                <i class="fa-solid fa-trash" style="cursor:pointer; color:var(--text-dim);" onclick="clearTerminal()" title="Clear"></i>
+            </div>
+            <div id="terminal" class="terminal"><span class="system-msg">> Downloading LLVM/WASM boundaries. Please wait ~10s...</span><br></div>
         </div>
     </div>
 
     <script>
         // Initialize CodeMirror Editor
         const editor = CodeMirror.fromTextArea(document.getElementById("code-editor"), {
-            mode: "python", // Best approximate for now
-            theme: "material-ocean",
+            mode: "python", // EPL is close enough visually to python for the highlighter
+            theme: "monokai",
             lineNumbers: true,
             indentUnit: 4,
-            matchBrackets: true
-        End);
+            matchBrackets: true,
+            viewportMargin: Infinity
+        });
 
-        // Terminal output helper
+        // Terminal Helper
         const terminal = document.getElementById("terminal");
         function printToTerminal(text, type='normal') {
             const span = document.createElement('span');
             if(type === 'error') span.className = 'error-msg';
             if(type === 'system') span.className = 'system-msg';
+            if(type === 'success') span.className = 'success-msg';
             span.innerText = text + '\n';
             terminal.appendChild(span);
             terminal.scrollTop = terminal.scrollHeight;
-        End
+        }
 
         function clearTerminal() {
             terminal.innerHTML = '';
-        End
+        }
 
         // Pyodide Instance
         let pyodideReady = false;
@@ -212,7 +303,7 @@ Say greet("Abneesh")
 
         async function initEngine() {
             try {
-                // 1. Load Pyodide (Python WASM environment)
+                // 1. Load Pyodide
                 pyodide = await loadPyodide();
                 
                 // 2. Install required Pyodide packages
@@ -221,22 +312,23 @@ Say greet("Abneesh")
                 await pyodide.loadPackage("ssl");
                 const micropip = pyodide.pyimport("micropip");
                 
-                printToTerminal("> Installing EPL compiler backend from PyPI...", "system");
+                printToTerminal("> Installing standard EPL Compiler (v7.4.1)...", "system");
                 
-                // 3. Install EPL from PyPI!
+                // 3. Install EPL from PyPI
                 await micropip.install("eplang");
                 
-                printToTerminal("> Environment Ready! You can now run EPL code. \n", "system");
+                printToTerminal("> Kernel Initialized. System Ready.", "success");
+                printToTerminal("--------------------------------------------------\n");
                 
-                document.getElementById('status-text').innerHTML = '<i class="fa-solid fa-check" style="color:#10b981"></i> Engine Ready';
+                document.getElementById('status-text').innerHTML = '<i class="fa-solid fa-check" style="color:var(--success); margin-right:8px;"></i> Runtime Online';
                 document.getElementById('run-btn').disabled = false;
                 pyodideReady = true;
 
-            End catch (err) {
-                printToTerminal(`> Failed to initialize: ${errEnd`, "error");
-                document.getElementById('status-text').innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#ef4444"></i> Engine Error';
-            End
-        End
+            } catch (err) {
+                printToTerminal(`> KERNEL PANIC: ${err}`, "error");
+                document.getElementById('status-text').innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:var(--error); margin-right:8px;"></i> System Offline';
+            }
+        }
 
         async function runCode() {
             if(!pyodideReady) return;
@@ -244,7 +336,7 @@ Say greet("Abneesh")
             clearTerminal();
             const eplCode = editor.getValue();
             
-            // We write a small python script that imports EPL and runs the string
+            // Core EPL Python Execution Bridge
             const pythonRunner = `
 import sys
 import io
@@ -280,14 +372,13 @@ sys.stdout = stdout
 
 output_res = ""
 try:
-    code = """${eplCode.replace(/"/g, '\\"')End"""
+    code = """${eplCode.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"""
     
     program = _parse_epl_program(code, "playground.epl")
     
     interpreter = Interpreter(safe_mode=True)
     interpreter.execute(program)
     
-    # Capture output
     output_res = stdout.getvalue()
 except Exception as e:
     output_res = "ERROR: " + str(e)
@@ -298,19 +389,20 @@ output_res
 `;
 
             try {
-                // Execute in WebAssembly
-                printToTerminal("> Running code...\n", "system");
+                printToTerminal(`> Executing [${new Date().toLocaleTimeString()}]...`, "system");
                 const result = await pyodide.runPythonAsync(pythonRunner);
                 
-                if(result && result.startsWith && result.startsWith("ERROR:")) {
+                if(result && typeof result === 'string' && result.startsWith("ERROR:")) {
                     printToTerminal(result, "error");
-                End else {
+                } else if (result) {
                     printToTerminal(result);
-                End
-            End catch (err) {
-                printToTerminal(`Execution Error:\n${errEnd`, "error");
-            End
-        End
+                } else {
+                    printToTerminal("[Program exited with code 0]", "system");
+                }
+            } catch (err) {
+                printToTerminal(`FATAL ERROR:\n${err}`, "error");
+            }
+        }
 
         // Start booting engine on page load
         initEngine();
