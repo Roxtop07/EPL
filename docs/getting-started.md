@@ -48,8 +48,8 @@ Hello, World!
 ### Variables
 
 ```epl
-Create name equal to "Alice"
-Create age equal to 25
+name = "Alice"
+age = 25
 Say "Hello, " + name
 Say "You are " + age + " years old"
 ```
@@ -57,7 +57,7 @@ Say "You are " + age + " years old"
 ### Conditionals
 
 ```epl
-Create score equal to 85
+score = 85
 
 If score is greater than 90 then
     Say "Grade: A"
@@ -75,7 +75,7 @@ Repeat 5 times
 End Repeat
 
 Note: Loop over a list
-Create fruits equal to ["apple", "banana", "mango"]
+fruits = ["apple", "banana", "mango"]
 For Each fruit in fruits
     Say fruit
 End For
@@ -84,7 +84,7 @@ End For
 ### Functions
 
 ```epl
-Define Function greet Takes name
+Function greet takes name
     Return "Hello, " + name + "!"
 End Function
 
@@ -95,7 +95,7 @@ Say greet("World")
 
 ```epl
 Class Animal
-    Define Function Begin Takes name
+    Function Begin takes name
         Set this.name equal to name
     End Function
 
@@ -104,7 +104,7 @@ Class Animal
     End Function
 End Class
 
-Create dog equal to New Animal("Rex")
+dog = New Animal("Rex")
 Call dog.speak()
 ```
 

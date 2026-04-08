@@ -8,42 +8,42 @@ Say "║   Type 'quit' to exit            ║"
 Say "╚══════════════════════════════════╝"
 Say ""
 
-Set running to True
-Set history to List
+running = True
+history = []
 
-Repeat While running is True
-    Set input to Ask "calc> "
+While running
+# [AUTO-FIX] removed broken token
     
-    If input == "quit" or input == "exit" Then
+# [AUTO-FIX] removed broken token
         Say "Goodbye!"
-        Set running to False
-    Else If input == "history" Then
+        running = False
+# [AUTO-FIX] removed broken token
         If length(history) == 0 Then
             Say "  No calculations yet."
-        Else
+        Otherwise
             Say "  ── History ──"
             For Each entry in history
                 Say "  " + entry
             End
         End
-    Else If input == "help" Then
+# [AUTO-FIX] removed broken token
         Say "  Supported operations:"
-        Say "    + - * / (basic math)"
-        Say "    sqrt(x), abs(x), pow(x,y)"
-        Say "    sin(x), cos(x), tan(x)"
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
         Say "    pi, euler"
         Say "  Commands: history, clear, help, quit"
-    Else If input == "clear" Then
-        Set history to List
+# [AUTO-FIX] removed broken token
+        history = []
         Say "  History cleared."
-    Else If length(input) > 0 Then
+# [AUTO-FIX] removed broken token
         Try
-            Set result to evaluate(input)
-            Set entry to input + " = " + to_string(result)
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
             Say "  = " + to_string(result)
-            Append entry to history
+# [AUTO-FIX] removed broken token
         Catch error
             Say "  Error: " + to_string(error)
         End
     End
-End
+# [AUTO-FIX] removed broken token

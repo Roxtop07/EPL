@@ -6,28 +6,28 @@ Print "=== EPL Built-in Functions Demo ==="
 Print ""
 
 Note: --- DateTime ---
-Create ts equal to timestamp()
+ts = timestamp()
 Print "Current timestamp: " + to_text(floor(ts))
-Create today_date equal to today()
+today_date = today()
 Print "Today: " + today_date
 
 Print ""
 Note: --- Crypto ---
-Create hash_val equal to hash_sha256("Hello EPL!")
+hash_val = hash_sha256("Hello EPL!")
 Print "SHA256: " + hash_val
-Create encoded equal to base64_encode("Secret message")
+encoded = base64_encode("Secret message")
 Print "Base64 encoded: " + encoded
-Create decoded equal to base64_decode(encoded)
+decoded = base64_decode(encoded)
 Print "Base64 decoded: " + decoded
-Create id equal to uuid4()
+id = uuid4()
 Print "UUID: " + id
 
 Print ""
 Note: --- Regex ---
-Create sample equal to "The price is 42.50 and 18.75"
-Create matches equal to regex_find_all("[0-9]+\\.[0-9]+", sample)
+sample = "The price is 42.50 and 18.75"
+matches = regex_find_all("[0-9]+\\.[0-9]+", sample)
 Print "Found prices: " + to_text(matches)
-Create valid equal to regex_test("^[a-z]+@[a-z]+\\.[a-z]+$", "user@example.com")
+valid = regex_test("^[a-z]+@[a-z]+\\.[a-z]+$", "user@example.com")
 Print "Email valid: " + to_text(valid)
 
 Print ""
@@ -41,18 +41,18 @@ Print "power(2, 10): " + to_text(power(2, 10))
 
 Print ""
 Note: --- Collections ---
-Create names equal to ["Alice", "Bob", "Charlie"]
-Create scores equal to [95, 87, 92]
-Create lookup equal to dict_from_lists(names, scores)
+names = ["Alice", "Bob", "Charlie"]
+scores = [95, 87, 92]
+lookup = dict_from_lists(names, scores)
 Print "Dict: " + to_text(lookup)
 Print "Keys: " + to_text(keys(lookup))
 Print "Values: " + to_text(values(lookup))
 
 Print ""
 Note: --- URL Encoding ---
-Create url equal to url_encode("hello world & more")
+url = url_encode("hello world & more")
 Print "Encoded: " + url
-Create orig equal to url_decode(url)
+orig = url_decode(url)
 Print "Decoded: " + orig
 
 Print ""
@@ -63,9 +63,9 @@ Print "Lowercase: " + lowercase("HELLO WORLD")
 
 Print ""
 Note: --- JSON ---
-Create json_str equal to json_stringify(lookup)
+json_str = json_stringify(lookup)
 Print "JSON: " + json_str
-Create parsed equal to json_parse(json_str)
+parsed = json_parse(json_str)
 Print "Parsed back: " + to_text(parsed)
 
 Print ""

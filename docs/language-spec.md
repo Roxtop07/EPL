@@ -60,7 +60,7 @@ Identifiers start with a letter or underscore and may contain letters, digits, a
 Strings support `$variable` and `${expression}` interpolation:
 
 ```epl
-Create name equal to "World"
+name = "World"
 Say "Hello, $name!"              Note: Hello, World!
 Say "2 + 2 = ${2 + 2}"          Note: 2 + 2 = 4
 ```
@@ -96,10 +96,10 @@ Statements are line-terminated. One statement per line (no semicolons required).
 ### 3.2 Variable Declaration
 
 ```epl
-Create x equal to 10
-Create name equal to "Alice"
-Create items equal to [1, 2, 3]
-Create config equal to {"port": 8080, "debug": True}
+x = 10
+name = "Alice"
+items = [1, 2, 3]
+config = Map with port = 8080 and debug = True
 ```
 
 English alias:
@@ -110,15 +110,15 @@ Remember x as 10
 ### 3.3 Variable Assignment
 
 ```epl
-Set x to 20
-Set name to "Bob"
+x = 20
+name = "Bob"
 ```
 
 Compound assignment:
 ```epl
-Set x to x + 1      Note: standard
-Set x += 1           Note: shorthand increment
-Set x -= 5           Note: shorthand decrement
+x = x + 1      Note: standard
+Increase x by 1           Note: shorthand increment
+Decrease x by 5           Note: shorthand decrement
 Set x *= 2           Note: shorthand multiply
 Set x /= 4           Note: shorthand divide
 Set x %= 3           Note: shorthand modulo
@@ -145,8 +145,8 @@ Show result              Note: alias for Print
 ### 3.6 Input
 
 ```epl
-Create name equal to Input "What is your name? "
-Create age equal to Ask "How old are you? "    Note: alias
+name = ask("What is your name? ")
+age = ask("How old are you? ")    Note: alias
 ```
 
 ---
@@ -186,39 +186,39 @@ Create age equal to Ask "How old are you? "    Note: alias
 ### 4.4 String Operations
 
 ```epl
-Create full equal to first + " " + last     Note: concatenation
-Create len equal to length(name)             Note: length
-Create sub equal to substring(name, 0, 3)   Note: substring
-Create up equal to uppercase(name)           Note: uppercase
-Create low equal to lowercase(name)          Note: lowercase
+full = first + " " + last     Note: concatenation
+len = length(name)             Note: length
+sub = substring(name, 0, 3)   Note: substring
+up = uppercase(name)           Note: uppercase
+low = lowercase(name)          Note: lowercase
 ```
 
 ### 4.5 List Operations
 
 ```epl
-Create items equal to [1, 2, 3]
-append(items, 4)                    Note: add to end
-remove(items, 2)                    Note: remove first occurrence
-Create first equal to items[0]      Note: index access
-Create len equal to length(items)   Note: list length
-Create has equal to contains(items, 3)  Note: membership test
+items = [1, 2, 3]
+items.push(4)  Note: add to end
+items.remove(2)  Note: remove first occurrence
+first = items[0]      Note: index access
+len = length(items)   Note: list length
+has = contains(items, 3)  Note: membership test
 ```
 
 ### 4.6 Dictionary Operations
 
 ```epl
-Create config equal to {"host": "localhost", "port": 8080}
-Create host equal to config["host"]         Note: access by key
+config = Map with host = "localhost" and port = 8080
+host = config.host         Note: access by key
 Set config["debug"] to True                 Note: set key
-Create ks equal to keys(config)             Note: get all keys
-Create vs equal to values(config)           Note: get all values
+ks = keys(config)             Note: get all keys
+vs = values(config)           Note: get all values
 ```
 
 ### 4.7 Member Access
 
 ```epl
-Create len equal to name.length        Note: property access
-Create up equal to name.upper()        Note: method call
+len = name.length        Note: property access
+up = name.upper()        Note: method call
 Module::function_name()                Note: module-scoped access
 ```
 
@@ -229,23 +229,23 @@ Module::function_name()                Note: module-scoped access
 ### 5.1 If / Else
 
 ```epl
-If condition Then
+If condition then
     Note: body
 End
 
-If x > 10 Then
+If x > 10 then
     Say "Big"
-Else
+Otherwise
     Say "Small"
 End
 
 If score >= 90 Then
     Say "A"
-Else If score >= 80 Then
+Otherwise If score >= 80 Then
     Say "B"
-Else If score >= 70 Then
+Otherwise If score >= 70 Then
     Say "C"
-Else
+Otherwise
     Say "F"
 End
 ```
@@ -268,10 +268,10 @@ EndMatch
 ### 5.3 While Loop
 
 ```epl
-Create counter equal to 0
+counter = 0
 While counter < 10
     Say counter
-    Set counter to counter + 1
+    counter = counter + 1
 End
 ```
 
@@ -290,7 +290,7 @@ End
 ### 5.5 For Each Loop
 
 ```epl
-Create names equal to ["Alice", "Bob", "Charlie"]
+names = ["Alice", "Bob", "Charlie"]
 For Each name In names
     Say "Hello, $name!"
 End
@@ -325,27 +325,27 @@ End
 ### 6.1 Definition
 
 ```epl
-Define Function greet Takes name
+Function greet takes name
     Say "Hello, $name!"
-EndFunction
+End
 
-Define Function add Takes a, b
+Function add takes a, b
     Return a + b
-EndFunction
+End
 
-Define Function factorial Takes n
+Function factorial takes n
     If n <= 1 Then
         Return 1
     End
     Return n * factorial(n - 1)
-EndFunction
+End
 ```
 
 ### 6.2 Calling
 
 ```epl
 greet("Alice")
-Create result equal to add(3, 4)
+result = add(3, 4)
 ```
 
 ### 6.3 Default Parameters
@@ -355,7 +355,7 @@ Functions without required arguments can be called with fewer arguments.
 ### 6.4 Lambda / Anonymous Functions
 
 ```epl
-Create double equal to Lambda x: x * 2
+double = Lambda x -> x * 2
 Say double(5)          Note: 10
 ```
 
@@ -367,57 +367,57 @@ Say double(5)          Note: 10
 
 ```epl
 Class Animal
-    Constructor Takes name, sound
-        Set Self.name to name
-        Set Self.sound to sound
-    EndConstructor
+    Function init takes name, sound
+        Self.name = name
+        Self.sound = sound
+    End
 
-    Method speak
+    Function speak
         Say "$Self.name says $Self.sound!"
-    EndMethod
+    End
 
-    Method get_name
+    Function get_name
         Return Self.name
-    EndMethod
-EndClass
+    End
+End
 ```
 
 ### 7.2 Instantiation
 
 ```epl
-Create dog equal to new Animal("Dog", "Woof")
+dog = new Animal("Dog", "Woof")
 dog.speak()            Note: Dog says Woof!
 ```
 
 ### 7.3 Inheritance
 
 ```epl
-Class Dog Inherits Animal
-    Constructor Takes name
-        Super("Dog: " + name, "Woof")
-        Set Self.tricks to []
-    EndConstructor
+Class Dog extends Animal
+    Function init takes name
+        Super.init("Dog: " + name, "Woof")
+        Self.tricks = []
+    End
 
-    Method learn Takes trick
+    Function learn takes trick
         append(Self.tricks, trick)
-    EndMethod
+    End
 
-    Method show_tricks
+    Function show_tricks
         Say "$Self.name knows: $Self.tricks"
-    EndMethod
-EndClass
+    End
+End
 ```
 
 ### 7.4 Static Methods
 
 ```epl
 Class MathUtils
-    Method Static add Takes a, b
+    Function add takes a, b
         Return a + b
-    EndMethod
-EndClass
+    End
+End
 
-Create result equal to MathUtils.add(3, 4)
+result = MathUtils.add(3, 4)
 ```
 
 ---
@@ -428,9 +428,9 @@ Create result equal to MathUtils.add(3, 4)
 
 ```epl
 Module Utils
-    Define Function helper Takes x
+    Function helper takes x
         Return x * 2
-    EndFunction
+    End
 
     Constant VERSION = "1.0"
 End
@@ -438,7 +438,7 @@ End
 
 Access via `Module::member`:
 ```epl
-Create result equal to Utils::helper(5)
+result = Utils::helper(5)
 Say Utils::VERSION
 ```
 
@@ -475,9 +475,9 @@ Import "crypto"                Note: hashing, encoding, random
 ### 8.5 Python Bridge
 
 ```epl
-Use python "json" as json
-Use python "os" as os
-Use python "requests" as req
+Import python "json" as json
+Import python "os" as os
+Import python "requests" as req
 ```
 
 For project-managed third-party packages, declare them in `epl.toml`:
@@ -505,13 +505,13 @@ EPL projects can also declare GitHub-hosted EPL packages in `[github-dependencie
 
 ```epl
 Try
-    Create result equal to risky_operation()
+    result = risky_operation()
     Say result
 Catch error
     Say "Error: $error"
 Finally
     cleanup()
-EndTry
+End
 ```
 
 ### 9.2 Throw
@@ -536,8 +536,12 @@ Assert name != Nothing
 ### 10.1 Routes
 
 ```epl
-Route GET "/" handler home_page
-Route POST "/api/data" handler process_data
+Route "/" shows
+    home_page()
+End
+Route "/api/data" responds with
+    process_data()
+End
 Create WebApp called app
 ```
 
@@ -553,7 +557,7 @@ Route "/" shows
 End
 
 Route "/api/users" responds with
-    Create users equal to ["Alice", "Bob"]
+    users = ["Alice", "Bob"]
     Send json Map with users = users and count = length(users)
 End
 ```
@@ -572,8 +576,8 @@ Inside native WebApp routes, EPL exposes:
 
 ```epl
 Route "/users/:name" responds with
-    Create name equal to request_params.name
-    Create role equal to request_data.get("role")
+    name = request_params.name
+    role = request_data.get("role")
     Send json Map with name = name and role = role and method = request_method
 End
 ```
@@ -584,7 +588,7 @@ Page strings support `$variable` interpolation from values defined earlier in th
 
 ```epl
 Route "/hello/:name" shows
-    Create title equal to "Welcome, " + request_params.name
+    title = "Welcome, " + request_params.name
 
     Page "$title"
         Heading "$title"
@@ -715,22 +719,22 @@ Plus 300+ built-in functions available without imports (math, string, file, data
 ### 13.1 Threads
 
 ```epl
-Create t equal to real_thread_run(my_function, arg1, arg2)
+t = real_thread_run(my_function, arg1, arg2)
 real_thread_join(t)
 ```
 
 ### 13.2 Channels
 
 ```epl
-Create ch equal to real_channel_create(10)  Note: buffered channel
+ch = real_channel_create(10)  Note: buffered channel
 real_channel_send(ch, "message")
-Create msg equal to real_channel_receive(ch)
+msg = real_channel_receive(ch)
 ```
 
 ### 13.3 Mutexes
 
 ```epl
-Create lock equal to real_mutex_create()
+lock = real_mutex_create()
 real_mutex_lock(lock)
 Note: critical section
 real_mutex_unlock(lock)
@@ -739,10 +743,10 @@ real_mutex_unlock(lock)
 ### 13.4 Async / Await
 
 ```epl
-Async Define Function fetch_data Takes url
-    Create response equal to Await http_get(url)
+Async Function fetch_data takes url
+    response = Await http_get(url)
     Return response
-EndFunction
+End
 ```
 
 ---
@@ -895,9 +899,12 @@ EPL is dynamically typed with optional static checking (`--strict` mode).
 ### 17.2 Type Checking Functions
 
 ```epl
-is_integer(42)       Note: True
-is_decimal(3.14)     Note: True
-is_text("hello")     Note: True
+is_integer(42)
+Note: True
+is_decimal(3.14)
+Note: True
+is_text("hello")
+Note: True
 is_boolean(True)     Note: True
 is_list([1, 2])      Note: True
 is_map({"a": 1})     Note: True

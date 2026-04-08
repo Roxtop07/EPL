@@ -27,13 +27,13 @@ Hello, World!
 
 ```epl
 Note: Creating variables
-Create name equal to "Alice"
-Create age equal to 25
-Create height equal to 5.6
+name = "Alice"
+age = 25
+height = 5.6
 
 Note: Math operations
-Create sum equal to age + 10
-Create doubled equal to age * 2
+sum = age + 10
+doubled = age * 2
 
 Say "Name: " + name
 Say "Age in 10 years: " + sum
@@ -52,13 +52,13 @@ Is adult: true
 ## Tutorial 3: Making Decisions
 
 ```epl
-Create temperature equal to 75
+temperature = 75
 
-If temperature > 90 Then
+If temperature > 90 then
     Say "It's hot outside!"
-Otherwise If temperature > 70 Then
+Otherwise If temperature > 70 then
     Say "Nice weather!"
-Otherwise If temperature > 50 Then
+Otherwise If temperature > 50 then
     Say "A bit chilly."
 Otherwise
     Say "Bundle up!"
@@ -81,7 +81,7 @@ For i from 1 to 5
 End
 
 Note: Loop through a list
-Create fruits equal to ["apple", "banana", "cherry"]
+fruits = ["apple", "banana", "cherry"]
 For each fruit in fruits
     Say "I like " + fruit
 End
@@ -110,7 +110,7 @@ Function add takes a, b
     Return a + b
 End
 
-Create result equal to add(10, 20)
+result = add(10, 20)
 Say "10 + 20 = " + result
 
 Note: Recursive function
@@ -137,22 +137,22 @@ Hello, Bob!
 ## Tutorial 6: Lists and Functional Programming
 
 ```epl
-Create numbers equal to [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 Note: Filter even numbers
-Create evens equal to numbers.filter(lambda x -> x % 2 == 0)
+evens = numbers.filter(lambda x -> x % 2 == 0)
 Say "Even numbers: " + evens
 
 Note: Double each number
-Create doubled equal to numbers.map(lambda x -> x * 2)
+doubled = numbers.map(lambda x -> x * 2)
 Say "Doubled: " + doubled
 
 Note: Sum all numbers
-Create total equal to numbers.reduce(lambda a, b -> a + b)
+total = numbers.reduce(lambda a, b -> a + b)
 Say "Total: " + total
 
 Note: Chain operations
-Create result equal to numbers.filter(lambda x -> x > 5).map(lambda x -> x * x)
+result = numbers.filter(lambda x -> x > 5).map(lambda x -> x * x)
 Say "Squares of numbers > 5: " + result
 ```
 
@@ -162,26 +162,26 @@ Say "Squares of numbers > 5: " + result
 
 ```epl
 Class BankAccount
-    Set owner to ""
-    Set balance to 0
+    owner = ""
+    balance = 0
 
-    Method deposit takes amount
-        Set balance to balance + amount
+    Function deposit takes amount
+        balance = balance + amount
         Say owner + " deposited " + amount + ". Balance: " + balance
     End
 
-    Method withdraw takes amount
-        If amount > balance Then
+    Function withdraw takes amount
+        If amount > balance then
             Say "Insufficient funds!"
         Otherwise
-            Set balance to balance - amount
+            balance = balance - amount
             Say owner + " withdrew " + amount + ". Balance: " + balance
         End
     End
 End
 
-Create account equal to new BankAccount
-Set account.owner to "Alice"
+account = new BankAccount
+account.owner = "Alice"
 account.deposit(100)
 account.deposit(50)
 account.withdraw(30)
@@ -210,7 +210,7 @@ End
 
 Note: Safe division
 Try
-    Create result equal to divide(10, 0)
+    result = divide(10, 0)
     Say "Result: " + result
 Catch error
     Say "Error caught: " + error
@@ -218,7 +218,7 @@ End
 
 Note: Normal division
 Try
-    Create result2 equal to divide(10, 2)
+    result2 = divide(10, 2)
     Say "Result: " + result2
 Catch error
     Say "Error: " + error
@@ -240,15 +240,15 @@ Note: Write a file
 write_file("data.txt", "Hello from EPL!")
 
 Note: Read it back
-Create content equal to read_file("data.txt")
+content = read_file("data.txt")
 Say "File says: " + content
 
 Note: Write JSON
-Create data equal to Map with name = "Alice" and scores = [95, 87, 92]
+data = Map with name = "Alice" and scores = [95, 87, 92]
 write_file("data.json", json_stringify(data))
 
 Note: Read JSON
-Create loaded equal to json_parse(read_file("data.json"))
+loaded = json_parse(read_file("data.json"))
 Say "Name: " + loaded.name
 ```
 

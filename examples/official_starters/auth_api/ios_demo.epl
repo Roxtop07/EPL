@@ -3,11 +3,11 @@ Note: Run: epl ios examples/official_starters/auth_api/ios_demo.epl --name "EPL 
 
 Say "EPL Auth Demo v1.0.0"
 
-Define Function greet Takes name
+Function greet takes name
     Return "Hello, " + name + "!"
 End
 
-Define Function make_greeting Takes username
+Function make_greeting takes username
     Return "Welcome to EPL Auth, " + username + "!"
 End
 

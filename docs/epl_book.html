@@ -172,7 +172,7 @@ blockquote footer{font-family:'Inter',sans-serif;font-size:13px;font-style:norma
     <a href="#ch14">Errors</a><a href="#ch15">Lists</a><a href="#ch16">Maps</a>
     <a href="#ch17">OOP</a><a href="#ch18">Lambdas</a><a href="#ch19">Files</a>
     <a href="#ch20">DB</a><a href="#ch21">Web</a><a href="#ch22">Python</a>
-    <a href="#ch23">Modules</a><a href="#ch24">Project</a><a href="#ch25">Best Practices</a><a href="#ch26">Reference</a>
+    <a href="#ch23">Modules</a><a href="#ch24">Project</a><a href="#ch25">Best Practices</a><a href="#ch26">Reference</a><a href="#ch27">v7.4 Features</a>
   </div>
   <button class="nav-pdf-btn" onclick="window.print()">&#8681; Save as PDF</button>
 </nav>
@@ -222,6 +222,7 @@ blockquote footer{font-family:'Inter',sans-serif;font-size:13px;font-style:norma
 <div class="toc-entry"><span class="toc-num">Ch 24</span><span class="toc-name"><a href="#ch24">Capstone Project — Library Management System</a></span><span class="toc-pg">•</span></div>
 <div class="toc-entry"><span class="toc-num">Ch 25</span><span class="toc-name"><a href="#ch25">Best Practices &amp; Professional Code Style</a></span><span class="toc-pg">•</span></div>
 <div class="toc-entry"><span class="toc-num">Ch 26</span><span class="toc-name"><a href="#ch26">EPL Quick Reference</a></span><span class="toc-pg">•</span></div>
+<div class="toc-entry"><span class="toc-num">Ch 27</span><span class="toc-name"><a href="#ch27">What's New in EPL v7.4.0</a></span><span class="toc-pg">?</span></div>
 <div class="toc-section">Appendices</div>
 <div class="toc-entry"><span class="toc-num">Appx A</span><span class="toc-name"><a href="#appxA">Standard Library Deep Dive</a></span><span class="toc-pg">•</span></div>
 <div class="toc-entry"><span class="toc-num">Appx B</span><span class="toc-name"><a href="#appxB">Formal Grammar Reference (EBNF)</a></span><span class="toc-pg">•</span></div>
@@ -692,7 +693,7 @@ primary       ::= INTEGER | FLOAT | STRING | BOOLEAN
 
 <h2>5.3 A Complete AST Example</h2>
 <p>Let us trace through a slightly more complex EPL program and see the full AST the Parser produces:</p>
-<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="kw">If</span> score <span class="op">&gt;=</span> <span class="num">90</span> <span class="kw">Then</span>
+<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="kw">If</span> score <span class="op">&gt;=</span> <span class="num">90</span> <span class="kw">then</span>
     <span class="fn">Say</span> <span class="str">"Excellent"</span>
 <span class="kw">Otherwise</span>
     <span class="fn">Say</span> <span class="str">"Keep trying"</span>
@@ -855,7 +856,7 @@ score = <span class="num">85</span>             <span class="cmt">Note: overwrit
 <p>A variable defined inside a function exists in that function's <em>local scope</em>. It is created fresh every time the function is called and destroyed when the function returns. It is completely invisible outside the function. Trying to access it outside the function will cause a <code>NameError</code>.</p>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre>greeting = <span class="str">"Hello"</span>      <span class="cmt">Note: GLOBAL — accessible everywhere</span>
 
-<span class="kw">Define Function</span> <span class="fn">say_hello</span>
+<span class="kw">Function</span> <span class="fn">say_hello</span>
     message = <span class="str">"World"</span>   <span class="cmt">Note: LOCAL — only exists inside this function</span>
     <span class="fn">Say</span> greeting + <span class="str">", "</span> + message  <span class="cmt">Note: can read global 'greeting'</span>
 <span class="kw">End</span>
@@ -978,7 +979,7 @@ should_carry_umbrella = is_raining <span class="kw">and</span> <span class="kw">
 <p>Common uses for <code>nothing</code>: initialising a variable before you know its value, returning from a function that has no meaningful result, and representing optional fields in a data structure that may or may not be populated.</p>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre>result = <span class="kw">nothing</span>            <span class="cmt">Note: no value yet</span>
 
-<span class="kw">If</span> result <span class="op">==</span> <span class="kw">nothing</span> <span class="kw">Then</span>
+<span class="kw">If</span> result <span class="op">==</span> <span class="kw">nothing</span> <span class="kw">then</span>
     <span class="fn">Say</span> <span class="str">"No result available yet"</span>
 <span class="kw">End</span>
 
@@ -1183,7 +1184,7 @@ email = email.lower()
 <span class="fn">Say</span> email                          <span class="cmt">Note: "alice@example.com"</span>
 
 <span class="cmt">Note: Step 3 — basic format validation</span>
-<span class="kw">If</span> email.contains(<span class="str">"@"</span>) <span class="kw">and</span> email.contains(<span class="str">"."</span>) <span class="kw">Then</span>
+<span class="kw">If</span> email.contains(<span class="str">"@"</span>) <span class="kw">and</span> email.contains(<span class="str">"."</span>) <span class="kw">then</span>
     <span class="fn">Say</span> <span class="str">"Valid email: $email"</span>
 <span class="kw">Otherwise</span>
     <span class="fn">Say</span> <span class="str">"Invalid email format"</span>
@@ -1230,7 +1231,7 @@ domain = email.slice(at_position + <span class="num">1</span>, email.length)
 <p>The simplest form of a conditional executes a block of code only if a condition is true. If the condition is false, the block is skipped entirely.</p>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre>temperature = <span class="num">38</span>
 
-<span class="kw">If</span> temperature <span class="op">&gt;</span> <span class="num">37.5</span> <span class="kw">Then</span>
+<span class="kw">If</span> temperature <span class="op">&gt;</span> <span class="num">37.5</span> <span class="kw">then</span>
     <span class="fn">Say</span> <span class="str">"You have a fever."</span>
     <span class="fn">Say</span> <span class="str">"Please rest and drink fluids."</span>
 <span class="kw">End</span>
@@ -1248,7 +1249,7 @@ domain = email.slice(at_position + <span class="num">1</span>, email.length)
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre>score = <span class="num">72</span>
 pass_mark = <span class="num">75</span>
 
-<span class="kw">If</span> score >= pass_mark <span class="kw">Then</span>
+<span class="kw">If</span> score >= pass_mark <span class="kw">then</span>
     <span class="fn">Say</span> <span class="str">"Congratulations — you passed!"</span>
     <span class="fn">Say</span> <span class="str">"Your score: $score"</span>
 <span class="kw">Otherwise</span>
@@ -1261,16 +1262,16 @@ pass_mark = <span class="num">75</span>
 <p>When you have more than two possible outcomes, you can chain multiple conditions using <code>Otherwise If</code>. EPL checks each condition in order from top to bottom, executes the first block whose condition is true, and skips all the rest. If no condition is true, the final <code>Otherwise</code> block runs.</p>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div><div class="code-file">grade_calculator.epl</div></div><pre>score = <span class="num">83</span>
 
-<span class="kw">If</span> score >= <span class="num">90</span> <span class="kw">Then</span>
+<span class="kw">If</span> score >= <span class="num">90</span> <span class="kw">then</span>
     grade = <span class="str">"A"</span>
     label = <span class="str">"Excellent"</span>
-<span class="kw">Otherwise If</span> score >= <span class="num">80</span> <span class="kw">Then</span>
+<span class="kw">Otherwise If</span> score >= <span class="num">80</span> <span class="kw">then</span>
     grade = <span class="str">"B"</span>
     label = <span class="str">"Good"</span>
-<span class="kw">Otherwise If</span> score >= <span class="num">70</span> <span class="kw">Then</span>
+<span class="kw">Otherwise If</span> score >= <span class="num">70</span> <span class="kw">then</span>
     grade = <span class="str">"C"</span>
     label = <span class="str">"Average"</span>
-<span class="kw">Otherwise If</span> score >= <span class="num">60</span> <span class="kw">Then</span>
+<span class="kw">Otherwise If</span> score >= <span class="num">60</span> <span class="kw">then</span>
     grade = <span class="str">"D"</span>
     label = <span class="str">"Below Average"</span>
 <span class="kw">Otherwise</span>
@@ -1287,8 +1288,8 @@ pass_mark = <span class="num">75</span>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre>age = <span class="num">20</span>
 has_id = <span class="kw">true</span>
 
-<span class="kw">If</span> age >= <span class="num">18</span> <span class="kw">Then</span>
-    <span class="kw">If</span> has_id <span class="op">==</span> <span class="kw">true</span> <span class="kw">Then</span>
+<span class="kw">If</span> age >= <span class="num">18</span> <span class="kw">then</span>
+    <span class="kw">If</span> has_id <span class="op">==</span> <span class="kw">true</span> <span class="kw">then</span>
         <span class="fn">Say</span> <span class="str">"Entry granted."</span>
     <span class="kw">Otherwise</span>
         <span class="fn">Say</span> <span class="str">"Age OK but ID required."</span>
@@ -1356,7 +1357,7 @@ n = <span class="num">27</span>
 steps = <span class="num">0</span>
 
 <span class="kw">While</span> n <span class="op">!=</span> <span class="num">1</span>
-    <span class="kw">If</span> n % <span class="num">2</span> <span class="op">==</span> <span class="num">0</span> <span class="kw">Then</span>
+    <span class="kw">If</span> n % <span class="num">2</span> <span class="op">==</span> <span class="num">0</span> <span class="kw">then</span>
         n = n / <span class="num">2</span>
     <span class="kw">Otherwise</span>
         n = n * <span class="num">3</span> + <span class="num">1</span>
@@ -1405,7 +1406,7 @@ total  = <span class="num">0</span>
 <p><code>Break</code> immediately exits the loop entirely — no more iterations, execution continues after <code>End</code>. <code>Continue</code> skips the rest of the current iteration and jumps to the next one.</p>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="cmt">Note: Find the first number divisible by 7 between 1 and 100</span>
 <span class="kw">For</span> i <span class="kw">from</span> <span class="num">1</span> <span class="kw">to</span> <span class="num">100</span>
-    <span class="kw">If</span> i % <span class="num">7</span> <span class="op">==</span> <span class="num">0</span> <span class="kw">Then</span>
+    <span class="kw">If</span> i % <span class="num">7</span> <span class="op">==</span> <span class="num">0</span> <span class="kw">then</span>
         <span class="fn">Say</span> <span class="str">"First multiple of 7: $i"</span>
         <span class="kw">Break</span>          <span class="cmt">Note: exit loop immediately</span>
     <span class="kw">End</span>
@@ -1413,7 +1414,7 @@ total  = <span class="num">0</span>
 
 <span class="cmt">Note: Print only odd numbers using Continue</span>
 <span class="kw">For</span> i <span class="kw">from</span> <span class="num">1</span> <span class="kw">to</span> <span class="num">10</span>
-    <span class="kw">If</span> i % <span class="num">2</span> <span class="op">==</span> <span class="num">0</span> <span class="kw">Then</span>
+    <span class="kw">If</span> i % <span class="num">2</span> <span class="op">==</span> <span class="num">0</span> <span class="kw">then</span>
         <span class="kw">Continue</span>    <span class="cmt">Note: skip even numbers</span>
     <span class="kw">End</span>
     <span class="fn">Say</span> i
@@ -1455,7 +1456,7 @@ total  = <span class="num">0</span>
 <p>This is called the <span class="key-term">DRY principle</span>: <em>Don't Repeat Yourself</em>. Functions are the primary tool for DRY programming. Beyond avoiding repetition, functions serve two other crucial purposes: they <em>name</em> a concept (giving a meaningful label to a piece of logic makes code self-documenting) and they <em>hide complexity</em> (the caller does not need to know how a function works, only what it does).</p>
 
 <h2>13.2 Defining a Function</h2>
-<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="kw">Define Function</span> <span class="fn">greet</span> <span class="kw">takes</span> name
+<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="kw">Function</span> <span class="fn">greet</span> <span class="kw">takes</span> name
     message = <span class="str">"Hello, $name! Welcome to EPL."</span>
     <span class="fn">Say</span> message
 <span class="kw">End</span>
@@ -1475,7 +1476,7 @@ greet(<span class="str">"Charlie"</span>)   <span class="cmt">Note: Hello, Charl
 <h2>13.3 Parameters and Arguments</h2>
 <p>A <span class="key-term">parameter</span> is the placeholder name in the function definition. An <span class="key-term">argument</span> is the actual value passed when calling the function. They are different things even though people often use the terms interchangeably.</p>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="cmt">Note: Function with multiple parameters</span>
-<span class="kw">Define Function</span> <span class="fn">calculate_area</span> <span class="kw">takes</span> length, width
+<span class="kw">Function</span> <span class="fn">calculate_area</span> <span class="kw">takes</span> length, width
     area = length * width
     <span class="fn">Say</span> <span class="str">"Area: $area square units"</span>
 <span class="kw">End</span>
@@ -1486,12 +1487,12 @@ calculate_area(<span class="num">2.5</span>, <span class="num">4</span>) <span c
 
 <h2>13.4 Return Values</h2>
 <p>Functions that only print output are limited. Far more useful are functions that <em>compute a value and return it</em> to the caller. The caller can then use that value in expressions, assign it to variables, or pass it to other functions.</p>
-<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="kw">Define Function</span> <span class="fn">circle_area</span> <span class="kw">takes</span> radius
+<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="kw">Function</span> <span class="fn">circle_area</span> <span class="kw">takes</span> radius
     pi = <span class="num">3.14159265</span>
     <span class="kw">Return</span> pi * radius * radius
 <span class="kw">End</span>
 
-<span class="kw">Define Function</span> <span class="fn">circle_circumference</span> <span class="kw">takes</span> radius
+<span class="kw">Function</span> <span class="fn">circle_circumference</span> <span class="kw">takes</span> radius
     pi = <span class="num">3.14159265</span>
     <span class="kw">Return</span> <span class="num">2</span> * pi * radius
 <span class="kw">End</span>
@@ -1508,7 +1509,7 @@ circ = circle_circumference(r)
 
 <h2>13.5 Default Parameter Values</h2>
 <p>EPL allows function parameters to have default values. When a caller does not provide an argument for a parameter that has a default, the default is used automatically. This makes functions more flexible without requiring callers to specify every detail every time.</p>
-<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="kw">Define Function</span> <span class="fn">power</span> <span class="kw">takes</span> base, exponent = <span class="num">2</span>
+<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="kw">Function</span> <span class="fn">power</span> <span class="kw">takes</span> base, exponent = <span class="num">2</span>
     <span class="kw">Return</span> base ** exponent
 <span class="kw">End</span>
 
@@ -1519,8 +1520,8 @@ circ = circle_circumference(r)
 <h2>13.6 Recursive Functions</h2>
 <p>A <span class="key-term">recursive function</span> is one that calls itself. Every recursive solution has two essential parts: a <em>base case</em> (a condition where the function does NOT call itself) and a <em>recursive case</em> (where it calls itself with a simpler input). Without a base case, recursion yields an infinite loop equivalent — a stack overflow.</p>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="cmt">Note: Factorial — n! = n × (n-1) × (n-2) × ... × 1</span>
-<span class="kw">Define Function</span> <span class="fn">factorial</span> <span class="kw">takes</span> n
-    <span class="kw">If</span> n <span class="op">==</span> <span class="num">0</span> <span class="kw">or</span> n <span class="op">==</span> <span class="num">1</span> <span class="kw">Then</span>
+<span class="kw">Function</span> <span class="fn">factorial</span> <span class="kw">takes</span> n
+    <span class="kw">If</span> n <span class="op">==</span> <span class="num">0</span> <span class="kw">or</span> n <span class="op">==</span> <span class="num">1</span> <span class="kw">then</span>
         <span class="kw">Return</span> <span class="num">1</span>        <span class="cmt">Note: base case</span>
     <span class="kw">End</span>
     <span class="kw">Return</span> n * factorial(n - <span class="num">1</span>)   <span class="cmt">Note: recursive case</span>
@@ -1566,7 +1567,7 @@ circ = circle_circumference(r)
 
 <h2>14.2 Try–Catch: The Core Error Handling Pattern</h2>
 <p>EPL handles runtime errors using the <code>Try...Catch...End</code> construct. The code inside the <code>Try</code> block runs normally. If an error occurs anywhere in the <code>Try</code> block, execution immediately jumps to the <code>Catch</code> block. The variable after <code>Catch</code> captures the error message as a string.</p>
-<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div><div class="code-file">safe_divide.epl</div></div><pre><span class="kw">Define Function</span> <span class="fn">safe_divide</span> <span class="kw">takes</span> a, b
+<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div><div class="code-file">safe_divide.epl</div></div><pre><span class="kw">Function</span> <span class="fn">safe_divide</span> <span class="kw">takes</span> a, b
     <span class="kw">Try</span>
         result = a / b
         <span class="fn">Say</span> <span class="str">"$a ÷ $b = $result"</span>
@@ -1581,8 +1582,8 @@ safe_divide(<span class="num">7</span>, <span class="num">3</span>)    <span cla
 
 <h2>14.3 Raising Your Own Errors</h2>
 <p>You can intentionally signal an error using the <code>Raise</code> keyword. This is useful when a function receives arguments that violate its assumptions — rather than silently producing garbage output, it should loudly announce the problem.</p>
-<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="kw">Define Function</span> <span class="fn">square_root</span> <span class="kw">takes</span> n
-    <span class="kw">If</span> n <span class="op">&lt;</span> <span class="num">0</span> <span class="kw">Then</span>
+<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="kw">Function</span> <span class="fn">square_root</span> <span class="kw">takes</span> n
+    <span class="kw">If</span> n <span class="op">&lt;</span> <span class="num">0</span> <span class="kw">then</span>
         <span class="kw">Raise</span> <span class="str">"Cannot take square root of a negative number: $n"</span>
     <span class="kw">End</span>
     <span class="kw">Return</span> n ** <span class="num">0.5</span>
@@ -1686,10 +1687,10 @@ colours[<span class="num">2</span>] = <span class="str">"purple"</span>    <span
 highest = scores[<span class="num">0</span>]
 lowest  = scores[<span class="num">0</span>]
 <span class="kw">For each</span> s <span class="kw">in</span> scores
-    <span class="kw">If</span> s <span class="op">&gt;</span> highest <span class="kw">Then</span>
+    <span class="kw">If</span> s <span class="op">&gt;</span> highest <span class="kw">then</span>
         highest = s
     <span class="kw">End</span>
-    <span class="kw">If</span> s <span class="op">&lt;</span> lowest <span class="kw">Then</span>
+    <span class="kw">If</span> s <span class="op">&lt;</span> lowest <span class="kw">then</span>
         lowest = s
     <span class="kw">End</span>
 <span class="kw">End</span>
@@ -1706,7 +1707,7 @@ average = total / scores.length
 <span class="cmt">Note: Pattern 3 — filter to a new list</span>
 passing = []
 <span class="kw">For each</span> s <span class="kw">in</span> scores
-    <span class="kw">If</span> s <span class="op">&gt;=</span> <span class="num">75</span> <span class="kw">Then</span>
+    <span class="kw">If</span> s <span class="op">&gt;=</span> <span class="num">75</span> <span class="kw">then</span>
         passing.add(s)
     <span class="kw">End</span>
 <span class="kw">End</span>
@@ -1804,7 +1805,7 @@ student[<span class="str">"year"</span>] = <span class="num">3</span>    <span c
 <span class="cmt">Note: Find items below reorder threshold</span>
 low_stock = []
 <span class="kw">For each</span> item <span class="kw">in</span> inventory.keys()
-    <span class="kw">If</span> inventory[item] <span class="op">&lt;</span> <span class="num">25</span> <span class="kw">Then</span>
+    <span class="kw">If</span> inventory[item] <span class="op">&lt;</span> <span class="num">25</span> <span class="kw">then</span>
         low_stock.add(item)
     <span class="kw">End</span>
 <span class="kw">End</span>
@@ -1823,7 +1824,7 @@ low_stock = []
 <span class="fn">Say</span> <span class="str">"=== Student Report ==="</span>
 <span class="kw">For each</span> s <span class="kw">in</span> students
     status = <span class="str">"PASS"</span>
-    <span class="kw">If</span> s[<span class="str">"passed"</span>] <span class="op">==</span> <span class="kw">false</span> <span class="kw">Then</span>
+    <span class="kw">If</span> s[<span class="str">"passed"</span>] <span class="op">==</span> <span class="kw">false</span> <span class="kw">then</span>
         status = <span class="str">"FAIL"</span>
     <span class="kw">End</span>
     <span class="fn">Say</span> <span class="str">"$s[name]  |  Score: $s[score]  |  $status"</span>
@@ -1863,42 +1864,42 @@ low_stock = []
 <p>OOP has four defining principles: <strong>Encapsulation</strong> (bundling data and behaviour together), <strong>Abstraction</strong> (hiding implementation details), <strong>Inheritance</strong> (new classes building on existing ones), and <strong>Polymorphism</strong> (different objects responding to the same method call in their own way). EPL supports all four.</p>
 
 <h2>17.2 Defining a Class</h2>
-<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div><div class="code-file">bank_account.epl</div></div><pre><span class="kw">Define Class</span> <span class="cls">BankAccount</span>
+<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div><div class="code-file">bank_account.epl</div></div><pre><span class="kw">Class</span> <span class="cls">BankAccount</span>
     field owner   = <span class="str">""</span>
     field balance = <span class="num">0</span>
 
-    <span class="kw">Define Method</span> <span class="fn">setup</span> <span class="kw">takes</span> owner_name, opening_balance
+    <span class="kw">Function</span> <span class="fn">setup</span> <span class="kw">takes</span> owner_name, opening_balance
         self.owner   = owner_name
         self.balance = opening_balance
     <span class="kw">End</span>
 
-    <span class="kw">Define Method</span> <span class="fn">deposit</span> <span class="kw">takes</span> amount
-        <span class="kw">If</span> amount <span class="op">&lt;=</span> <span class="num">0</span> <span class="kw">Then</span>
+    <span class="kw">Function</span> <span class="fn">deposit</span> <span class="kw">takes</span> amount
+        <span class="kw">If</span> amount <span class="op">&lt;=</span> <span class="num">0</span> <span class="kw">then</span>
             <span class="kw">Raise</span> <span class="str">"Deposit amount must be positive"</span>
         <span class="kw">End</span>
         <span class="kw">Increase</span> self.balance <span class="kw">by</span> amount
         <span class="fn">Say</span> <span class="str">"Deposited $amount. New balance: $self.balance"</span>
     <span class="kw">End</span>
 
-    <span class="kw">Define Method</span> <span class="fn">withdraw</span> <span class="kw">takes</span> amount
-        <span class="kw">If</span> amount <span class="op">&gt;</span> self.balance <span class="kw">Then</span>
+    <span class="kw">Function</span> <span class="fn">withdraw</span> <span class="kw">takes</span> amount
+        <span class="kw">If</span> amount <span class="op">&gt;</span> self.balance <span class="kw">then</span>
             <span class="kw">Raise</span> <span class="str">"Insufficient funds"</span>
         <span class="kw">End</span>
         <span class="kw">Decrease</span> self.balance <span class="kw">by</span> amount
         <span class="fn">Say</span> <span class="str">"Withdrawn $amount. New balance: $self.balance"</span>
     <span class="kw">End</span>
 
-    <span class="kw">Define Method</span> <span class="fn">get_balance</span>
+    <span class="kw">Function</span> <span class="fn">get_balance</span>
         <span class="kw">Return</span> self.balance
     <span class="kw">End</span>
 
-    <span class="kw">Define Method</span> <span class="fn">to_string</span>
+    <span class="kw">Function</span> <span class="fn">to_string</span>
         <span class="kw">Return</span> <span class="str">"Account[$self.owner]: ₹$self.balance"</span>
     <span class="kw">End</span>
 <span class="kw">End</span>
 
 <span class="cmt">Note: Creating objects (instances)</span>
-alice_acc = <span class="kw">Create</span> <span class="cls">BankAccount</span>
+alice_acc = <span class="cls">BankAccount</span>()
 alice_acc.setup(<span class="str">"Alice"</span>, <span class="num">5000</span>)
 
 alice_acc.deposit(<span class="num">2000</span>)     <span class="cmt">Note: Deposited 2000. New balance: 7000</span>
@@ -1911,17 +1912,17 @@ alice_acc.withdraw(<span class="num">500</span>)     <span class="cmt">Note: Wit
 <h2>17.4 Inheritance</h2>
 <p><span class="key-term">Inheritance</span> lets a new class (the <em>child</em> or <em>subclass</em>) automatically gain all the fields and methods of an existing class (the <em>parent</em> or <em>superclass</em>), while adding or overriding specific behaviour.</p>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="cmt">Note: SavingsAccount inherits from BankAccount</span>
-<span class="kw">Define Class</span> <span class="cls">SavingsAccount</span> <span class="kw">extends</span> <span class="cls">BankAccount</span>
+<span class="kw">Class</span> <span class="cls">SavingsAccount</span> <span class="kw">extends</span> <span class="cls">BankAccount</span>
     field interest_rate = <span class="num">0.05</span>
 
-    <span class="kw">Define Method</span> <span class="fn">apply_interest</span>
+    <span class="kw">Function</span> <span class="fn">apply_interest</span>
         interest = self.balance * self.interest_rate
         <span class="kw">Increase</span> self.balance <span class="kw">by</span> interest
         <span class="fn">Say</span> <span class="str">"Interest applied: $interest"</span>
     <span class="kw">End</span>
 <span class="kw">End</span>
 
-savings = <span class="kw">Create</span> <span class="cls">SavingsAccount</span>
+savings = <span class="cls">SavingsAccount</span>()
 savings.setup(<span class="str">"Bob"</span>, <span class="num">10000</span>)  <span class="cmt">Note: inherited from BankAccount</span>
 savings.deposit(<span class="num">5000</span>)       <span class="cmt">Note: inherited from BankAccount</span>
 savings.apply_interest()      <span class="cmt">Note: new method on SavingsAccount</span>
@@ -1961,7 +1962,7 @@ savings.apply_interest()      <span class="cmt">Note: new method on SavingsAccou
 
 <h2>18.2 Lambda Syntax</h2>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="cmt">Note: A named function</span>
-<span class="kw">Define Function</span> <span class="fn">double</span> <span class="kw">takes</span> x
+<span class="kw">Function</span> <span class="fn">double</span> <span class="kw">takes</span> x
     <span class="kw">Return</span> x * <span class="num">2</span>
 <span class="kw">End</span>
 
@@ -2002,7 +2003,7 @@ ranked = sort_by(students, <span class="kw">lambda</span> s: -s[<span class="str
 <h2>18.4 Functions as Values</h2>
 <p>In EPL (and in Python, JavaScript, and all functional languages), functions are <span class="key-term">first-class values</span>: they can be assigned to variables, passed as arguments, and returned from other functions. This enables powerful patterns like function composition and strategy patterns.</p>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="cmt">Note: A function that takes another function as argument</span>
-<span class="kw">Define Function</span> <span class="fn">apply_twice</span> <span class="kw">takes</span> fn, value
+<span class="kw">Function</span> <span class="fn">apply_twice</span> <span class="kw">takes</span> fn, value
     <span class="kw">Return</span> fn(fn(value))
 <span class="kw">End</span>
 
@@ -2012,7 +2013,7 @@ ranked = sort_by(students, <span class="kw">lambda</span> s: -s[<span class="str
 <div class="chapter-end">
 <h4>Chapter 18 Summary</h4>
 <ul>
-  <li>Lambdas are anonymous functions: <code>lambda params: expression</code></li>
+  <li>Lambdas are anonymous functions: <code>Lambda params -&gt; expression</code></li>
   <li>Use lambdas for short, one-time operations (sorting criteria, map/filter transforms)</li>
   <li>Functions are first-class values in EPL — assign, pass, and return them like any other value</li>
   <li><code>map(list, fn)</code>, <code>filter(list, fn)</code>, <code>reduce(list, fn, init)</code> are functional alternatives to loops</li>
@@ -2065,7 +2066,7 @@ ranked = sort_by(students, <span class="kw">lambda</span> s: -s[<span class="str
 append_file(<span class="str">"log.txt"</span>, <span class="str">"[2025-01-01] Operation completed\n"</span>)
 
 <span class="cmt">Note: Check if a file exists before reading</span>
-<span class="kw">If</span> file_exists(<span class="str">"config.txt"</span>) <span class="kw">Then</span>
+<span class="kw">If</span> file_exists(<span class="str">"config.txt"</span>) <span class="kw">then</span>
     config = read_file(<span class="str">"config.txt"</span>)
     <span class="fn">Say</span> config
 <span class="kw">Otherwise</span>
@@ -2091,7 +2092,7 @@ records = []
 
 <span class="cmt">Note: Print all A-grade students</span>
 <span class="kw">For each</span> r <span class="kw">in</span> records
-    <span class="kw">If</span> r[<span class="str">"grade"</span>] <span class="op">==</span> <span class="str">"A"</span> <span class="kw">Then</span>
+    <span class="kw">If</span> r[<span class="str">"grade"</span>] <span class="op">==</span> <span class="str">"A"</span> <span class="kw">then</span>
         <span class="fn">Say</span> <span class="str">"Top student: $r[name] ($r[score])"</span>
     <span class="kw">End</span>
 <span class="kw">End</span></pre></div>
@@ -2402,24 +2403,24 @@ result = python_eval(<span class="str">"send_email(recipient, 'Hello', 'Greeting
 PI = <span class="num">3.14159265358979</span>
 E  = <span class="num">2.71828182845905</span>
 
-<span class="kw">Define Function</span> <span class="fn">circle_area</span> <span class="kw">takes</span> r
+<span class="kw">Function</span> <span class="fn">circle_area</span> <span class="kw">takes</span> r
     <span class="kw">Return</span> PI * r * r
 <span class="kw">End</span>
 
-<span class="kw">Define Function</span> <span class="fn">is_prime</span> <span class="kw">takes</span> n
-    <span class="kw">If</span> n <span class="op">&lt;</span> <span class="num">2</span> <span class="kw">Then</span>
+<span class="kw">Function</span> <span class="fn">is_prime</span> <span class="kw">takes</span> n
+    <span class="kw">If</span> n <span class="op">&lt;</span> <span class="num">2</span> <span class="kw">then</span>
         <span class="kw">Return</span> <span class="kw">false</span>
     <span class="kw">End</span>
     <span class="kw">For</span> i <span class="kw">from</span> <span class="num">2</span> <span class="kw">to</span> n - <span class="num">1</span>
-        <span class="kw">If</span> n % i <span class="op">==</span> <span class="num">0</span> <span class="kw">Then</span>
+        <span class="kw">If</span> n % i <span class="op">==</span> <span class="num">0</span> <span class="kw">then</span>
             <span class="kw">Return</span> <span class="kw">false</span>
         <span class="kw">End</span>
     <span class="kw">End</span>
     <span class="kw">Return</span> <span class="kw">true</span>
 <span class="kw">End</span>
 
-<span class="kw">Define Function</span> <span class="fn">factorial</span> <span class="kw">takes</span> n
-    <span class="kw">If</span> n <span class="op">&lt;=</span> <span class="num">1</span> <span class="kw">Then</span> <span class="kw">Return</span> <span class="num">1</span> <span class="kw">End</span>
+<span class="kw">Function</span> <span class="fn">factorial</span> <span class="kw">takes</span> n
+    <span class="kw">If</span> n <span class="op">&lt;=</span> <span class="num">1</span> <span class="kw">then</span> <span class="kw">Return</span> <span class="num">1</span> <span class="kw">End</span>
     <span class="kw">Return</span> n * factorial(n - <span class="num">1</span>)
 <span class="kw">End</span></pre></div>
 
@@ -2544,14 +2545,14 @@ CREATE TABLE IF NOT EXISTS loans (
 real_db_close(db)</pre></div>
 
 <h2>24.3 The Book Model</h2>
-<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div><div class="code-file">models/book.epl</div></div><pre><span class="kw">Define Class</span> <span class="cls">BookRepository</span>
+<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div><div class="code-file">models/book.epl</div></div><pre><span class="kw">Class</span> <span class="cls">BookRepository</span>
     field db = <span class="kw">nothing</span>
 
-    <span class="kw">Define Method</span> <span class="fn">setup</span> <span class="kw">takes</span> conn
+    <span class="kw">Function</span> <span class="fn">setup</span> <span class="kw">takes</span> conn
         self.db = conn
     <span class="kw">End</span>
 
-    <span class="kw">Define Method</span> <span class="fn">add</span> <span class="kw">takes</span> isbn, title, author, year, copies = <span class="num">1</span>
+    <span class="kw">Function</span> <span class="fn">add</span> <span class="kw">takes</span> isbn, title, author, year, copies = <span class="num">1</span>
         <span class="kw">Try</span>
             real_db_execute(self.db,
                 <span class="str">"INSERT INTO books (isbn,title,author,year,copies) VALUES (?,?,?,?,?)"</span>,
@@ -2562,41 +2563,41 @@ real_db_close(db)</pre></div>
         <span class="kw">End</span>
     <span class="kw">End</span>
 
-    <span class="kw">Define Method</span> <span class="fn">search</span> <span class="kw">takes</span> query
+    <span class="kw">Function</span> <span class="fn">search</span> <span class="kw">takes</span> query
         pattern = <span class="str">"%"</span> + query + <span class="str">"%"</span>
         <span class="kw">Return</span> real_db_query(self.db,
             <span class="str">"SELECT * FROM books WHERE title LIKE ? OR author LIKE ? ORDER BY title"</span>,
             [pattern, pattern])
     <span class="kw">End</span>
 
-    <span class="kw">Define Method</span> <span class="fn">get_all</span>
+    <span class="kw">Function</span> <span class="fn">get_all</span>
         <span class="kw">Return</span> real_db_query(self.db, <span class="str">"SELECT * FROM books ORDER BY title"</span>)
     <span class="kw">End</span>
 
-    <span class="kw">Define Method</span> <span class="fn">is_available</span> <span class="kw">takes</span> book_id
+    <span class="kw">Function</span> <span class="fn">is_available</span> <span class="kw">takes</span> book_id
         active_loans = real_db_query(self.db,
             <span class="str">"SELECT COUNT(*) as cnt FROM loans WHERE book_id=? AND returned_on IS NULL"</span>,
             [book_id])
         book = real_db_query(self.db,
             <span class="str">"SELECT copies FROM books WHERE id=?"</span>, [book_id])
-        <span class="kw">If</span> book.length <span class="op">==</span> <span class="num">0</span> <span class="kw">Then</span> <span class="kw">Return</span> <span class="kw">false</span> <span class="kw">End</span>
+        <span class="kw">If</span> book.length <span class="op">==</span> <span class="num">0</span> <span class="kw">then</span> <span class="kw">Return</span> <span class="kw">false</span> <span class="kw">End</span>
         <span class="kw">Return</span> active_loans[<span class="num">0</span>][<span class="str">"cnt"</span>] <span class="op">&lt;</span> book[<span class="num">0</span>][<span class="str">"copies"</span>]
     <span class="kw">End</span>
 <span class="kw">End</span></pre></div>
 
 <h2>24.4 The Loan Service</h2>
-<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div><div class="code-file">models/loan.epl</div></div><pre><span class="kw">Define Class</span> <span class="cls">LoanService</span>
+<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div><div class="code-file">models/loan.epl</div></div><pre><span class="kw">Class</span> <span class="cls">LoanService</span>
     field db      = <span class="kw">nothing</span>
     field books   = <span class="kw">nothing</span>
     field loan_days = <span class="num">14</span>
 
-    <span class="kw">Define Method</span> <span class="fn">setup</span> <span class="kw">takes</span> conn, book_repo
+    <span class="kw">Function</span> <span class="fn">setup</span> <span class="kw">takes</span> conn, book_repo
         self.db    = conn
         self.books = book_repo
     <span class="kw">End</span>
 
-    <span class="kw">Define Method</span> <span class="fn">checkout</span> <span class="kw">takes</span> book_id, member_id
-        <span class="kw">If</span> <span class="kw">not</span> self.books.is_available(book_id) <span class="kw">Then</span>
+    <span class="kw">Function</span> <span class="fn">checkout</span> <span class="kw">takes</span> book_id, member_id
+        <span class="kw">If</span> <span class="kw">not</span> self.books.is_available(book_id) <span class="kw">then</span>
             <span class="kw">Raise</span> <span class="str">"Book $book_id is not available for loan"</span>
         <span class="kw">End</span>
         due_date = python_eval(<span class="str">"from datetime import date, timedelta; str(date.today() + timedelta(days=14))"</span>)
@@ -2606,7 +2607,7 @@ real_db_close(db)</pre></div>
         <span class="fn">Say</span> <span class="str">"Loan created. Due: $due_date"</span>
     <span class="kw">End</span>
 
-    <span class="kw">Define Method</span> <span class="fn">return_book</span> <span class="kw">takes</span> loan_id
+    <span class="kw">Function</span> <span class="fn">return_book</span> <span class="kw">takes</span> loan_id
         today = python_eval(<span class="str">"from datetime import date; str(date.today())"</span>)
         real_db_execute(self.db,
             <span class="str">"UPDATE loans SET returned_on=? WHERE id=? AND returned_on IS NULL"</span>,
@@ -2614,7 +2615,7 @@ real_db_close(db)</pre></div>
         <span class="fn">Say</span> <span class="str">"Book returned on $today"</span>
     <span class="kw">End</span>
 
-    <span class="kw">Define Method</span> <span class="fn">overdue_report</span>
+    <span class="kw">Function</span> <span class="fn">overdue_report</span>
         today = python_eval(<span class="str">"from datetime import date; str(date.today())"</span>)
         <span class="kw">Return</span> real_db_query(self.db, <span class="str">"
             SELECT l.id, b.title, m.name, m.email, l.due_on
@@ -2632,9 +2633,9 @@ real_db_close(db)</pre></div>
 <span class="kw">Import</span> <span class="str">"models/loan.epl"</span>
 
 db       = real_db_connect(<span class="str">"library.db"</span>)
-books    = <span class="kw">Create</span> <span class="cls">BookRepository</span>
+books    = <span class="cls">BookRepository</span>()
 books.setup(db)
-loans    = <span class="kw">Create</span> <span class="cls">LoanService</span>
+loans    = <span class="cls">LoanService</span>()
 loans.setup(db, books)
 server   = web_server_create()
 web_server_set_port(server, <span class="num">8080</span>)
@@ -2691,20 +2692,20 @@ web_server_start(server)</pre></div>
 <p>Every function should follow these principles:
 <strong>Single Responsibility</strong> — a function does one thing and does it well. If you cannot describe a function in one sentence without using "and", it is doing too much. <strong>Small size</strong> — aim for under 20 lines; if longer, extract sub-functions. <strong>Clear contracts</strong> — validate inputs with early returns or <code>Raise</code>, and make return types consistent (always return a value, or always return nothing — not sometimes one and sometimes the other).</p>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="cmt">Note: BAD — function does too many things and has unclear contract</span>
-<span class="kw">Define Function</span> <span class="fn">process</span> <span class="kw">takes</span> data
+<span class="kw">Function</span> <span class="fn">process</span> <span class="kw">takes</span> data
     <span class="cmt">Note: validates, transforms, saves, and emails in one function</span>
 <span class="kw">End</span>
 
 <span class="cmt">Note: GOOD — each function has one clear job</span>
-<span class="kw">Define Function</span> <span class="fn">validate_email</span> <span class="kw">takes</span> email
+<span class="kw">Function</span> <span class="fn">validate_email</span> <span class="kw">takes</span> email
     <span class="kw">Return</span> email.contains(<span class="str">"@"</span>) <span class="kw">and</span> email.contains(<span class="str">"."</span>)
 <span class="kw">End</span>
 
-<span class="kw">Define Function</span> <span class="fn">normalise_email</span> <span class="kw">takes</span> email
+<span class="kw">Function</span> <span class="fn">normalise_email</span> <span class="kw">takes</span> email
     <span class="kw">Return</span> email.trim().lower()
 <span class="kw">End</span>
 
-<span class="kw">Define Function</span> <span class="fn">save_user</span> <span class="kw">takes</span> db, email
+<span class="kw">Function</span> <span class="fn">save_user</span> <span class="kw">takes</span> db, email
     real_db_execute(db, <span class="str">"INSERT INTO users(email) VALUES (?)"</span>, [email])
 <span class="kw">End</span></pre></div>
 
@@ -2773,7 +2774,7 @@ web_server_start(server)</pre></div>
   <tr><td><code>Define Method name takes...</code></td><td>Class method</td><td>Inside Define Class block</td></tr>
   <tr><td><code>Create ClassName</code></td><td>Instantiate class</td><td><code>d = Create Dog</code></td></tr>
   <tr><td><code>Import "file.epl"</code></td><td>Import module</td><td><code>Import "utils.epl" as u</code></td></tr>
-  <tr><td><code>lambda params: expr</code></td><td>Anonymous function</td><td><code>lambda x: x * 2</code></td></tr>
+  <tr><td><code>Lambda params -&gt; expr</code></td><td>Anonymous function</td><td><code>Lambda x -&gt; x * 2</code></td></tr>
 </table>
 
 <h2>A.2 Operators</h2>
@@ -2856,7 +2857,88 @@ web_server_start(server)</pre></div>
 </div>
 </section>
 
+
+<!-- CHAPTER 27: WHAT'S NEW IN V7.4.0 -->
+<section id="ch27" class="chapter">
+<div class="part-label">Part IV - The Future of EPL</div>
+<div class="chapter-num">Chapter 27</div>
+<h1>What's New in EPL v7.4.0</h1>
+
+<p>The release of EPL v7.4.0 represents a monumental leap forward for the language, evolving it from an esoteric hobby language into an industrial-grade tool. With new compilation targets, interactive AI frameworks, and universal commenting standards, v7.4.0 introduces capabilities unmatched by many mainstream languages.</p>
+
+<p>This chapter dives deep into the major new features and explains how to adopt them in your production workflows.</p>
+
+<h2>Native iOS Transpilation & Execution</h2>
+<p>EPL v7.4.0 introduces the world-first "English-to-Native-Mobile" pipeline. You can now write standard EPL code and immediately compile it down into native Swift/Objective-C binaries capable of running directly on iOS devices.</p>
+
+<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">BASH</div></div><pre>
+epl ios hello.epl
+</pre></div>
+
+<p>When you run this command, the EPL compiler:</p>
+<ol>
+  <li>Validates your AST natively.</li>
+  <li>Transpiles the instructions directly into a temporary XCode project (using Swift).</li>
+  <li>Triggers the LLVM compiler to build a highly optimized <code>.app</code> binary payload.</li>
+</ol>
+<p>This bypasses interpreted overhead entirely, offering near-C level application performance directly on your iPhone.</p>
+
+<h2>Universal <code>#</code> Comment Support</h2>
+<p>While <code>Note:</code> has historically been EPL's beloved way to document code organically, many developers transitioning from Python or Ruby requested a faster shortcut for inline disabling of code during debugging.</p>
+<p>EPL v7.4.0 introduces support for the standard <code>#</code> symbol for single-line comments.</p>
+
+<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre>
+# This is a fast, universal comment
+# x = 10 (this code is disabled)
+
+Note: This is the traditional, organic EPL comment
+Say "Hello!" # You can even add them inline!
+</pre></div>
+<p>The parser intercepts the <code>#</code> token directly inside the <code>skip_newlines</code> phase, meaning it carries absolutely zero runtime performance penalty in the VM.</p>
+
+<h2>Advanced AI Chatbot Starter Templates</h2>
+<p>Building production-scale AI applications used to require integrating Python wrappers manually. EPL v7.4.0 ships with native templating commands to instantly generate intelligent AI conversational applications using the new <code>epl.ai</code> framework.</p>
+
+<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">BASH</div></div><pre>
+epl new mybot --template chatbot
+</pre></div>
+
+<p>This single command generates a full-stack directory layout including:</p>
+<ul>
+  <li>A modern Native WebApp Backend routing structure.</li>
+  <li>Pre-configured AI Module imports (<code>Import "epl.ai" As ai</code>).</li>
+  <li>Message history management using Native Maps.</li>
+</ul>
+
+<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre>
+Route "/api/chat" responds with
+    messages = [Map with role = "user" and content = request_data.get("message")]
+    Send json Map with reply = ai.chat(messages)
+End
+</pre></div>
+
+<h2>The Package Publisher (<code>epl publish</code>)</h2>
+<p>Sharing EPL modules is now official. The new packaging system allows developers to bundle their `.epl` modules and publish them to a global registry.</p>
+
+<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">BASH</div></div><pre>
+epl publish
+</pre></div>
+
+<p>This recursively scans your project, statically verifies types, bundles imports, and creates a distributable package that any other user can install via <code>epl install</code>.</p>
+
+<div class="chapter-end">
+  <h4>Chapter Snapshot</h4>
+  <ul>
+    <li>Use <b>epl ios</b> to compile directly to Native Swift binaries.</li>
+    <li>Use <b>#</b> for fast, universal Pythonic comments alongside <i>Note:</i>.</li>
+    <li>Generate full AI frameworks with <b>epl new mybot --template chatbot</b>.</li>
+    <li>Distribute code safely with <b>epl publish</b>.</li>
+  </ul>
+</div>
+</section>
+
 <!-- APPENDIX B: FORMAL GRAMMAR -->
+
 <section id="appxB" class="chapter">
 <div class="part-label">Appendices</div>
 <div class="chapter-num">Appendix B</div>
@@ -2993,46 +3075,46 @@ string         = '"' { any_char_except_quotes } '"' ;
 <h2>C.1 Game Architecture</h2>
 <p>Our game consists of three core classes: <code>Room</code>, <code>Player</code>, and <code>Game</code>. A Room manages connectivity to other rooms and holds items. A Player tracks inventory and current location. The Game class runs the main REPL (Read-Evaluate-Print Loop) to parse user inputs.</p>
 
-<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div><div class="code-file">game.epl</div></div><pre><span class="kw">Define Class</span> <span class="cls">Room</span>
+<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div><div class="code-file">game.epl</div></div><pre><span class="kw">Class</span> <span class="cls">Room</span>
     field name = <span class="str">""</span>
     field description = <span class="str">""</span>
     field exits = {}
     field items = []
 
-    <span class="kw">Define Method</span> <span class="fn">setup</span> <span class="kw">takes</span> name, desc
+    <span class="kw">Function</span> <span class="fn">setup</span> <span class="kw">takes</span> name, desc
         self.name = name
         self.description = desc
     <span class="kw">End</span>
 
-    <span class="kw">Define Method</span> <span class="fn">add_exit</span> <span class="kw">takes</span> direction, room_obj
+    <span class="kw">Function</span> <span class="fn">add_exit</span> <span class="kw">takes</span> direction, room_obj
         self.exits[direction] = room_obj
     <span class="kw">End</span>
 
-    <span class="kw">Define Method</span> <span class="fn">add_item</span> <span class="kw">takes</span> item_name
+    <span class="kw">Function</span> <span class="fn">add_item</span> <span class="kw">takes</span> item_name
         self.items.add(item_name)
     <span class="kw">End</span>
 
-    <span class="kw">Define Method</span> <span class="fn">remove_item</span> <span class="kw">takes</span> item_name
+    <span class="kw">Function</span> <span class="fn">remove_item</span> <span class="kw">takes</span> item_name
         self.items = filter(self.items, <span class="kw">lambda</span> x: x != item_name)
     <span class="kw">End</span>
 
-    <span class="kw">Define Method</span> <span class="fn">describe</span>
+    <span class="kw">Function</span> <span class="fn">describe</span>
         <span class="fn">Say</span> <span class="str">""</span>
         <span class="fn">Say</span> <span class="str">"=== "</span> + self.name + <span class="str">" ==="</span>
         <span class="fn">Say</span> self.description
-        <span class="kw">If</span> self.items.length <span class="op">&gt;</span> <span class="num">0</span> <span class="kw">Then</span>
+        <span class="kw">If</span> self.items.length <span class="op">&gt;</span> <span class="num">0</span> <span class="kw">then</span>
             <span class="fn">Say</span> <span class="str">"You see here: "</span> + self.items.join(<span class="str">", "</span>)
         <span class="kw">End</span>
         <span class="fn">Say</span> <span class="str">"Exits: "</span> + self.exits.keys().join(<span class="str">", "</span>)
     <span class="kw">End</span>
 <span class="kw">End</span>
 
-<span class="kw">Define Class</span> <span class="cls">Player</span>
+<span class="kw">Class</span> <span class="cls">Player</span>
     field current_room = <span class="kw">nothing</span>
     field inventory = []
 
-    <span class="kw">Define Method</span> <span class="fn">move</span> <span class="kw">takes</span> direction
-        <span class="kw">If</span> self.current_room.exits.has(direction) <span class="kw">Then</span>
+    <span class="kw">Function</span> <span class="fn">move</span> <span class="kw">takes</span> direction
+        <span class="kw">If</span> self.current_room.exits.has(direction) <span class="kw">then</span>
             self.current_room = self.current_room.exits[direction]
             self.current_room.describe()
         <span class="kw">Otherwise</span>
@@ -3040,8 +3122,8 @@ string         = '"' { any_char_except_quotes } '"' ;
         <span class="kw">End</span>
     <span class="kw">End</span>
 
-    <span class="kw">Define Method</span> <span class="fn">take</span> <span class="kw">takes</span> item
-        <span class="kw">If</span> item <span class="kw">in</span> self.current_room.items <span class="kw">Then</span>
+    <span class="kw">Function</span> <span class="fn">take</span> <span class="kw">takes</span> item
+        <span class="kw">If</span> item <span class="kw">in</span> self.current_room.items <span class="kw">then</span>
             self.inventory.add(item)
             self.current_room.remove_item(item)
             <span class="fn">Say</span> <span class="str">"You picked up the "</span> + item + <span class="str">"."</span>
@@ -3051,27 +3133,27 @@ string         = '"' { any_char_except_quotes } '"' ;
     <span class="kw">End</span>
 <span class="kw">End</span>
 
-<span class="kw">Define Class</span> <span class="cls">Game</span>
+<span class="kw">Class</span> <span class="cls">Game</span>
     field player = <span class="kw">nothing</span>
     field is_running = <span class="kw">true</span>
 
-    <span class="kw">Define Method</span> <span class="fn">init_world</span>
-        cave = <span class="kw">Create</span> <span class="cls">Room</span>
+    <span class="kw">Function</span> <span class="fn">init_world</span>
+        cave = <span class="cls">Room</span>()
         cave.setup(<span class="str">"Dark Cave"</span>, <span class="str">"A damp, incredibly dark cave. Water drips from the ceiling."</span>)
         cave.add_item(<span class="str">"lantern"</span>)
 
-        hall = <span class="kw">Create</span> <span class="cls">Room</span>
+        hall = <span class="cls">Room</span>()
         hall.setup(<span class="str">"Great Hall"</span>, <span class="str">"A massive stone hall with faded banners hanging from the walls."</span>)
         hall.add_item(<span class="str">"sword"</span>)
 
         cave.add_exit(<span class="str">"north"</span>, hall)
         hall.add_exit(<span class="str">"south"</span>, cave)
 
-        self.player = <span class="kw">Create</span> <span class="cls">Player</span>
+        self.player = <span class="cls">Player</span>()
         self.player.current_room = cave
     <span class="kw">End</span>
 
-    <span class="kw">Define Method</span> <span class="fn">start</span>
+    <span class="kw">Function</span> <span class="fn">start</span>
         self.init_world()
         <span class="fn">Say</span> <span class="str">"Welcome to Ruins of EPL!"</span>
         self.player.current_room.describe()
@@ -3081,16 +3163,16 @@ string         = '"' { any_char_except_quotes } '"' ;
             parts = cmd.trim().lower().split(<span class="str">" "</span>)
             verb = parts[<span class="num">0</span>]
             
-            <span class="kw">If</span> verb <span class="op">==</span> <span class="str">"quit"</span> <span class="kw">Then</span>
+            <span class="kw">If</span> verb <span class="op">==</span> <span class="str">"quit"</span> <span class="kw">then</span>
                 self.is_running = <span class="kw">false</span>
                 <span class="fn">Say</span> <span class="str">"Thanks for playing!"</span>
-            <span class="kw">Otherwise</span> <span class="kw">If</span> verb <span class="op">==</span> <span class="str">"go"</span> <span class="kw">and</span> parts.length <span class="op">&gt;</span> <span class="num">1</span> <span class="kw">Then</span>
+            <span class="kw">Otherwise</span> <span class="kw">If</span> verb <span class="op">==</span> <span class="str">"go"</span> <span class="kw">and</span> parts.length <span class="op">&gt;</span> <span class="num">1</span> <span class="kw">then</span>
                 self.player.move(parts[<span class="num">1</span>])
-            <span class="kw">Otherwise</span> <span class="kw">If</span> verb <span class="op">==</span> <span class="str">"take"</span> <span class="kw">and</span> parts.length <span class="op">&gt;</span> <span class="num">1</span> <span class="kw">Then</span>
+            <span class="kw">Otherwise</span> <span class="kw">If</span> verb <span class="op">==</span> <span class="str">"take"</span> <span class="kw">and</span> parts.length <span class="op">&gt;</span> <span class="num">1</span> <span class="kw">then</span>
                 self.player.take(parts[<span class="num">1</span>])
-            <span class="kw">Otherwise</span> <span class="kw">If</span> verb <span class="op">==</span> <span class="str">"look"</span> <span class="kw">Then</span>
+            <span class="kw">Otherwise</span> <span class="kw">If</span> verb <span class="op">==</span> <span class="str">"look"</span> <span class="kw">then</span>
                 self.player.current_room.describe()
-            <span class="kw">Otherwise</span> <span class="kw">If</span> verb <span class="op">==</span> <span class="str">"inventory"</span> <span class="kw">Then</span>
+            <span class="kw">Otherwise</span> <span class="kw">If</span> verb <span class="op">==</span> <span class="str">"inventory"</span> <span class="kw">then</span>
                 <span class="fn">Say</span> <span class="str">"You are carrying: "</span> + self.player.inventory.join(<span class="str">", "</span>)
             <span class="kw">Otherwise</span>
                 <span class="fn">Say</span> <span class="str">"I don't understand that command."</span>
@@ -3099,7 +3181,7 @@ string         = '"' { any_char_except_quotes } '"' ;
     <span class="kw">End</span>
 <span class="kw">End</span>
 
-game = <span class="kw">Create</span> <span class="cls">Game</span>
+game = <span class="cls">Game</span>()
 game.start()</pre></div>
 </section>
 

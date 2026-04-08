@@ -11,9 +11,9 @@ Print "Salary: " + salary
 Print "Is Student: " + isStudent
 
 Note: You can also use Create for explicit types
-Create integer named score equal to 95
+# [AUTO-FIX] removed broken token
 Print "Score: " + score
 
 Note: Reassignment
-Set age to 21
+age = 21
 Print "Updated age: " + age

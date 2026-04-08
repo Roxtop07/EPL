@@ -10,7 +10,7 @@ Print MAX_SIZE
 Print GREETING
 
 Note: Constants cannot be reassigned (would throw an error)
-Note: Set PI to 3.0  <-- This would fail!
+Note: PI = 3.0  <-- This would fail!
 
 Note: ─── Augmented Assignment ───
 x = 10

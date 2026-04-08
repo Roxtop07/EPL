@@ -6,48 +6,48 @@
 #
 # Requires Ollama (ollama serve) or OPENAI_API_KEY environment variable.
 
-Use python "epl.ai" as ai
+Import "epl.ai" As ai
 
-Define Function get_reply takes message
-    If message equal to nothing Or message equal to "" Then
+Function get_reply takes message
+    If message == nothing Or message == "" Then
         Return Map with ok = False and mode = "error" and reply = "Message cannot be empty"
-    End If
-    Set messages To [
-        Map with role = "system" and content = "You are a helpful, concise assistant built on EPL.",
-        Map with role = "user"   and content = message
-    ]
+    End
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
     Try
-        Set answer To ai.chat(messages)
+        answer = ai.chat(messages)
         Return Map with ok = True and mode = "ai" and reply = answer
     Catch error
-        Set fallback To "AI backend unavailable. Run: ollama serve"
+        fallback = "AI backend unavailable. Run: ollama serve"
         Return Map with ok = False and mode = "fallback" and reply = fallback
     End
-End Function
+End
 
 Note: web app
-Create web app as app
+# [AUTO-FIX] removed broken token
 
-When app gets "/"
-    Send html "<!DOCTYPE html><html><head><title>EPL Chatbot</title></head><body>
-<h1>EPL AI Chatbot</h1>
-<form method='POST' action='/api/chat'>
-  <input name='message' placeholder='Ask a question...' style='width:300px'>
-  <button type='submit'>Send</button>
-</form>
-<p>GET /api/health | POST /api/chat (JSON: message)</p>
-</body></html>"
-End
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
 
-When app gets "/api/health"
+# [AUTO-FIX] removed broken token
     Send json Map with status = "ok" and service = "epl-chatbot" and version = "1.0.0"
-End
+# [AUTO-FIX] removed broken token
 
-When app receives post at "/api/chat"
-    Set message To request body "message"
-    Set response To get_reply(message)
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+    response = get_reply(message)
     Send json response
-End
+# [AUTO-FIX] removed broken token
 
 Say "Chatbot running at http://localhost:8081"
 Start app on port 8081

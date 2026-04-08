@@ -31,10 +31,10 @@ EPL is a **production-grade programming language** where code reads like English
 ```epl
 Say "Hello, World!"
 
-Create name equal to "Alice"
-If name is "Alice" then
+name = "Alice"
+If name == "Alice" then
     Say "Welcome back, Alice!"
-End If
+End
 ```
 
 ---
@@ -80,28 +80,23 @@ Create 2D games with Pygame-powered sprites, collision detection, scenes, and an
 ## Quick Example: REST API
 
 ```epl
-Create app called "Todo API"
+Create WebApp called app
 
-Set db to db_open("todos.db")
-Call db_create_table(db, "todos", Map with
-    id = "INTEGER PRIMARY KEY AUTOINCREMENT"
-    and title = "TEXT NOT NULL"
-    and done = "INTEGER DEFAULT 0"
-)
+db = db_open("todos.db")
+db_create_table(db, "todos", Map with id = "INTEGER PRIMARY KEY AUTOINCREMENT" and title = "TEXT NOT NULL" and done = "INTEGER DEFAULT 0")
 
-API GET "/api/todos" responds with
-    Set todos to db_query(db, "SELECT * FROM todos")
+Route GET "/api/todos" responds with
+    todos = db_query(db, "SELECT * FROM todos")
     Return Map with success = True and data = todos
 End
 
-API POST "/api/todos" responds with
-    Set body to request_body()
-    Call db_execute(db, "INSERT INTO todos (title) VALUES (?)",
-        List with get(body, "title"))
+Route POST "/api/todos" responds with
+    body = request_body()
+    db_execute(db, "INSERT INTO todos (title) VALUES (?)", [body.get("title")])
     Return Map with success = True
 End
 
-Start app on port 8000
+app.start(8000)
 ```
 
 ```bash

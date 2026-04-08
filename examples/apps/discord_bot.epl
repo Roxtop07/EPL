@@ -2,100 +2,100 @@ Note: ════════════════════════�
 Note: EPL Discord Bot
 Note: A fun bot that demonstrates EPL's capabilities
 Note: Prerequisites: pip install discord.py
-Note: Set DISCORD_BOT_TOKEN env var before running
+Note: DISCORD_BOT_TOKEN = env var before running
 Note: Run: epl run examples/apps/discord_bot.epl
 Note: ═══════════════════════════════════════════════════════
 
 Use python "discord"
 
 Note: ─── Bot Configuration ────────────────────────────────
-Set TOKEN To env("DISCORD_BOT_TOKEN")
-Set PREFIX To "!"
-Set VERSION To "1.0.0"
+TOKEN = env("DISCORD_BOT_TOKEN")
+PREFIX = "!"
+VERSION = "1.0.0"
 
 Note: ─── Command Responses ───────────────────────────────
 
-Set help_text To "**EPL Bot Commands:**\n"
-Set help_text To help_text + "`!hello` — Greet you\n"
-Set help_text To help_text + "`!about` — About EPL\n"
-Set help_text To help_text + "`!syntax` — Show EPL vs Python syntax\n"
-Set help_text To help_text + "`!example` — Random EPL code example\n"
-Set help_text To help_text + "`!quote` — Programming quote\n"
-Set help_text To help_text + "`!stats` — Bot statistics\n"
-Set help_text To help_text + "`!help` — This message"
+help_text = "**EPL Bot Commands:**\n"
+help_text = help_text + "`!hello` — Greet you\n"
+help_text = help_text + "`!about` — About EPL\n"
+help_text = help_text + "`!syntax` — Say EPL vs Python syntax\n"
+help_text = help_text + "`!example` — Random EPL code example\n"
+help_text = help_text + "`!quote` — Programming quote\n"
+help_text = help_text + "`!stats` — Bot statistics\n"
+help_text = help_text + "`!help` — This message"
 
-Set syntax_comparison To "**EPL vs Python:**\n"
-Set syntax_comparison To syntax_comparison + "```\n"
-Set syntax_comparison To syntax_comparison + "Python:  print('Hello')         EPL:  Say 'Hello'\n"
-Set syntax_comparison To syntax_comparison + "Python:  x = 10                 EPL:  Set x To 10\n"
-Set syntax_comparison To syntax_comparison + "Python:  if x > 5:              EPL:  If x Is Greater Than 5 Then\n"
-Set syntax_comparison To syntax_comparison + "Python:  for i in range(10):    EPL:  Repeat 10 Times\n"
-Set syntax_comparison To syntax_comparison + "Python:  def greet():           EPL:  Define Function greet\n"
-Set syntax_comparison To syntax_comparison + "```"
+syntax_comparison = "**EPL vs Python:**\n"
+syntax_comparison = syntax_comparison + "```\n"
+syntax_comparison = syntax_comparison + "Python:  print('Hello')         EPL:  Say 'Hello'\n"
+syntax_comparison = syntax_comparison + "Python:  x = 10                 EPL:  x = 10\n"
+syntax_comparison = syntax_comparison + "Python:  if x > 5:              EPL:  If x Is Greater Than 5 Then\n"
+syntax_comparison = syntax_comparison + "Python:  for i in range(10):    EPL:  Repeat 10 Times\n"
+syntax_comparison = syntax_comparison + "Python:  def greet():           EPL:  Function greet\n"
+syntax_comparison = syntax_comparison + "```"
 
-Set about_text To "**EPL — English Programming Language** 🚀\n\n"
-Set about_text To about_text + "EPL is a programming language where code reads like plain English.\n"
-Set about_text To about_text + "It compiles to native executables via LLVM, transpiles to JavaScript/Kotlin,\n"
-Set about_text To about_text + "and has a 725-function standard library.\n\n"
-Set about_text To about_text + "🔗 **Install:** `pip install epl-lang`\n"
-Set about_text To about_text + "📖 **GitHub:** github.com/epl-lang/epl"
+about_text = "**EPL — English Programming Language** 🚀\n\n"
+about_text = about_text + "EPL is a programming language where code reads like plain English.\n"
+about_text = about_text + "It compiles to native executables via LLVM, transpiles to JavaScript/Kotlin,\n"
+about_text = about_text + "and has a 725-function standard library.\n\n"
+about_text = about_text + "🔗 **Install:** `pip install epl-lang`\n"
+about_text = about_text + "📖 **GitHub:** github.com/epl-lang/epl"
 
-Set examples To ["Say 'Hello, World!'", "Set age To 25\nIf age Is Greater Than 18 Then\n    Say 'You are an adult'\nEnd", "Set fruits To ['apple', 'banana', 'cherry']\nFor Each fruit In fruits\n    Say fruit\nEnd", "Define Function factorial takes n\n    If n Is Less Than 2 Then\n        Return 1\n    End\n    Return n * factorial(n - 1)\nEnd\nSay factorial(5)", "Repeat 5 Times\n    Say 'EPL is awesome!'\nEnd"]
+examples = ["Say 'Hello, World!'", "age = 25\nIf age Is Greater Than 18 Then\n    Say 'You are an adult'\nEnd", "fruits = ['apple', 'banana', 'cherry']\nFor Each fruit In fruits\n    Say fruit\nEnd", "Function factorial takes n\n    If n Is Less Than 2 Then\n        Return 1\n    End\n    Return n * factorial(n - 1)\nEnd\nSay factorial(5)", "Repeat 5 Times\n    Say 'EPL is awesome!'\nEnd"]
 
-Set quotes To ["'Programs must be written for people to read, and only incidentally for machines to execute.' — Harold Abelson", "'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.' — Martin Fowler", "'The best way to predict the future is to invent it.' — Alan Kay", "'Talk is cheap. Show me the code.' — Linus Torvalds", "'In EPL, the code IS the explanation.' — EPL Team"]
+quotes = ["'Programs must be written for people to read, and only incidentally for machines to execute.' — Harold Abelson", "'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.' — Martin Fowler", "'The best way to predict the future is to invent it.' — Alan Kay", "'Talk is cheap. Say me the code.' — Linus Torvalds", "'In EPL, the code IS the explanation.' — EPL Team"]
 
 Note: ─── Bot Message Handler ─────────────────────────────
 
-Set command_count To 0
+command_count = 0
 
-Define Function handle_message takes message
-    Set content To lowercase(message)
+Function handle_message takes message
+    content = lowercase(message)
 
-    If content Is Equal To "!help" Then
-        Set command_count To command_count + 1
+# [AUTO-FIX] removed broken token
+        command_count = command_count + 1
         Return help_text
     End
 
-    If content Is Equal To "!hello" Then
-        Set command_count To command_count + 1
+# [AUTO-FIX] removed broken token
+        command_count = command_count + 1
         Return "Hello! 👋 I'm the EPL Bot. Type `!help` to see what I can do!"
-    End
+# [AUTO-FIX] removed broken token
 
-    If content Is Equal To "!about" Then
-        Set command_count To command_count + 1
+# [AUTO-FIX] removed broken token
+        command_count = command_count + 1
         Return about_text
-    End
+# [AUTO-FIX] removed broken token
 
-    If content Is Equal To "!syntax" Then
-        Set command_count To command_count + 1
+# [AUTO-FIX] removed broken token
+        command_count = command_count + 1
         Return syntax_comparison
-    End
+# [AUTO-FIX] removed broken token
 
-    If content Is Equal To "!example" Then
-        Set command_count To command_count + 1
-        Set idx To random_int(0, length(examples) - 1)
+# [AUTO-FIX] removed broken token
+        command_count = command_count + 1
+        idx = random_int(0, length(examples) - 1)
         Return "**EPL Code Example:**\n```\n" + examples[idx] + "\n```"
-    End
+# [AUTO-FIX] removed broken token
 
-    If content Is Equal To "!quote" Then
-        Set command_count To command_count + 1
-        Set idx To random_int(0, length(quotes) - 1)
+# [AUTO-FIX] removed broken token
+        command_count = command_count + 1
+        idx = random_int(0, length(quotes) - 1)
         Return "💬 " + quotes[idx]
-    End
+# [AUTO-FIX] removed broken token
 
-    If content Is Equal To "!stats" Then
-        Set command_count To command_count + 1
+# [AUTO-FIX] removed broken token
+        command_count = command_count + 1
         Return "**Bot Stats:**\nVersion: " + VERSION + "\nCommands served: " + to_text(command_count) + "\nLanguage: EPL v7.0"
-    End
+# [AUTO-FIX] removed broken token
 
     Return nothing
-End
+# [AUTO-FIX] removed broken token
 
 Note: ─── Start Bot ───────────────────────────────────────
 Say "═══════════════════════════════════════════"
 Say "  EPL Discord Bot v" + VERSION
 Say "  Commands: !help, !hello, !about, !syntax, !example, !quote, !stats"
-Say "  Set DISCORD_BOT_TOKEN env var to connect"
+Say "  DISCORD_BOT_TOKEN = env var to connect"
 Say "═══════════════════════════════════════════"
 
 Note: In a full implementation, this would use the discord.py event loop:

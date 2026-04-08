@@ -10,13 +10,13 @@ Note: Create API app
 app = web_api_create("Todo API")
 
 Note: Helper - get all todos
-Define Function get_todos
+Function get_todos
     rows = real_db_query(db, "SELECT * FROM todos ORDER BY id DESC")
     Return rows
 End
 
 Note: Helper - create a todo
-Define Function create_todo
+Function create_todo
     data = web_request_data()
     title = data.title
     Return Map with message = "Todo created" and title = title

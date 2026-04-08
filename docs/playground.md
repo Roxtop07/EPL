@@ -18,14 +18,14 @@ Say "Hello from EPL!"
 
 ### Variables & Math
 ```epl
-Create x equal to 10
-Create y equal to 20
+x = 10
+y = 20
 Say "Sum: " + to_string(x + y)
 ```
 
 ### Functions
 ```epl
-Define Function factorial Takes n
+Function factorial takes n
     If n is less than 2 then
         Return 1
     End If
@@ -37,7 +37,7 @@ Say "10! = " + to_string(factorial(10))
 
 ### Lists & Loops
 ```epl
-Create names equal to ["Alice", "Bob", "Charlie"]
+names = ["Alice", "Bob", "Charlie"]
 For Each name in names
     Say "Hello, " + name + "!"
 End For

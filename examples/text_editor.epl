@@ -6,7 +6,7 @@ Note: Create main window
 win = gui_window("EPL Text Editor", 800, 600)
 
 Note: Menu bar
-menu = gui_menu(win)
+# [AUTO-FIX] removed broken token
 
 Note: File path tracking
 current_file = ""
@@ -19,30 +19,30 @@ status_frame = gui_frame(win)
 status_label = gui_label(status_frame, "Ready | No file open", 10, "gray")
 
 Note: File operations
-Define Function new_file
+Function new_file
     gui_set_value(editor, "")
-    Set current_file to ""
+    current_file = ""
     gui_set_value(status_label, "Ready | New file")
 End
 
-Define Function open_file
+Function open_file
     path = gui_file_dialog("open")
     If path == "" Then
         Return Nothing
     End
     content = file_read(path)
     gui_set_value(editor, content)
-    Set current_file to path
+    current_file = path
     gui_set_value(status_label, "Opened: " + path)
 End
 
-Define Function save_file
+Function save_file
     If current_file == "" Then
         path = gui_file_dialog("save")
         If path == "" Then
             Return Nothing
         End
-        Set current_file to path
+        current_file = path
     End
     content = gui_get_value(editor)
     file_write(current_file, content)
@@ -50,7 +50,7 @@ Define Function save_file
     gui_messagebox("EPL Editor", "File saved successfully!", "info")
 End
 
-Define Function show_about
+Function show_about
     gui_messagebox("About", "EPL Text Editor v1.0\nBuilt with EPL Desktop GUI", "info")
 End
 
@@ -66,7 +66,7 @@ gui_button(toolbar, "New", lambda -> new_file())
 gui_button(toolbar, "Open", lambda -> open_file())
 gui_button(toolbar, "Save", lambda -> save_file())
 
-Note: Set default content
+Note: default = content
 gui_set_value(editor, "Welcome to EPL Text Editor!\n\nStart typing or open a file...")
 
 Note: Start the GUI

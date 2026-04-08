@@ -32,8 +32,8 @@ Note: Hello World
 Say "Hello, World!"
 
 Note: Variables
-Create name equal to "Abneesh"
-Create age equal to 20
+name = "Abneesh"
+age = 20
 
 Note: Conditionals
 If age is greater than 18 then
@@ -43,7 +43,7 @@ Otherwise
 End
 
 Note: Functions
-Define Function greet Takes person
+Function greet takes person
     Return "Hello, " + person + "!"
 End
 
@@ -55,7 +55,7 @@ Repeat 5 times
 End
 
 Note: Lists
-Create fruits equal to ["apple", "banana", "mango"]
+fruits = ["apple", "banana", "mango"]
 For Each fruit in fruits
     Say fruit
 End
@@ -136,17 +136,17 @@ epl serve
 Create WebApp called apiApp
 
 Route "/api/users" responds with
-    Create users equal to ["Alice", "Bob"]
+    users = ["Alice", "Bob"]
     Send json Map with users = users and count = length(users)
 End
 ```
 
 ### 🤖 AI & Machine Learning
 ```epl
-Use python "epl.ai" as ai
+Import "epl.ai" As ai
 
-Create messages equal to [Map with role = "user" and content = "Explain quantum computing simply"]
-Create response equal to ai.chat(messages)
+messages = [Map with role = "user" and content = "Explain quantum computing simply"]
+response = ai.chat(messages)
 Say response
 ```
 
@@ -154,9 +154,9 @@ Say response
 ```epl
 Import "epl-db"
 
-Create db equal to open("myapp.db")
-Call create_table(db, "users", Map with name = "TEXT" and email = "TEXT")
-Call insert(db, "users", Map with name = "Ada" and email = "ada@example.com")
+db = open("myapp.db")
+create_table(db, "users", Map with name = "TEXT" and email = "TEXT")
+insert(db, "users", Map with name = "Ada" and email = "ada@example.com")
 Say query(db, "SELECT * FROM users")
 ```
 

@@ -55,7 +55,7 @@ End
 
 ```epl
 Route "/api/users" responds with
-    Create users equal to ["Alice", "Bob"]
+    users = ["Alice", "Bob"]
     Send json Map with users = users and count = length(users)
 End
 ```
@@ -76,8 +76,8 @@ Example:
 
 ```epl
 Route "/users/:name" responds with
-    Create name equal to request_params.name
-    Create role equal to request_data.get("role")
+    name = request_params.name
+    role = request_data.get("role")
     Send json Map with name = name and role = role and path = request_path
 End
 ```
@@ -88,7 +88,7 @@ You can define variables before `Send json` and reuse them in page text with `$v
 
 ```epl
 Route "/hello/:name" shows
-    Create title equal to "Welcome, " + request_params.name
+    title = "Welcome, " + request_params.name
 
     Page "$title"
         Heading "$title"
@@ -104,11 +104,8 @@ Use the supported `epl-db` facade for application data:
 ```epl
 Import "epl-db"
 
-Create db equal to open(":memory:")
-Call create_table(db, "notes", Map with
-    id = "INTEGER PRIMARY KEY AUTOINCREMENT"
-    and title = "TEXT NOT NULL"
-)
+db = open(":memory:")
+create_table(db, "notes", Map with id = "INTEGER PRIMARY KEY AUTOINCREMENT" and title = "TEXT NOT NULL")
 
 Route "/api/notes" responds with
     Send json Map with notes = query(db, "SELECT id, title FROM notes ORDER BY id")
@@ -120,9 +117,9 @@ End
 EPL exposes auth helpers directly in the runtime:
 
 ```epl
-Create hash equal to auth_hash_password("secret")
-Create ok equal to auth_verify_password("secret", hash)
-Create token equal to auth_generate_token(32)
+hash = auth_hash_password("secret")
+ok = auth_verify_password("secret", hash)
+token = auth_generate_token(32)
 ```
 
 The `auth` starter template combines these helpers with `epl-db` and request context bindings for login/register APIs.
@@ -132,10 +129,10 @@ The `auth` starter template combines these helpers with `epl-db` and request con
 For chatbot-style apps, use the native WebApp DSL for HTTP routes and the Python bridge for model access:
 
 ```epl
-Use python "epl.ai" as ai
+Import "epl.ai" As ai
 
 Route "/api/chat" responds with
-    Create messages equal to [Map with role = "user" and content = request_data.get("message")]
+    messages = [Map with role = "user" and content = request_data.get("message")]
     Send json Map with reply = ai.chat(messages)
 End
 ```

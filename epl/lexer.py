@@ -46,6 +46,11 @@ class Lexer:
                 self.column = 1
                 continue
 
+            # Universal '# ' comments
+            if ch == '#':
+                self._skip_comment()
+                continue
+
             # Comments: Note: ...
             if ch.lower() == 'n' and self._match_word("note"):
                 if self.pos + 4 < len(self.source) and self.source[self.pos + 4] == ':':

@@ -46,7 +46,7 @@ Import "collections"
 
 Print ""
 Print "── Collections ──"
-Create data equal to [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5]
+data = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5]
 Print "  unique([3,1,4,1,5,9,2,6,5,3,5]) = " + to_text(unique(data))
 Print "  chunk([1,2,3,4,5], 2) = " + to_text(chunk([1, 2, 3, 4, 5], 2))
 Print "  flatten([[1,[2]],[3]]) = " + to_text(flatten([[1, [2]], [3]]))
@@ -55,20 +55,20 @@ Print "  take([10,20,30,40,50], 3) = " + to_text(take([10, 20, 30, 40, 50], 3))
 Print "  drop([10,20,30,40,50], 2) = " + to_text(drop([10, 20, 30, 40, 50], 2))
 
 Note: Stack demo
-Create stack equal to stack_new()
-Set stack to stack_push(stack, "first")
-Set stack to stack_push(stack, "second")
-Set stack to stack_push(stack, "third")
+stack = stack_new()
+stack = stack_push(stack, "first")
+stack = stack_push(stack, "second")
+stack = stack_push(stack, "third")
 Print "  Stack peek: " + stack_peek(stack)
-Create popped equal to stack_pop(stack)
+popped = stack_pop(stack)
 Print "  Stack pop: " + to_text(popped)
 
 Note: Queue demo
-Create queue equal to queue_new()
-Set queue to queue_enqueue(queue, "alpha")
-Set queue to queue_enqueue(queue, "beta")
-Set queue to queue_enqueue(queue, "gamma")
-Create front equal to queue_dequeue(queue)
+queue = queue_new()
+queue = queue_enqueue(queue, "alpha")
+queue = queue_enqueue(queue, "beta")
+queue = queue_enqueue(queue, "gamma")
+front = queue_dequeue(queue)
 Print "  Queue dequeue: " + to_text(front)
 Print "  Queue peek: " + queue_peek(queue)
 
@@ -79,21 +79,21 @@ Import "functional"
 
 Print ""
 Print "── Functional ──"
-Create numbers equal to [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-Create doubled equal to map_list(numbers, lambda x -> x * 2)
+doubled = map_list(numbers, lambda x -> x * 2)
 Print "  map x*2:  " + to_text(doubled)
 
-Create evens equal to filter_list(numbers, lambda x -> x % 2 == 0)
+evens = filter_list(numbers, lambda x -> x % 2 == 0)
 Print "  filter even: " + to_text(evens)
 
-Create total equal to reduce_list(numbers, lambda acc, x -> acc + x, 0)
+total = reduce_list(numbers, lambda acc, x -> acc + x, 0)
 Print "  reduce sum:  " + to_text(total)
 
-Create composed equal to compose(lambda x -> x * 2, lambda x -> x + 1)
+composed = compose(lambda x -> x * 2, lambda x -> x + 1)
 Print "  compose (x+1 then x*2)(4) = " + to_text(Call composed With 4)
 
-Create piped equal to pipe(5, [lambda x -> x * 2, lambda x -> x + 3, lambda x -> x * x])
+piped = pipe(5, [lambda x -> x * 2, lambda x -> x + 3, lambda x -> x * x])
 Print "  pipe 5 -> *2 -> +3 -> ^2 = " + to_text(piped)
 
 Note: ═══════════════════════════════════════════════════

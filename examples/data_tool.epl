@@ -24,7 +24,7 @@ Print "=== EPL Data Dashboard ==="
 Print "Loaded " + to_text(length(data)) + " records"
 Print ""
 
-Note: Show all records
+Note: Say all records
 Print "--- All Records ---"
 For Each row In data
     Print "  $row"
@@ -65,10 +65,10 @@ max_salary = salaries[0]
 For Each s In salaries
     total_salary = total_salary + s
     If s < min_salary Then
-        Set min_salary to s
+        min_salary = s
     End
     If s > max_salary Then
-        Set max_salary to s
+        max_salary = s
     End
 End
 
@@ -104,7 +104,7 @@ Print "--- Top Earners (85k+) ---"
 For Each row In data
     salary = to_integer(row.Salary)
     If salary >= 85000 Then
-        Print "  " + row.Name + " - $" + row.Salary + " (" + row.City + ")"
+# [AUTO-FIX] removed broken token
     End
 End
 

@@ -39,9 +39,9 @@ Note: --- Both syntaxes on same module ---
 Import "functional" as FP
 Print ""
 Print "5) Both :: and . work on same alias:"
-Create doubled equal to FP::map_list([1, 2, 3], lambda x -> x * 2)
+doubled = FP::map_list([1, 2, 3], lambda x -> x * 2)
 Print "   FP::map_list([1,2,3], x*2) = " + to_text(doubled)
-Create total equal to FP.reduce_list([1, 2, 3, 4, 5], lambda acc, x -> acc + x, 0)
+total = FP.reduce_list([1, 2, 3, 4, 5], lambda acc, x -> acc + x, 0)
 Print "   FP.reduce_list([1..5], sum) = " + to_text(total)
 
 Print ""
