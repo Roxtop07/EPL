@@ -214,6 +214,71 @@
         .spinner { animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         
+        /* AGENTIC FEATURES */
+        .ai-block {
+            margin-top: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            background: #000;
+            border-left: 3px solid var(--accent);
+        }
+        .ai-block pre {
+            margin: 0;
+            padding: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            overflow-x: auto;
+            font-size: 0.8rem;
+            color: #eab308;
+            border: none;
+        }
+        .ai-actions {
+            display: flex;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+        }
+        .ai-actions button {
+            flex: 1;
+            padding: 0.5rem;
+            background: transparent;
+            color: var(--text-dim);
+            border: none;
+            border-right: 1px solid var(--border);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .ai-actions button:last-child { border-right: none; }
+        .ai-actions button:hover {
+            color: var(--accent);
+            background: rgba(255, 69, 0, 0.1);
+        }
+        
+        .terminal-ai-btn {
+            background: rgba(255, 69, 0, 0.15);
+            color: var(--accent);
+            border: 1px dashed var(--accent);
+            padding: 4px 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .terminal-ai-btn:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
         /* SCROLLBARS */
         ::-webkit-scrollbar { width: 10px; height: 10px; }
         ::-webkit-scrollbar-track { background: var(--bg); border-left: 1px solid var(--border); }
@@ -469,6 +534,8 @@ Say greet("Abneesh")
 
         // Terminal Helper
         const terminal = document.getElementById("terminal");
+        let lastTerminalOutput = "";
+
         function printToTerminal(text, type='normal') {
             const span = document.createElement('span');
             if(type === 'error') span.className = 'error-msg';
@@ -481,6 +548,7 @@ Say greet("Abneesh")
 
         function clearTerminal() {
             terminal.innerHTML = '';
+            lastTerminalOutput = "";
         }
 
         // Pyodide Instance
@@ -577,16 +645,29 @@ output_res
             try {
                 printToTerminal(`> Executing [${new Date().toLocaleTimeString()}]...`, "system");
                 const result = await pyodide.runPythonAsync(pythonRunner);
+                lastTerminalOutput = result || "";
                 
                 if(result && typeof result === 'string' && result.startsWith("ERROR:")) {
                     printToTerminal(result, "error");
+                    // Inject AI Auto-Debug button!
+                    const aiBtn = document.createElement("button");
+                    aiBtn.className = "terminal-ai-btn";
+                    aiBtn.innerHTML = "<i class=\"fa-solid fa-robot\"></i> Analyze with AI Assistant";
+                    aiBtn.onclick = () => {
+                        window.toggleChat();
+                        document.getElementById('chat-input').value = "Why did I get this error? Please analyze my code and fix it.";
+                        window.sendChatMessage();
+                    };
+                    terminal.appendChild(aiBtn);
+                    terminal.scrollTop = terminal.scrollHeight;
                 } else if (result) {
                     printToTerminal(result);
                 } else {
                     printToTerminal("[Program exited with code 0]", "system");
                 }
             } catch (err) {
-                printToTerminal(`FATAL ERROR:\n${err}`, "error");
+                lastTerminalOutput = "FATAL ERROR:\n" + err;
+                printToTerminal(lastTerminalOutput, "error");
             }
         }
 
@@ -598,7 +679,7 @@ output_res
         const chatBody = document.getElementById('chat-body');
         const chatInput = document.getElementById('chat-input');
 
-        const systemPrompt = `You are the official AI Assistant and strict expert for EPL (English Programming Language).
+        const baseSystemPrompt = `You are an elite AI Copilot and strict expert for EPL (English Programming Language).
 EPL is a production-grade systems language where every keyword reads like natural English - DO NOT USE brackets {}, semicolons, or standard Python/C syntax!
 CORE SYNTAX RULES OF EPL:
 1. Variables: 'Set count to 5' or 'name = "Alice"'
@@ -607,28 +688,41 @@ CORE SYNTAX RULES OF EPL:
 4. Loops: 'Repeat 5 times \\n Say "Hi" \\n End'
 5. Functions: 'Function greet takes name \\n Return "Hi " + name \\n End'
 6. Web Server: 'Start server on port 3000 \\n Route "/api" responds with \\n Send JSON {"ok": true} \\n End \\n End'
-Always respond concisely. Always use Markdown code blocks for EPL code.`;
 
-        let chatHistory = [
-            { role: "system", content: systemPrompt }
-        ];
+You are fully agentic. The user has direct UI buttons to INSERT or REPLACE their code with your generated code blocks.
+Whenever the user asks to write, edit, or fix code, ALWAYS output the COMPLETE correct EPL code wrapped in standard triple backticks (e.g. \`\`\`epl ... \`\`\`).
+The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom of the system prompt to give you exact context.`;
 
-        function toggleChat() {
+        let chatHistory = [];
+
+        window.toggleChat = function() {
             chatWindow.classList.toggle('active');
             if(chatWindow.classList.contains('active')) {
                 chatInput.focus();
             }
-        }
+        };
 
-        function handleChatEnter(e) {
+        window.handleChatEnter = function(e) {
             if (e.key === 'Enter') {
-                sendChatMessage();
+                window.sendChatMessage();
             }
-        }
+        };
 
         function parseMarkdown(md) {
             let html = md.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            html = html.replace(/```[a-z]*\n([\s\S]*?)```/g, '<pre>$1</pre>');
+            
+            // Agentic Code Blocks parser
+            html = html.replace(/```[a-z]*\n([\s\S]*?)```/g, (match, code) => {
+                const encoded = encodeURIComponent(code);
+                return `<div class="ai-block">
+                    <pre>${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>
+                    <div class="ai-actions">
+                        <button onclick="editor.setValue(decodeURIComponent('${encoded}'))" title="Completely override workspace"><i class="fa-solid fa-file-import"></i> Replace Workspace</button>
+                        <button onclick="editor.replaceSelection(decodeURIComponent('${encoded}'))" title="Inject at cursor"><i class="fa-solid fa-plus"></i> Insert at Cursor</button>
+                    </div>
+                </div>`;
+            });
+            
             html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
             html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
             html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
@@ -644,34 +738,45 @@ Always respond concisely. Always use Markdown code blocks for EPL code.`;
             chatBody.scrollTop = chatBody.scrollHeight;
         }
 
-        function clearChat() {
-            chatHistory = [{ role: "system", content: systemPrompt }];
-            chatBody.innerHTML = '<div class="chat-msg bot">Chat context cleared. Im ready to write some native EPL! ⚡</div>';
-        }
+        window.clearChat = function() {
+            chatHistory = [];
+            chatBody.innerHTML = '<div class="chat-msg bot">Agent Memory Wiped. Code context synchronized. I am ready! ⚡</div>';
+        };
 
-        async function sendChatMessage() {
+        window.sendChatMessage = async function() {
             const text = chatInput.value.trim();
             if(!text) return;
             
             appendMessage(parseMarkdown(text), 'user');
             chatInput.value = '';
+            
+            // Append only user query to visible history array (to prevent massive token blowout from repetitive context)
             chatHistory.push({ role: "user", content: text });
 
             const typingId = "typing-" + Date.now();
             const msgDiv = document.createElement('div');
             msgDiv.className = `chat-msg bot`;
             msgDiv.id = typingId;
-            msgDiv.innerHTML = '<i class="fa-solid fa-circle-notch spinner"></i> Running neural network...';
+            msgDiv.innerHTML = '<i class="fa-solid fa-circle-notch spinner"></i> Analyzing Workspace & Neural Inference...';
             chatBody.appendChild(msgDiv);
             chatBody.scrollTop = chatBody.scrollHeight;
 
             try {
+                // Dynamically compile the Agent's Workspace Reality Payload
+                const dynamicContext = `\n\n--- ENVIRONMENT STATE ---\n[CURRENT WORKSPACE EPL CODE]\n\`\`\`epl\n${editor.getValue()}\n\`\`\`\n\n[LAST TERMINAL OUTPUT]\n\`\`\`\n${lastTerminalOutput}\n\`\`\``;
+                
+                // Shadow payload to API (includes the live context exactly once at the system root)
+                const apiPayload = [
+                    { role: "system", content: baseSystemPrompt + dynamicContext },
+                    ...chatHistory
+                ];
+
                 // Free public LLM API endpoint
                 const response = await fetch("https://text.pollinations.ai/openai", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        messages: chatHistory,
+                        messages: apiPayload,
                         model: "openai",
                         jsonMode: false
                     })
@@ -685,14 +790,18 @@ Always respond concisely. Always use Markdown code blocks for EPL code.`;
                 }
 
                 document.getElementById(typingId).remove();
+                
+                // Save AI response to history
                 chatHistory.push({ role: "assistant", content: replyText });
+                
+                // Render with Agentic interaction buttons
                 appendMessage(parseMarkdown(replyText), 'bot');
 
             } catch (err) {
                 document.getElementById(typingId).remove();
                 appendMessage("API Connection interrupted. Please ensure network access and try again.", 'bot');
             }
-        }
+        };
     </script>
 </body>
 </html>
