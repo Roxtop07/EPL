@@ -680,51 +680,29 @@ output_res
         const chatInput = document.getElementById('chat-input');
 
         const baseSystemPrompt = `You are the OMNISCIENT AI Copilot for EPL (English Programming Language).
-You have ABSOLUTE KNOWLEDGE of EPL's syntax, standard library, and architecture.
+You have ABSOLUTE KNOWLEDGE of the comprehensive 'EPL Book', syntax, standard library, and internal AST architecture.
 EPL is a production-grade systems language where keywords are natural English. NEVER use brackets {}, semicolons, colons, or standard C/Python syntax.
 
---- ARCHITECTURE KNOWLEDGE ---
-- EPL uses a custom Lexer (Lexical Analyzer) that converts natural English keywords (like 'Set', 'Say') into tokens.
-- It is powered by a tree-walking interpreter, an optimized Bytecode VM, and a native LLVM compiler.
-- Looping in EPL does not use 'for(;;)', it uses 'Repeat N times' or 'While' to iterate over instructions naturally.
+--- AGENTIC BEHAVIOR ---
+Any code you output inside \`\`\`epl ... \`\`\` will be AUTOMATICALLY INJECTED by the system directly into the user's Editor!
+Keep your conversational text concise because ONLY the casual chat stays inside the chatbot. All your generated code is piped straight to the developer's workspace.
 
---- FULL EPL SYNTAX REFERENCE ---
-1. Variables & Types: 'Set count to 5', 'name = "Alice"', 'Remember age as 25'
-   Types: integer, decimal, text, boolean, list, map, nothing.
+--- CAPABILITIES & PROGRAM TYPES ---
+1. FULLSTACK WEBSITES & WEB APPS:
+   'Start server on port 8000 \\n Route "/" responds with \\n HTML = "<style>body{background:#000;color:#0f0}</style><h1>Welcome</h1>" \\n Send HTML HTML \\n End \\n End'
+2. GAMES & CLI APPS:
+   'Print "Guess a number!" \\n guess = Ask "Enter number: " \\n If to_integer(guess) == 5 then \\n Print "You win" \\n End'
+3. CALCULATORS:
+   'Function calculate takes a, b \\n Return a + b \\n End'
+4. DEEP KNOWLEDGE FUNDAMENTALS:
+   Variables: 'Set count to 5', 'name = "Alice"'
+   Loops: 'Repeat 5 times \\n Say "Hi" \\n End', 'While x < 10 \\n End', 'For i from 1 to 10 \\n End'
+   Logic: 'If age >= 18 then \\n Say "Adult" \\n Otherwise \\n Say "Child" \\n End'
+   Functions: 'Function greet takes name \\n Return "Hi " + name \\n End'
+   Classes: 'Class Dog \\n Function speak \\n Say "Woof" \\n End \\n End'
+   Error Handling: 'Try \\n ... \\n Catch err \\n Say err \\n End'
 
-2. Collections (Lists & Maps):
-   'items = [1, 2, 3]', 'items.append(4)', 'items.remove(1)', 'items.contains(2)'
-   'person = Map with name = "John" and age = 30', 'person.set("job", "Dev")'
-
-3. Printing & Logic:
-   'Print "Hello"' or 'Say "Hello"'
-   'If age >= 18 then \\n Print "Adult" \\n Otherwise If age > 12 then \\n Print "Teen" \\n Otherwise \\n Print "Child" \\n End'
-
-4. Loops:
-   'Repeat 5 times \\n Say "Hi" \\n End'
-   'While x < 10 \\n Increase x by 1 \\n End'
-   'For i from 1 to 10 \\n Say i \\n End'
-   'For Each item in items \\n Say item \\n End'
-
-5. Functions & Lambdas:
-   'Function greet takes name \\n Return "Hi " + name \\n End'
-   'double = lambda x -> x * 2'
-
-6. Object Oriented (Classes):
-   'Class Animal \\n name = "" \\n Function speak \\n Say "Sound" \\n End \\n End'
-   'Class Dog extends Animal \\n Function speak \\n Say "Woof" \\n End \\n End'
-   'rex = new Dog'
-
-7. Error Handling:
-   'Try \\n x = 1/0 \\n Catch err \\n Say err \\n End'
-
-8. Web Server & UI/UX (Building Portfolios/Websites):
-   EPL natively supports ASGI web serving. To build proper UI/UX portfolios, return modern HTML/CSS.
-   'Start server on port 8000 \\n Route "/" responds with \\n page = "<!DOCTYPE html><html><style>body{background:#0a0a0a;color:#fff;font-family:sans-serif;text-align:center}</style><body><h1>EPL Portfolio</h1></body></html>" \\n Send HTML page \\n End \\n End'
-
-You are fully agentic. The user has direct UI buttons to INSERT or REPLACE their code with your generated code blocks.
-If the user asks for a portfolio or complex application, write the FULL, flawless EPL script inside \`\`\`epl ... \`\`\`. Use inline CSS for beautiful UI (glassmorphism, gradients) in string template vars.
-Answer any theory questions (like "what is a Lexer") perfectly.
+You MUST build exact, highly complex, perfectly working programs (calculators, games, web apps) perfectly using ONLY natural English EPL syntax. You must deeply understand what the user wants and deliver complete structural EPL code.
 The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom of the system prompt to give you exact context.`;
 
         let chatHistory = [];
@@ -744,19 +722,6 @@ The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom 
 
         function parseMarkdown(md) {
             let html = md.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            
-            // Agentic Code Blocks parser
-            html = html.replace(/```[a-z]*\n([\s\S]*?)```/g, (match, code) => {
-                const encoded = encodeURIComponent(code);
-                return `<div class="ai-block">
-                    <pre>${code.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>
-                    <div class="ai-actions">
-                        <button onclick="editor.setValue(decodeURIComponent('${encoded}'))" title="Completely override workspace"><i class="fa-solid fa-file-import"></i> Replace Workspace</button>
-                        <button onclick="editor.replaceSelection(decodeURIComponent('${encoded}'))" title="Inject at cursor"><i class="fa-solid fa-plus"></i> Insert at Cursor</button>
-                    </div>
-                </div>`;
-            });
-            
             html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
             html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
             html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
@@ -825,11 +790,30 @@ The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom 
 
                 document.getElementById(typingId).remove();
                 
-                // Save AI response to history
+                // Save AI original response to history
                 chatHistory.push({ role: "assistant", content: replyText });
                 
-                // Render with Agentic interaction buttons
-                appendMessage(parseMarkdown(replyText), 'bot');
+                // Auto-Typer Agentic Logic:
+                const codeBlockRegex = /```(?:epl|[a-z]*)\n([\s\S]*?)```/gi;
+                let codeChunks = [];
+                
+                // Filter out the code blocks from conversational text
+                let conversationalText = replyText.replace(codeBlockRegex, (match, code) => {
+                    codeChunks.push(code.trim());
+                    return `<div class="ai-block" style="border-left: 3px solid #0f0;">
+                        <div class="ai-actions" style="background: rgba(0, 255, 0, 0.05); color: #0f0; padding: 0.6rem; text-align: center; font-weight: bold;">
+                            <i class="fa-solid fa-bolt"></i> Auto-Typed Extracted Code Directly into Workspace
+                        </div>
+                    </div>`;
+                });
+
+                // Directly type the code into the CodeMirror editor!
+                if (codeChunks.length > 0) {
+                    editor.setValue(codeChunks.join("\n\n"));
+                }
+                
+                // Render ONLY conversational text inside chatbot UI
+                appendMessage(parseMarkdown(conversationalText), 'bot');
 
             } catch (err) {
                 document.getElementById(typingId).remove();
