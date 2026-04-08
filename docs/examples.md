@@ -16,7 +16,7 @@ Page "/" renders
     Link "/about" shows "About this app"
 End
 
-Route GET "/api/health" responds with
+Route "/api/health" responds with
     Return Map with status = "ok" and version = "1.0.0"
 End
 
@@ -36,15 +36,15 @@ Full RESTful CRUD API with SQLite.
 ```epl
 Create WebApp called app
 db = db_open("todos.db")
-db_create_table(db, "todos", Map with id = "INTEGER PRIMARY KEY AUTOINCREMENT" and title = "TEXT NOT NULL" and completed = "INTEGER DEFAULT 0"
-)
+Note: [Parser Error] db_create_table(db, "todos", Map with id = "INTEGER PRIMARY KEY AUTOINCREMENT" and title = "TEXT NOT NULL" and completed = "INTEGER DEFAULT 0"
+Note: [Parser Error] )
 
-Route GET "/api/todos" responds with
+Route "/api/todos" responds with
     todos = db_query(db, "SELECT * FROM todos ORDER BY id DESC")
     Return Map with success = True and data = todos
 End
 
-Route POST "/api/todos" responds with
+Route "/api/todos" responds with
     body = request_body()
     db_execute(db, "INSERT INTO todos (title) VALUES (?)", [body.get("title")])
     Return Map with success = True and message = "Created"
@@ -58,7 +58,7 @@ epl serve examples/todo_api/main.epl
 
 # Test:
 curl http://localhost:8000/api/todos
-curl -X POST http://localhost:8000/api/todos -d '{"title":"Buy groceries"}'
+curl -X POST http://localhost:8000/api/todos -d '{"title":"Buy groceries"End'
 ```
 
 ---
@@ -77,18 +77,18 @@ Repeat 3 times
 End
 
 While running == True
-    input = Ask "calc> "
-    If input == "quit" then
+Note: [Parser Error]     input = Ask "calc> "
+Note: [Parser Error]     If input == "quit" then
         running = False
-    Otherwise if input == "history" then
+Note: [Parser Error]     Otherwise if input == "history" then
         For Each entry in history
             Say entry
         End
-    Otherwise
-        result = evaluate(input)
+Note: [Parser Error]     Otherwise
+Note: [Parser Error]         result = evaluate(input)
         Say "= " + to_string(result)
     End
-End
+Note: [Parser Error] End
 ```
 
 ```bash

@@ -32,15 +32,15 @@ epl android myapp.epl --name "My App" --build
 Note: A simple counter app
 count = 0
 
-Define Function increment
+Function increment
     count = count + 1
     Say "Count: " + to_string(count)
-End Function
+End
 
-Define Function decrement
+Function decrement
     count = count - 1
     Say "Count: " + to_string(count)
-End Function
+End
 ```
 
 ```bash

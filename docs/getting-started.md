@@ -63,7 +63,7 @@ If score is greater than 90 then
     Say "Grade: A"
 Otherwise
     Say "Grade: B"
-End If
+End
 ```
 
 ### Loops
@@ -72,13 +72,13 @@ End If
 Note: Count from 1 to 5
 Repeat 5 times
     Say "Counting..."
-End Repeat
+End
 
 Note: Loop over a list
 fruits = ["apple", "banana", "mango"]
 For Each fruit in fruits
     Say fruit
-End For
+End
 ```
 
 ### Functions
@@ -86,7 +86,7 @@ End For
 ```epl
 Function greet takes name
     Return "Hello, " + name + "!"
-End Function
+End
 
 Say greet("World")
 ```
@@ -96,16 +96,16 @@ Say greet("World")
 ```epl
 Class Animal
     Function Begin takes name
-        Set this.name equal to name
-    End Function
+Note: [Parser Error]         this.name = name
+    End
 
-    Define Function speak
+    Function speak
         Say this.name + " makes a sound"
-    End Function
-End Class
+    End
+End
 
 dog = New Animal("Rex")
-Call dog.speak()
+dog.speak()
 ```
 
 ---
@@ -130,14 +130,14 @@ Useful REPL commands:
 
 ```epl
 Start server on port 8080
-    Route GET "/"
+    Route "/"
         Send "Welcome to my EPL web app!"
-    End Route
+    End
 
-    Route GET "/hello"
+    Route "/hello"
         Send "Hello from EPL!"
-    End Route
-End Server
+    End
+Note: [Parser Error] End
 ```
 
 Run it:

@@ -208,22 +208,22 @@ The lockfile pins exact resolved versions for reproducible builds.
   "metadata": {
     "project": "my-project",
     "manifest": "epl.toml"
-  },
+  End,
   "packages": {
     "epl-math": {
       "version": "1.2.0",
       "integrity": "abc123...",
       "required_by": ["my-project"]
-    }
-  },
+    End
+  End,
   "python_packages": {
     "yaml": {
       "distribution": "PyYAML",
       "version": "6.0.1",
       "pip_spec": "pyyaml>=6",
       "integrity": "def456..."
-    }
-  },
+    End
+  End,
   "github_packages": {
     "web-kit": {
       "repo": "epl-lang/web-kit",
@@ -231,9 +231,9 @@ The lockfile pins exact resolved versions for reproducible builds.
       "package": "web-kit-pkg",
       "version": "1.2.0",
       "integrity": "ghi789..."
-    }
-  }
-}
+    End
+  End
+End
 ```
 
 ### Lockfile Commands

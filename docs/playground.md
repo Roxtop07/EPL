@@ -28,9 +28,9 @@ Say "Sum: " + to_string(x + y)
 Function factorial takes n
     If n is less than 2 then
         Return 1
-    End If
+    End
     Return n * factorial(n - 1)
-End Function
+End
 
 Say "10! = " + to_string(factorial(10))
 ```
@@ -40,5 +40,5 @@ Say "10! = " + to_string(factorial(10))
 names = ["Alice", "Bob", "Charlie"]
 For Each name in names
     Say "Hello, " + name + "!"
-End For
+End
 ```

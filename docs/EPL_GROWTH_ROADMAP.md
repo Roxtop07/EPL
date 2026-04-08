@@ -136,7 +136,7 @@ name = "epl-lang"
 version = "7.0.0"
 description = "English Programming Language — Write code in plain English"
 readme = "README.md"
-license = {text = "MIT"}
+license = {text = "MIT"End
 requires-python = ">=3.9"
 keywords = ["programming-language", "english", "beginner-friendly", "compiler"]
 classifiers = [
@@ -350,7 +350,7 @@ Create these labels to attract contributors:
 | 5 | Conditions | `If score > 90 Then Say "A grade!"` |
 | 6 | Loops | `Repeat 10 times` / `For Each item In list` |
 | 7 | Lists | `Set fruits To ["apple", "banana"]` |
-| 8 | Functions | `Define function greet takes name` |
+| 8 | Functions | `Function greet takes name` |
 | 9 | Files | `Read file "data.txt" into content` |
 | 10 | Web Server | `epl serve myapp.epl` |
 

@@ -12,107 +12,107 @@
   --ink: #0B2A4A; --ink2: #334155; --ink3: #64748B;
   --code-bg: #F5F5F5; --code-border: #E5E5E5;
   --page-w: 860px;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-html{scroll-behavior:smooth;}
-body{font-family:'Crimson Pro',Georgia,serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.9;overflow-x:hidden;}
-#topnav{position:sticky;top:0;z-index:200;background:var(--ink);border-bottom:3px solid var(--accent);padding:0 24px;display:flex;align-items:center;height:52px;box-shadow:0 2px 16px rgba(0,0,0,.3);}
-.nav-brand{font-family:'Inter',sans-serif;font-size:15px;font-weight:700;color:var(--accent);margin-right:20px;white-space:nowrap;}
-.nav-links{display:flex;flex:1;overflow-x:auto;scrollbar-width:none;}
-.nav-links::-webkit-scrollbar{display:none;}
-.nav-links a{font-family:'Inter',sans-serif;font-size:11.5px;font-weight:500;color:rgba(255,255,255,.7);text-decoration:none;padding:0 12px;height:52px;display:flex;align-items:center;border-bottom:3px solid transparent;transition:.15s;white-space:nowrap;}
-.nav-links a:hover{color:#fff;border-bottom-color:var(--accent);}
-.nav-pdf-btn{font-family:'Inter',sans-serif;font-size:12px;font-weight:600;background:var(--accent);color:#fff;border:none;cursor:pointer;padding:7px 18px;border-radius:6px;margin-left:16px;white-space:nowrap;}
-.nav-pdf-btn:hover{background:var(--accent-dark);}
-#book{max-width:var(--page-w);margin:0 auto;}
-.chapter{padding:72px 48px 64px;border-bottom:2px solid var(--border);}
-.chapter:last-child{border-bottom:none;}
-#cover { min-height: 100vh; position: relative; background-color: #050a15; display: flex; flex-direction: column; padding: 0; margin: 0; overflow: hidden; color-adjust: exact; -webkit-print-color-adjust: exact; }
-img.cover-bg-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: 0; opacity: 1; }
-.cover-code-mesh { position: absolute; top: 10%; left: 10%; font-family: 'JetBrains Mono', monospace, sans-serif; font-size: 14px; color: rgba(100, 150, 255, 0.2); line-height: 1.6; z-index: 1; pointer-events: none; text-shadow: 0 0 10px rgba(100, 150, 255, 0.4); white-space: pre; }
-.cover-center { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 0 15%; text-align: left; }
-.cover-maintitle { font-family: 'Inter', sans-serif; font-size: 110px; font-weight: 800; color: #ffffff; letter-spacing: -3px; line-height: 1; margin: 0 0 16px 0; text-shadow: 0 10px 40px rgba(0,0,0,0.8); }
-.cover-subtitle { font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 500; color: #f8fafc; line-height: 1.4; margin: 0; letter-spacing: -0.5px; text-shadow: 0 5px 20px rgba(0,0,0,0.8); }
-.cover-footer { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: flex-end; padding: 48px 15%; }
-.cover-author { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; color: #f8fafc; letter-spacing: -0.5px; margin-bottom: 6px; }
-.cover-credentials { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: #94a3b8; letter-spacing: 0.5px; }
-.chapter-num{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
-h1{font-family:'Crimson Pro',serif;font-size:44px;font-weight:700;color:var(--ink);line-height:1.1;margin-bottom:12px;}
-.ch-intro{font-size:18px;color:var(--ink3);font-style:italic;font-weight:300;margin-bottom:40px;border-left:4px solid var(--accent);padding-left:16px;line-height:1.6;}
-h2{font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--ink);margin:52px 0 16px;padding-bottom:10px;border-bottom:2px solid var(--border);}
-h3{font-family:'Inter',sans-serif;font-size:17px;font-weight:700;color:var(--accent-dark);margin:36px 0 12px;}
-h4{font-family:'Inter',sans-serif;font-size:14px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.8px;margin:28px 0 8px;}
-p{margin-bottom:18px;}
-ul,ol{margin:16px 0 20px 28px;}
-li{margin-bottom:9px;}
-strong{font-weight:700;color:var(--ink);}
-em{font-style:italic;color:var(--ink2);}
-code{font-family:'JetBrains Mono',monospace;font-size:13.5px;color:var(--accent-dark);background:var(--code-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--code-border);}
-.code-wrap{background:var(--code-bg);border-radius:10px;margin:24px 0;overflow:hidden;border:1px solid var(--code-border);box-shadow:0 4px 12px rgba(0,0,0,.05);}
-.code-head{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#EAEAEA;border-bottom:1px solid var(--code-border);}
-.code-dots{display:flex;gap:6px;}
-.code-dots span{width:10px;height:10px;border-radius:50%;display:block;}
-.dot-r{background:#ff5f57;}.dot-y{background:#ffbd2e;}.dot-g{background:#28c840;}
-.code-lang{font-family:'Inter',sans-serif;font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:1.5px;text-transform:uppercase;}
-.code-file{font-family:'Inter',sans-serif;font-size:11px;color:var(--ink3);}
-pre{padding:20px 22px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.75;overflow-x:auto;color:#24292E;}
-.kw{color:#D73A49;font-weight:600;}.fn{color:#6F42C1;}.str{color:#032F62;}.num{color:#005CC5;}.cmt{color:#6A737D;font-style:italic;}.cls{color:#D73A49;font-weight:700;}.op{color:#D73A49;}
-.diagram{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:24px 0;}
-.diagram-title{font-family:'Inter',sans-serif;font-size:11px;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;}
-.diagram pre{background:none;border:none;padding:0;color:var(--ink2);font-size:12.5px;line-height:1.65;}
-.callout{border-radius:8px;padding:18px 22px;margin:28px 0;border-left:5px solid;font-family:'Inter',sans-serif;font-size:14.5px;line-height:1.65;}
-.info{background:#F0F9FF;border-color:#38BDF8;color:#0369A1;}
-.tip{background:#F0FDF4;border-color:#22C55E;color:#15803D;}
-.warn{background:#FFFBEB;border-color:#F59E0B;color:#B45309;}
-.danger{background:#FEF2F2;border-color:#EF4444;color:#B91C1C;}
-.callout strong{display:block;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
-table{width:100%;table-layout:fixed;border-collapse:collapse;margin:20px 0;font-family:'Inter',sans-serif;font-size:14px;}
-th{background:var(--bg2);color:var(--ink);padding:11px 14px;text-align:left;font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-bottom:2px solid var(--border);}
-td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--ink2);word-wrap:break-word;word-break:break-word;}
-table code{white-space:pre-wrap!important;word-break:break-word!important;}
-tr:nth-child(even) td{background:var(--bg2);}
-.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0;}
-.feat-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:18px;border-top:3px solid var(--accent);}
-.feat-card h4{margin:0 0 8px;font-size:13px;color:var(--accent-dark);text-transform:none;letter-spacing:0;}
-.feat-card p{font-family:'Inter',sans-serif;font-size:13.5px;color:var(--ink3);margin:0;line-height:1.55;}
-blockquote{border-left:4px solid var(--accent);padding:14px 22px;margin:28px 0;background:var(--bg2);border-radius:0 8px 8px 0;font-style:italic;color:var(--ink2);}
-blockquote footer{font-family:'Inter',sans-serif;font-size:13px;font-style:normal;color:var(--ink3);margin-top:8px;}
-.toc-entry{display:grid;grid-template-columns:60px 1fr 50px;gap:0;padding:9px 0;border-bottom:1px dotted var(--border);font-family:'Inter',sans-serif;}
-.toc-num{font-size:12px;color:var(--ink3);}
-.toc-name{font-size:14.5px;color:var(--ink2);}
-.toc-name a{color:inherit;text-decoration:none;}
-.toc-name a:hover{color:var(--accent);}
-.toc-pg{font-size:12px;color:var(--ink3);text-align:right;}
-.toc-section{font-family:'Inter',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin:28px 0 8px;}
-.chapter-end{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin-top:48px;}
-.chapter-end h4{font-family:'Inter',sans-serif;font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin:0 0 12px;}
-.chapter-end ul{margin:0;padding-left:20px;font-family:'Inter',sans-serif;font-size:14px;}
-.chapter-end li{margin-bottom:5px;color:var(--ink2);}
-.exercise-box{background:#F0F9FF;border:1px solid #BAE6FD;border-radius:10px;padding:24px 28px;margin:32px 0;}
-.exercise-box h4{font-family:'Inter',sans-serif;font-size:12px;font-weight:700;color:#0284C7;text-transform:uppercase;letter-spacing:2px;margin:0 0 16px;}
-.exercise-box ol{margin:0;padding-left:20px;font-family:'Inter',sans-serif;font-size:14px;color:var(--ink2);}
-.exercise-box li{margin-bottom:10px;}
-.key-term{display:inline-block;font-family:'Inter',sans-serif;font-weight:700;color:var(--accent);border-bottom:2px solid var(--accent);margin-right:4px;}
-.annotation{background:#FFFBEB;border:1px solid #FCD34D;border-radius:8px;padding:16px 20px;margin:16px 0;font-family:'Inter',sans-serif;font-size:14px;color:#92400E;}
-.annotation strong{display:block;font-size:12px;font-weight:700;text-transform:uppercase;color:#D97706;margin-bottom:4px;}
+End
+*{box-sizing:border-box;margin:0;padding:0;End
+html{scroll-behavior:smooth;End
+body{font-family:'Crimson Pro',Georgia,serif;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.9;overflow-x:hidden;End
+#topnav{position:sticky;top:0;z-index:200;background:var(--ink);border-bottom:3px solid var(--accent);padding:0 24px;display:flex;align-items:center;height:52px;box-shadow:0 2px 16px rgba(0,0,0,.3);End
+.nav-brand{font-family:'Inter',sans-serif;font-size:15px;font-weight:700;color:var(--accent);margin-right:20px;white-space:nowrap;End
+.nav-links{display:flex;flex:1;overflow-x:auto;scrollbar-width:none;End
+.nav-links::-webkit-scrollbar{display:none;End
+.nav-links a{font-family:'Inter',sans-serif;font-size:11.5px;font-weight:500;color:rgba(255,255,255,.7);text-decoration:none;padding:0 12px;height:52px;display:flex;align-items:center;border-bottom:3px solid transparent;transition:.15s;white-space:nowrap;End
+.nav-links a:hover{color:#fff;border-bottom-color:var(--accent);End
+.nav-pdf-btn{font-family:'Inter',sans-serif;font-size:12px;font-weight:600;background:var(--accent);color:#fff;border:none;cursor:pointer;padding:7px 18px;border-radius:6px;margin-left:16px;white-space:nowrap;End
+.nav-pdf-btn:hover{background:var(--accent-dark);End
+#book{max-width:var(--page-w);margin:0 auto;End
+.chapter{padding:72px 48px 64px;border-bottom:2px solid var(--border);End
+.chapter:last-child{border-bottom:none;End
+#cover { min-height: 100vh; position: relative; background-color: #050a15; display: flex; flex-direction: column; padding: 0; margin: 0; overflow: hidden; color-adjust: exact; -webkit-print-color-adjust: exact; End
+img.cover-bg-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: 0; opacity: 1; End
+.cover-code-mesh { position: absolute; top: 10%; left: 10%; font-family: 'JetBrains Mono', monospace, sans-serif; font-size: 14px; color: rgba(100, 150, 255, 0.2); line-height: 1.6; z-index: 1; pointer-events: none; text-shadow: 0 0 10px rgba(100, 150, 255, 0.4); white-space: pre; End
+.cover-center { position: relative; z-index: 2; flex: 1; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 0 15%; text-align: left; End
+.cover-maintitle { font-family: 'Inter', sans-serif; font-size: 110px; font-weight: 800; color: #ffffff; letter-spacing: -3px; line-height: 1; margin: 0 0 16px 0; text-shadow: 0 10px 40px rgba(0,0,0,0.8); End
+.cover-subtitle { font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 500; color: #f8fafc; line-height: 1.4; margin: 0; letter-spacing: -0.5px; text-shadow: 0 5px 20px rgba(0,0,0,0.8); End
+.cover-footer { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: flex-end; padding: 48px 15%; End
+.cover-author { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; color: #f8fafc; letter-spacing: -0.5px; margin-bottom: 6px; End
+.cover-credentials { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; color: #94a3b8; letter-spacing: 0.5px; End
+.chapter-num{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;End
+h1{font-family:'Crimson Pro',serif;font-size:44px;font-weight:700;color:var(--ink);line-height:1.1;margin-bottom:12px;End
+.ch-intro{font-size:18px;color:var(--ink3);font-style:italic;font-weight:300;margin-bottom:40px;border-left:4px solid var(--accent);padding-left:16px;line-height:1.6;End
+h2{font-family:'Inter',sans-serif;font-size:22px;font-weight:700;color:var(--ink);margin:52px 0 16px;padding-bottom:10px;border-bottom:2px solid var(--border);End
+h3{font-family:'Inter',sans-serif;font-size:17px;font-weight:700;color:var(--accent-dark);margin:36px 0 12px;End
+h4{font-family:'Inter',sans-serif;font-size:14px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.8px;margin:28px 0 8px;End
+p{margin-bottom:18px;End
+ul,ol{margin:16px 0 20px 28px;End
+li{margin-bottom:9px;End
+strong{font-weight:700;color:var(--ink);End
+em{font-style:italic;color:var(--ink2);End
+code{font-family:'JetBrains Mono',monospace;font-size:13.5px;color:var(--accent-dark);background:var(--code-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--code-border);End
+.code-wrap{background:var(--code-bg);border-radius:10px;margin:24px 0;overflow:hidden;border:1px solid var(--code-border);box-shadow:0 4px 12px rgba(0,0,0,.05);End
+.code-head{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#EAEAEA;border-bottom:1px solid var(--code-border);End
+.code-dots{display:flex;gap:6px;End
+.code-dots span{width:10px;height:10px;border-radius:50%;display:block;End
+.dot-r{background:#ff5f57;End.dot-y{background:#ffbd2e;End.dot-g{background:#28c840;End
+.code-lang{font-family:'Inter',sans-serif;font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:1.5px;text-transform:uppercase;End
+.code-file{font-family:'Inter',sans-serif;font-size:11px;color:var(--ink3);End
+pre{padding:20px 22px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.75;overflow-x:auto;color:#24292E;End
+.kw{color:#D73A49;font-weight:600;End.fn{color:#6F42C1;End.str{color:#032F62;End.num{color:#005CC5;End.cmt{color:#6A737D;font-style:italic;End.cls{color:#D73A49;font-weight:700;End.op{color:#D73A49;End
+.diagram{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:24px 0;End
+.diagram-title{font-family:'Inter',sans-serif;font-size:11px;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;End
+.diagram pre{background:none;border:none;padding:0;color:var(--ink2);font-size:12.5px;line-height:1.65;End
+.callout{border-radius:8px;padding:18px 22px;margin:28px 0;border-left:5px solid;font-family:'Inter',sans-serif;font-size:14.5px;line-height:1.65;End
+.info{background:#F0F9FF;border-color:#38BDF8;color:#0369A1;End
+.tip{background:#F0FDF4;border-color:#22C55E;color:#15803D;End
+.warn{background:#FFFBEB;border-color:#F59E0B;color:#B45309;End
+.danger{background:#FEF2F2;border-color:#EF4444;color:#B91C1C;End
+.callout strong{display:block;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;End
+table{width:100%;table-layout:fixed;border-collapse:collapse;margin:20px 0;font-family:'Inter',sans-serif;font-size:14px;End
+th{background:var(--bg2);color:var(--ink);padding:11px 14px;text-align:left;font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;border-bottom:2px solid var(--border);End
+td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--ink2);word-wrap:break-word;word-break:break-word;End
+table code{white-space:pre-wrap!important;word-break:break-word!important;End
+tr:nth-child(even) td{background:var(--bg2);End
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0;End
+.feat-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:18px;border-top:3px solid var(--accent);End
+.feat-card h4{margin:0 0 8px;font-size:13px;color:var(--accent-dark);text-transform:none;letter-spacing:0;End
+.feat-card p{font-family:'Inter',sans-serif;font-size:13.5px;color:var(--ink3);margin:0;line-height:1.55;End
+blockquote{border-left:4px solid var(--accent);padding:14px 22px;margin:28px 0;background:var(--bg2);border-radius:0 8px 8px 0;font-style:italic;color:var(--ink2);End
+blockquote footer{font-family:'Inter',sans-serif;font-size:13px;font-style:normal;color:var(--ink3);margin-top:8px;End
+.toc-entry{display:grid;grid-template-columns:60px 1fr 50px;gap:0;padding:9px 0;border-bottom:1px dotted var(--border);font-family:'Inter',sans-serif;End
+.toc-num{font-size:12px;color:var(--ink3);End
+.toc-name{font-size:14.5px;color:var(--ink2);End
+.toc-name a{color:inherit;text-decoration:none;End
+.toc-name a:hover{color:var(--accent);End
+.toc-pg{font-size:12px;color:var(--ink3);text-align:right;End
+.toc-section{font-family:'Inter',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin:28px 0 8px;End
+.chapter-end{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin-top:48px;End
+.chapter-end h4{font-family:'Inter',sans-serif;font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin:0 0 12px;End
+.chapter-end ul{margin:0;padding-left:20px;font-family:'Inter',sans-serif;font-size:14px;End
+.chapter-end li{margin-bottom:5px;color:var(--ink2);End
+.exercise-box{background:#F0F9FF;border:1px solid #BAE6FD;border-radius:10px;padding:24px 28px;margin:32px 0;End
+.exercise-box h4{font-family:'Inter',sans-serif;font-size:12px;font-weight:700;color:#0284C7;text-transform:uppercase;letter-spacing:2px;margin:0 0 16px;End
+.exercise-box ol{margin:0;padding-left:20px;font-family:'Inter',sans-serif;font-size:14px;color:var(--ink2);End
+.exercise-box li{margin-bottom:10px;End
+.key-term{display:inline-block;font-family:'Inter',sans-serif;font-weight:700;color:var(--accent);border-bottom:2px solid var(--accent);margin-right:4px;End
+.annotation{background:#FFFBEB;border:1px solid #FCD34D;border-radius:8px;padding:16px 20px;margin:16px 0;font-family:'Inter',sans-serif;font-size:14px;color:#92400E;End
+.annotation strong{display:block;font-size:12px;font-weight:700;text-transform:uppercase;color:#D97706;margin-bottom:4px;End
 @media print {
-  #topnav{display:none!important;}
-  body{background:var(--bg)!important;font-size:11pt;line-height:1.7;color:var(--ink)!important;-webkit-print-color-adjust:exact;color-adjust:exact;print-color-adjust:exact;}
-  * {-webkit-print-color-adjust:exact;color-adjust:exact;print-color-adjust:exact;}
-  #cover{height:100vh!important;padding:0!important;margin:0!important;border:none!important;page-break-after:always;}
-  .cover-center, .cover-code-mesh { display: none !important; }
-  img.cover-bg-image { display: block !important; width: 100vw; height: 100vh; position: absolute; top:0; left:0; right:0; bottom:0; object-fit: cover !important; object-position: center !important; z-index: 0; }
-  #book{max-width:100%!important;margin:0!important;padding:0!important;}
-  .chapter{page-break-before:always;border-bottom:none;background:var(--bg)!important;color:var(--ink)!important;}
-  h1{font-size:28pt;color:var(--ink)!important;}
-  h2{font-size:16pt;page-break-after:avoid;margin-top:32px;page-break-inside:avoid;color:var(--ink)!important;}
-  h3{font-size:13pt;page-break-after:avoid;color:var(--ink)!important;}
-  p{orphans:4;widows:4;color:var(--ink2)!important;}
-  .callout, .exercise-box, .chapter-end, .annotation, .feat-card, blockquote, .diagram, tr { page-break-inside: avoid; break-inside: avoid; }
-  .code-wrap{background:var(--code-bg)!important;overflow:visible!important;}
-  .callout, .exercise-box{background:var(--bg2)!important;border-color:var(--border)!important;}
-  pre{font-size:9pt;line-height:1.5;white-space:pre-wrap!important;word-wrap:break-word!important;overflow-x:visible!important;}
-}
+  #topnav{display:none!important;End
+  body{background:var(--bg)!important;font-size:11pt;line-height:1.7;color:var(--ink)!important;-webkit-print-color-adjust:exact;color-adjust:exact;print-color-adjust:exact;End
+  * {-webkit-print-color-adjust:exact;color-adjust:exact;print-color-adjust:exact;End
+  #cover{height:100vh!important;padding:0!important;margin:0!important;border:none!important;page-break-after:always;End
+  .cover-center, .cover-code-mesh { display: none !important; End
+  img.cover-bg-image { display: block !important; width: 100vw; height: 100vh; position: absolute; top:0; left:0; right:0; bottom:0; object-fit: cover !important; object-position: center !important; z-index: 0; End
+  #book{max-width:100%!important;margin:0!important;padding:0!important;End
+  .chapter{page-break-before:always;border-bottom:none;background:var(--bg)!important;color:var(--ink)!important;End
+  h1{font-size:28pt;color:var(--ink)!important;End
+  h2{font-size:16pt;page-break-after:avoid;margin-top:32px;page-break-inside:avoid;color:var(--ink)!important;End
+  h3{font-size:13pt;page-break-after:avoid;color:var(--ink)!important;End
+  p{orphans:4;widows:4;color:var(--ink2)!important;End
+  .callout, .exercise-box, .chapter-end, .annotation, .feat-card, blockquote, .diagram, tr { page-break-inside: avoid; break-inside: avoid; End
+  .code-wrap{background:var(--code-bg)!important;overflow:visible!important;End
+  .callout, .exercise-box{background:var(--bg2)!important;border-color:var(--border)!important;End
+  pre{font-size:9pt;line-height:1.5;white-space:pre-wrap!important;word-wrap:break-word!important;overflow-x:visible!important;End
+End
 
 /* -----------------------------------------
    PAGED.JS EXACT MARGINS, HEADERS & FOOTERS 
@@ -129,7 +129,7 @@ blockquote footer{font-family:'Inter',sans-serif;font-size:13px;font-style:norma
     color: #64748B;
     text-transform: uppercase;
     letter-spacing: 1px;
-  }
+  End
   
   @bottom-center {
     content: counter(page);
@@ -137,26 +137,26 @@ blockquote footer{font-family:'Inter',sans-serif;font-size:13px;font-style:norma
     font-size: 10pt;
     font-weight: 700;
     color: #0B2A4A;
-  }
-}
+  End
+End
 
 /* Override Cover Page */
 @page:first {
   margin: 0;
-  @top-left { content: none; }
-  @bottom-center { content: none; }
-}
+  @top-left { content: none; End
+  @bottom-center { content: none; End
+End
 
 /* Reset Page counter completely at the TOC */
 #toc {
   counter-reset: page 1;
-}
+End
 
 /* Screen Preview Styling for Paged.js */
 @media screen {
-  .pagedjs_pages { display: flex; flex-direction: column; align-items: center; background: #e2e8f0; padding: 40px 0; }
-  .pagedjs_page { background: #fff; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-}
+  .pagedjs_pages { display: flex; flex-direction: column; align-items: center; background: #e2e8f0; padding: 40px 0; End
+  .pagedjs_page { background: #fff; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); End
+End
 </style>
 <script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
 </head>
@@ -284,7 +284,7 @@ blockquote footer{font-family:'Inter',sans-serif;font-size:13px;font-style:norma
 <p>EPL's design is governed by a single principle: <strong>at every decision point, choose the option that reads most naturally as English</strong>. This principle guided every keyword choice, every structural decision, and every feature inclusion or exclusion.</p>
 <p>Consider how other languages express a loop that runs five times:</p>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">Comparison</div></div><pre><span class="cmt">/* C / JavaScript / Java */</span>
-<span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; 5; i++) { ... }
+<span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; 5; i++) { ... End
 
 <span class="cmt"># Python</span>
 <span class="kw">for</span> i <span class="kw">in</span> range(5): ...
@@ -310,10 +310,10 @@ blockquote footer{font-family:'Inter',sans-serif;font-size:13px;font-style:norma
   <tr><th>Feature</th><th>Python</th><th>JavaScript</th><th>Java</th><th>EPL</th></tr>
   <tr><td>Print text</td><td><code>print("Hi")</code></td><td><code>console.log("Hi")</code></td><td><code>System.out.println("Hi")</code></td><td><code>Say "Hi"</code></td></tr>
   <tr><td>Declare variable</td><td><code>x = 5</code></td><td><code>let x = 5;</code></td><td><code>int x = 5;</code></td><td><code>x = 5</code></td></tr>
-  <tr><td>If-else</td><td><code>if x&gt;0:<br>&nbsp; print("pos")<br>else:<br>&nbsp; print("neg")</code></td><td><code>if(x&gt;0){...}<br>else{...}</code></td><td><code>if(x&gt;0){...}<br>else{...}</code></td><td><code>If x &gt; 0 Then<br>&nbsp; Say "pos"<br>Otherwise<br>&nbsp; Say "neg"<br>End</code></td></tr>
+  <tr><td>If-else</td><td><code>if x&gt;0:<br>&nbsp; print("pos")<br>else:<br>&nbsp; print("neg")</code></td><td><code>if(x&gt;0){...End<br>else{...End</code></td><td><code>if(x&gt;0){...End<br>else{...End</code></td><td><code>If x &gt; 0 Then<br>&nbsp; Say "pos"<br>Otherwise<br>&nbsp; Say "neg"<br>End</code></td></tr>
   <tr><td>Loop 5 times</td><td><code>for i in range(5):</code></td><td><code>for(let i=0;i&lt;5;i++)</code></td><td><code>for(int i=0;i&lt;5;i++)</code></td><td><code>Repeat 5 times</code></td></tr>
-  <tr><td>Define function</td><td><code>def greet(name):</code></td><td><code>function greet(name){</code></td><td><code>public static void greet(String name){</code></td><td><code>Define Function greet takes name</code></td></tr>
-  <tr><td>Error handling</td><td><code>try: ... except e:</code></td><td><code>try{...}catch(e){...}</code></td><td><code>try{...}catch(Exception e){...}</code></td><td><code>Try ... Catch e ... End</code></td></tr>
+  <tr><td>Function</td><td><code>def greet(name):</code></td><td><code>function greet(name){</code></td><td><code>public static void greet(String name){</code></td><td><code>Function greet takes name</code></td></tr>
+  <tr><td>Error handling</td><td><code>try: ... except e:</code></td><td><code>try{...Endcatch(e){...End</code></td><td><code>try{...Endcatch(Exception e){...End</code></td><td><code>Try ... Catch e ... End</code></td></tr>
 </table>
 
 <h2>1.5 A Tour of What You Can Build</h2>
@@ -491,7 +491,7 @@ Token(type=STRING,   value="Hello, World!")</pre></div>
 <p>EPL's Lexer recognises nine fundamental token types. Every valid EPL program is composed entirely of these nine types — if any character sequence cannot be classified into one of them, the Lexer raises a <code>LexError</code>.</p>
 <table>
   <tr><th>Token Type</th><th>Examples</th><th>Description</th></tr>
-  <tr><td><code>KEYWORD</code></td><td><code>If</code>, <code>Say</code>, <code>Define Function</code>, <code>For each</code></td><td>Reserved words with special meaning in EPL's grammar</td></tr>
+  <tr><td><code>KEYWORD</code></td><td><code>If</code>, <code>Say</code>, <code>Function</code>, <code>For each</code></td><td>Reserved words with special meaning in EPL's grammar</td></tr>
   <tr><td><code>IDENTIFIER</code></td><td><code>name</code>, <code>calculate_tax</code>, <code>student_age</code></td><td>User-defined names for variables, functions, classes</td></tr>
   <tr><td><code>INTEGER</code></td><td><code>0</code>, <code>42</code>, <code>-7</code>, <code>1000</code></td><td>Whole number literals</td></tr>
   <tr><td><code>FLOAT</code></td><td><code>3.14</code>, <code>0.5</code>, <code>100.0</code></td><td>Decimal number literals</td></tr>
@@ -503,7 +503,7 @@ Token(type=STRING,   value="Hello, World!")</pre></div>
 </table>
 
 <h2>3.3 The Maximum Munch Strategy</h2>
-<p>EPL's most distinctive lexing challenge comes from its multi-word keywords. In most programming languages, every keyword is a single word: <code>if</code>, <code>for</code>, <code>while</code>. In EPL, many keywords are composed of multiple English words: <code>Define Function</code>, <code>For each</code>, <code>is equal to</code>, <code>Repeat</code>...<code>times</code>.</p>
+<p>EPL's most distinctive lexing challenge comes from its multi-word keywords. In most programming languages, every keyword is a single word: <code>if</code>, <code>for</code>, <code>while</code>. In EPL, many keywords are composed of multiple English words: <code>Function</code>, <code>For each</code>, <code>is equal to</code>, <code>Repeat</code>...<code>times</code>.</p>
 <p>The Lexer uses a strategy called <span class="key-term">maximum munch</span> (formally: <em>maximal munch</em>) to handle this. The rule is simple: <strong>always consume the longest possible sequence of characters that forms a valid token</strong>. When the Lexer sees the word "For", it does not immediately emit a token. It looks ahead — is the next significant word "each"? If yes, the entire phrase "For each" is tokenised as a single <code>KEYWORD</code> token. If the next word is something else (like "i from 2 to 10"), then "For" alone forms the keyword.</p>
 <div class="diagram"><div class="diagram-title">Maximum Munch in Action</div><pre>Input: "For each student in roster"
                 │
@@ -538,7 +538,7 @@ score   = <span class="num">94</span>
 <ul>
   <li>The Lexer is the first stage of EPL's pipeline — it converts raw source text into a list of typed tokens</li>
   <li>EPL has nine token types: KEYWORD, IDENTIFIER, INTEGER, FLOAT, STRING, BOOLEAN, OPERATOR, PUNCTUATION, NEWLINE</li>
-  <li>The <em>maximum munch</em> strategy handles EPL's multi-word keywords like <code>Define Function</code> and <code>For each</code></li>
+  <li>The <em>maximum munch</em> strategy handles EPL's multi-word keywords like <code>Function</code> and <code>For each</code></li>
   <li>String interpolation (the <code>$varname</code> syntax) is detected and handled by the Lexer</li>
   <li>Comments are stripped by the Lexer before any other processing — they have zero runtime cost</li>
   <li>The implementation in <code>epl/lexer.py</code> uses a finite state machine pattern</li>
@@ -549,7 +549,7 @@ score   = <span class="num">94</span>
 <ol>
   <li>Open <code>epl/lexer.py</code> in your editor. Find the <code>tokenise()</code> method and read through it. Identify where multi-word keywords are handled. What data structure is used to store the keyword list?</li>
   <li>Manually tokenise the following EPL line by writing out each token's type and value: <code>If age is greater than 18 Then Say "Adult" End</code></li>
-  <li>What would happen if the Lexer did <em>not</em> use maximum munch, and instead tokenised each word individually? Write out what the token list would look like for <code>Define Function greet takes name</code>. Why would that be a problem for the Parser?</li>
+  <li>What would happen if the Lexer did <em>not</em> use maximum munch, and instead tokenised each word individually? Write out what the token list would look like for <code>Function greet takes name</code>. Why would that be a problem for the Parser?</li>
   <li>Add a print statement to <code>epl/lexer.py</code> inside the tokenise loop to print each token as it is produced. Run a simple EPL file and observe the token output. This gives you a real-time view of the Lexer's work.</li>
 </ol>
 </div>
@@ -574,12 +574,12 @@ score   = <span class="num">94</span>
   <tr><td><code>::=</code></td><td>"is defined as"</td><td><code>statement ::= ...</code></td></tr>
   <tr><td><code>|</code></td><td>"or" (alternative)</td><td><code>A | B</code> means A or B</td></tr>
   <tr><td><code>[ ... ]</code></td><td>Optional (zero or one)</td><td><code>[Otherwise]</code></td></tr>
-  <tr><td><code>{ ... }</code></td><td>Repetition (zero or more)</td><td><code>{statement}</code></td></tr>
+  <tr><td><code>{ ... End</code></td><td>Repetition (zero or more)</td><td><code>{statementEnd</code></td></tr>
   <tr><td><code>( ... )</code></td><td>Grouping</td><td><code>(A | B) C</code></td></tr>
   <tr><td><code>"text"</code></td><td>Literal token</td><td><code>"If"</code></td></tr>
 </table>
 <p>Here is a simplified fragment of EPL's grammar in EBNF:</p>
-<div class="diagram"><div class="diagram-title">EPL Grammar Fragment (EBNF)</div><pre>program       ::= { statement } EOF
+<div class="diagram"><div class="diagram-title">EPL Grammar Fragment (EBNF)</div><pre>program       ::= { statement End EOF
 
 statement     ::= say_stmt
                 | assignment
@@ -594,17 +594,17 @@ say_stmt      ::= "Say" expression
 assignment    ::= IDENTIFIER "=" expression
 
 if_stmt       ::= "If" expression "Then" NEWLINE
-                    { statement }
-                  [ "Otherwise" NEWLINE { statement } ]
+                    { statement End
+                  [ "Otherwise" NEWLINE { statement End ]
                   "End"
 
-expression    ::= comparison { ("and" | "or") comparison }
+expression    ::= comparison { ("and" | "or") comparison End
 
-comparison    ::= addition { ("==" | "!=" | "&gt;" | "&lt;" | "&gt;=" | "&lt;=") addition }
+comparison    ::= addition { ("==" | "!=" | "&gt;" | "&lt;" | "&gt;=" | "&lt;=") addition End
 
-addition      ::= multiplication { ("+" | "-") multiplication }
+addition      ::= multiplication { ("+" | "-") multiplication End
 
-multiplication::= primary { ("*" | "/" | "%") primary }
+multiplication::= primary { ("*" | "/" | "%") primary End
 
 primary       ::= INTEGER | FLOAT | STRING | BOOLEAN
                 | IDENTIFIER
@@ -1427,7 +1427,7 @@ total  = <span class="num">0</span>
   <li><code>Repeat N times</code> — simplest loop; use when you know the exact count and don't need a counter variable</li>
   <li><code>While condition</code> — runs as long as condition is true; use when the number of repetitions is unknown</li>
   <li><code>For i from A to B</code> — count-based with an accessible counter variable</li>
-  <li><code>For each item in collection</code> — iterate over every element; the cleanest loop for lists and strings</li>
+  <li><code>For Each item in collection</code> — iterate over every element; the cleanest loop for lists and strings</li>
   <li><code>Break</code> exits the loop immediately; <code>Continue</code> skips the rest of the current iteration</li>
   <li>Always ensure While loops have a reachable exit condition to avoid infinite loops</li>
 </ul>
@@ -1466,7 +1466,7 @@ greet(<span class="str">"Alice"</span>)     <span class="cmt">Note: Hello, Alice
 greet(<span class="str">"Bob"</span>)       <span class="cmt">Note: Hello, Bob! Welcome to EPL.</span>
 greet(<span class="str">"Charlie"</span>)   <span class="cmt">Note: Hello, Charlie! Welcome to EPL.</span></pre></div>
 <div class="annotation"><strong>&#128196; Anatomy of a Function Definition</strong>
-<code>Define Function</code> — signals to EPL that this is a function definition<br>
+<code>Function</code> — signals to EPL that this is a function definition<br>
 <code>greet</code> — the function's name; follow the same naming rules as variables<br>
 <code>takes name</code> — declares one parameter named <code>name</code>; multiple parameters: <code>takes a, b, c</code><br>
 <em>indented body</em> — the statements to execute when the function is called<br>
@@ -1534,7 +1534,7 @@ circ = circle_circumference(r)
 <h4>Chapter 13 Summary</h4>
 <ul>
   <li>Functions implement the DRY principle: write logic once, call it from many places</li>
-  <li><code>Define Function name takes param1, param2 ... End</code> — defines a function</li>
+  <li><code>Function name takes param1, param2 ... End</code> — defines a function</li>
   <li>Parameters are placeholders; arguments are the actual values provided at call time</li>
   <li><code>Return value</code> sends a result back to the caller — without <code>Return</code>, the function returns <code>nothing</code></li>
   <li>Default parameter values make functions more flexible: <code>takes x, y = 10</code></li>
@@ -1767,7 +1767,7 @@ total = reduce(prices, <span class="kw">lambda</span> acc, p: acc + p, <span cla
     <span class="str">"age"</span>   : <span class="num">21</span>,
     <span class="str">"gpa"</span>   : <span class="num">3.85</span>,
     <span class="str">"major"</span> : <span class="str">"Computer Science"</span>
-}
+End
 
 <span class="fn">Say</span> student[<span class="str">"name"</span>]     <span class="cmt">Note: "Alice"</span>
 <span class="fn">Say</span> student[<span class="str">"gpa"</span>]      <span class="cmt">Note: 3.85</span>
@@ -1794,7 +1794,7 @@ student[<span class="str">"year"</span>] = <span class="num">3</span>    <span c
 </table>
 
 <h2>16.4 Iterating Over Maps</h2>
-<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre>inventory = {<span class="str">"apple"</span>: <span class="num">50</span>, <span class="str">"banana"</span>: <span class="num">30</span>, <span class="str">"cherry"</span>: <span class="num">120</span>, <span class="str">"date"</span>: <span class="num">15</span>}
+<div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre>inventory = {<span class="str">"apple"</span>: <span class="num">50</span>, <span class="str">"banana"</span>: <span class="num">30</span>, <span class="str">"cherry"</span>: <span class="num">120</span>, <span class="str">"date"</span>: <span class="num">15</span>End
 
 <span class="cmt">Note: Iterate over keys</span>
 <span class="kw">For each</span> fruit <span class="kw">in</span> inventory.keys()
@@ -1815,9 +1815,9 @@ low_stock = []
 <h2>16.5 Maps as Records: Modelling Real Data</h2>
 <p>Maps are ideal for representing real-world entities with named attributes — the kind of structured data you would find in a database or JSON file. You can have lists of maps, and maps containing lists.</p>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre>students = [
-    {<span class="str">"name"</span>: <span class="str">"Alice"</span>, <span class="str">"score"</span>: <span class="num">94</span>, <span class="str">"passed"</span>: <span class="kw">true</span>},
-    {<span class="str">"name"</span>: <span class="str">"Bob"</span>,   <span class="str">"score"</span>: <span class="num">67</span>, <span class="str">"passed"</span>: <span class="kw">false</span>},
-    {<span class="str">"name"</span>: <span class="str">"Carol"</span>, <span class="str">"score"</span>: <span class="num">88</span>, <span class="str">"passed"</span>: <span class="kw">true</span>}
+    {<span class="str">"name"</span>: <span class="str">"Alice"</span>, <span class="str">"score"</span>: <span class="num">94</span>, <span class="str">"passed"</span>: <span class="kw">true</span>End,
+    {<span class="str">"name"</span>: <span class="str">"Bob"</span>,   <span class="str">"score"</span>: <span class="num">67</span>, <span class="str">"passed"</span>: <span class="kw">false</span>End,
+    {<span class="str">"name"</span>: <span class="str">"Carol"</span>, <span class="str">"score"</span>: <span class="num">88</span>, <span class="str">"passed"</span>: <span class="kw">true</span>End
 ]
 
 <span class="cmt">Note: Print a formatted report</span>
@@ -1834,7 +1834,7 @@ low_stock = []
 <h4>Chapter 16 Summary</h4>
 <ul>
   <li>A map stores key-value pairs; access values by key, not by numeric index</li>
-  <li>Map literals use curly braces: <code>{"key": value, ...}</code></li>
+  <li>Map literals use curly braces: <code>{"key": value, ...End</code></li>
   <li>Use <code>map.get(key, default)</code> to safely access potentially missing keys</li>
   <li>Use <code>map.has(key)</code> before accessing keys when their existence is uncertain</li>
   <li>Lists of maps model database-style records — the most common pattern in real applications</li>
@@ -1846,7 +1846,7 @@ low_stock = []
 <ol>
   <li>Write a word frequency counter: given a sentence, produce a map where each key is a word and each value is the number of times it appears.</li>
   <li>Design a simple phone book: a map from name to phone number. Implement <code>add_contact</code>, <code>lookup</code>, <code>delete_contact</code>, and <code>list_all</code> functions.</li>
-  <li>Write a function <code>invert_map(m)</code> that swaps keys and values: <code>{"a": 1, "b": 2}</code> → <code>{1: "a", 2: "b"}</code>. What happens if two keys have the same value?</li>
+  <li>Write a function <code>invert_map(m)</code> that swaps keys and values: <code>{"a": 1, "b": 2End</code> → <code>{1: "a", 2: "b"End</code>. What happens if two keys have the same value?</li>
   <li>Model a simple shopping cart as a map from product name to quantity. Implement add, remove, and get_total functions (assuming you also have a price map).</li>
 </ol>
 </div>
@@ -1932,7 +1932,7 @@ savings.apply_interest()      <span class="cmt">Note: new method on SavingsAccou
 <h4>Chapter 17 Summary</h4>
 <ul>
   <li>OOP bundles data (fields) and behaviour (methods) into <em>classes</em>; individual objects are <em>instances</em></li>
-  <li><code>Define Class Name ... End</code> defines a class; <code>Create ClassName</code> creates an instance</li>
+  <li><code>Class Name ... End</code> defines a class; <code>Create ClassName</code> creates an instance</li>
   <li><code>self</code> refers to the current instance inside any method</li>
   <li>Use the <code>setup</code> method as EPL's constructor — called manually after <code>Create</code></li>
   <li><code>extends ParentClass</code> inherits all fields and methods from the parent</li>
@@ -1958,7 +1958,7 @@ savings.apply_interest()      <span class="cmt">Note: new method on SavingsAccou
 <div class="ch-intro">A lambda is an anonymous (nameless) function defined inline. Functional programming is the style of expressing computations as transformations of data rather than sequences of instructions. Together, they enable concise, expressive, and highly reusable code.</div>
 
 <h2>18.1 What is a Lambda?</h2>
-<p>Named functions declared with <code>Define Function</code> are ideal when a piece of logic is used in multiple places or is complex enough to deserve a name. But sometimes you need a tiny, one-time function — for example, to tell <code>sort()</code> how to compare elements, or to define the transformation in a <code>map()</code> call. Writing a full function definition for these one-off operations is verbose. <span class="key-term">Lambda expressions</span> — also called anonymous functions — solve this with a compact inline syntax.</p>
+<p>Named functions declared with <code>Function</code> are ideal when a piece of logic is used in multiple places or is complex enough to deserve a name. But sometimes you need a tiny, one-time function — for example, to tell <code>sort()</code> how to compare elements, or to define the transformation in a <code>map()</code> call. Writing a full function definition for these one-off operations is verbose. <span class="key-term">Lambda expressions</span> — also called anonymous functions — solve this with a compact inline syntax.</p>
 
 <h2>18.2 Lambda Syntax</h2>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="cmt">Note: A named function</span>
@@ -1979,10 +1979,10 @@ add = <span class="kw">lambda</span> a, b: a + b
 
 <h2>18.3 Lambdas with Map, Filter, Sort</h2>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre>students = [
-    {<span class="str">"name"</span>: <span class="str">"Alice"</span>, <span class="str">"score"</span>: <span class="num">88</span>},
-    {<span class="str">"name"</span>: <span class="str">"Bob"</span>,   <span class="str">"score"</span>: <span class="num">72</span>},
-    {<span class="str">"name"</span>: <span class="str">"Carol"</span>, <span class="str">"score"</span>: <span class="num">95</span>},
-    {<span class="str">"name"</span>: <span class="str">"Dave"</span>,  <span class="str">"score"</span>: <span class="num">61</span>}
+    {<span class="str">"name"</span>: <span class="str">"Alice"</span>, <span class="str">"score"</span>: <span class="num">88</span>End,
+    {<span class="str">"name"</span>: <span class="str">"Bob"</span>,   <span class="str">"score"</span>: <span class="num">72</span>End,
+    {<span class="str">"name"</span>: <span class="str">"Carol"</span>, <span class="str">"score"</span>: <span class="num">95</span>End,
+    {<span class="str">"name"</span>: <span class="str">"Dave"</span>,  <span class="str">"score"</span>: <span class="num">61</span>End
 ]
 
 <span class="cmt">Note: map — extract just the names</span>
@@ -2086,7 +2086,7 @@ records = []
         <span class="str">"name"</span>  : values[<span class="num">0</span>],
         <span class="str">"score"</span> : to_integer(values[<span class="num">1</span>]),
         <span class="str">"grade"</span> : values[<span class="num">2</span>]
-    }
+    End
     records.add(row)
 <span class="kw">End</span>
 
@@ -2228,7 +2228,7 @@ web_server_route(server, <span class="str">"GET"</span>, <span class="str">"/"</
 
 <span class="cmt">Note: Define a GET route returning JSON</span>
 web_server_route(server, <span class="str">"GET"</span>, <span class="str">"/api/status"</span>, <span class="kw">lambda</span> req:
-    web_response(<span class="num">200</span>, <span class="str">"application/json"</span>, <span class="str">"{\"status\": \"ok\", \"version\": \"1.0\"}"</span>)
+    web_response(<span class="num">200</span>, <span class="str">"application/json"</span>, <span class="str">"{\"status\": \"ok\", \"version\": \"1.0\"End"</span>)
 )
 
 <span class="cmt">Note: Start listening (blocks until Ctrl+C)</span>
@@ -2240,7 +2240,7 @@ web_server_start(server)</pre></div>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div></div><pre><span class="cmt">Note: Route with URL path parameter: /users/42</span>
 web_server_route(server, <span class="str">"GET"</span>, <span class="str">"/users/:id"</span>, <span class="kw">lambda</span> req:
     web_response(<span class="num">200</span>, <span class="str">"application/json"</span>,
-        <span class="str">"{\"user_id\": "</span> + to_text(req[<span class="str">"params"</span>][<span class="str">"id"</span>]) + <span class="str">"}"</span>)
+        <span class="str">"{\"user_id\": "</span> + to_text(req[<span class="str">"params"</span>][<span class="str">"id"</span>]) + <span class="str">"End"</span>)
 )
 
 <span class="cmt">Note: POST route — read JSON body</span>
@@ -2270,7 +2270,7 @@ web_server_route(server, <span class="str">"POST"</span>, <span class="str">"/to
 web_server_route(server, <span class="str">"DELETE"</span>, <span class="str">"/todos/:id"</span>, <span class="kw">lambda</span> req: (
     target_id = to_integer(req[<span class="str">"params"</span>][<span class="str">"id"</span>]),
     todos = filter(todos, <span class="kw">lambda</span> t: t[<span class="str">"id"</span>] != target_id),
-    web_response(<span class="num">204</span>, <span class="str">"application/json"</span>, <span class="str">"{}"</span>)
+    web_response(<span class="num">204</span>, <span class="str">"application/json"</span>, <span class="str">"{End"</span>)
 ))</pre></div>
 
 <h2>21.5 Serving Static Files</h2>
@@ -2338,7 +2338,7 @@ mean_age = python_eval(<span class="str">"df['age'].mean()"</span>)
 python_set(<span class="str">"epl_scores"</span>, scores)
 
 <span class="cmt">Note: Use Python statistics on EPL data</span>
-stats = python_eval(<span class="str">"import statistics; {'mean': statistics.mean(epl_scores), 'stdev': round(statistics.stdev(epl_scores), 2)}"</span>)
+stats = python_eval(<span class="str">"import statistics; {'mean': statistics.mean(epl_scores), 'stdev': round(statistics.stdev(epl_scores), 2)End"</span>)
 <span class="fn">Say</span> <span class="str">"Mean: $stats[mean]"</span>
 <span class="fn">Say</span> <span class="str">"Std Dev: $stats[stdev]"</span>
 
@@ -2766,12 +2766,12 @@ web_server_start(server)</pre></div>
   <tr><td><code>For each x in list ... End</code></td><td>Iterator loop</td><td><code>For each n in nums Say n End</code></td></tr>
   <tr><td><code>Break</code></td><td>Exit loop</td><td>Inside any loop</td></tr>
   <tr><td><code>Continue</code></td><td>Skip iteration</td><td>Inside any loop</td></tr>
-  <tr><td><code>Define Function name takes p...</code></td><td>Define function</td><td><code>Define Function add takes a,b</code></td></tr>
+  <tr><td><code>Function name takes p...</code></td><td>Function</td><td><code>Function add takes a,b</code></td></tr>
   <tr><td><code>Return value</code></td><td>Return from function</td><td><code>Return x * 2</code></td></tr>
   <tr><td><code>Try ... Catch e ... End</code></td><td>Error handling</td><td>Wrap risky operations</td></tr>
   <tr><td><code>Raise "message"</code></td><td>Throw an error</td><td><code>Raise "Invalid input"</code></td></tr>
-  <tr><td><code>Define Class Name ... End</code></td><td>Define class</td><td><code>Define Class Dog</code></td></tr>
-  <tr><td><code>Define Method name takes...</code></td><td>Class method</td><td>Inside Define Class block</td></tr>
+  <tr><td><code>Class Name ... End</code></td><td>Class</td><td><code>Class Dog</code></td></tr>
+  <tr><td><code>Function name takes...</code></td><td>Class method</td><td>Inside Class block</td></tr>
   <tr><td><code>Create ClassName</code></td><td>Instantiate class</td><td><code>d = Create Dog</code></td></tr>
   <tr><td><code>Import "file.epl"</code></td><td>Import module</td><td><code>Import "utils.epl" as u</code></td></tr>
   <tr><td><code>Lambda params -&gt; expr</code></td><td>Anonymous function</td><td><code>Lambda x -&gt; x * 2</code></td></tr>
@@ -2952,12 +2952,12 @@ epl publish
   <li><code>|</code> means alternation (this OR that).</li>
   <li><code>( ... )</code> groups items together.</li>
   <li><code>[ ... ]</code> means an optional item (zero or one occurrence).</li>
-  <li><code>{ ... }</code> means zero or more occurrences (repetition).</li>
+  <li><code>{ ... End</code> means zero or more occurrences (repetition).</li>
 </ul>
 
 <h2>B.2 The Complete EPL Grammar</h2>
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EBNF</div></div><pre><span class="cmt">Note: A program is a sequence of zero or more statements</span>
-program        = { statement } ;
+program        = { statement End ;
 
 <span class="cmt">Note: Statements are the top-level constructs</span>
 statement      = print_stmt
@@ -2986,30 +2986,30 @@ assign_stmt    = identifier "=" expression
                | identifier "Decrease" "by" expression
                | identifier "Multiply" "by" expression ;
 
-if_stmt        = "If" expression "Then" { statement }
-                 { "Otherwise" "If" expression "Then" { statement } }
-                 [ "Otherwise" { statement } ]
+if_stmt        = "If" expression "Then" { statement End
+                 { "Otherwise" "If" expression "Then" { statement End End
+                 [ "Otherwise" { statement End ]
                  "End" ;
 
-while_stmt     = "While" expression { statement } "End" ;
-repeat_stmt    = "Repeat" expression "times" { statement } "End" ;
+while_stmt     = "While" expression { statement End "End" ;
+repeat_stmt    = "Repeat" expression "times" { statement End "End" ;
 
-for_loop_stmt  = "For" identifier "from" expression "to" expression { statement } "End" ;
-for_each_stmt  = "For" "each" identifier "in" expression { statement } "End" ;
+for_loop_stmt  = "For" identifier "from" expression "to" expression { statement End "End" ;
+for_each_stmt  = "For" "each" identifier "in" expression { statement End "End" ;
 
 func_def_stmt  = "Define" "Function" identifier [ "takes" param_list ]
-                 { statement } "End" ;
-param_list     = identifier { "," identifier } ;
+                 { statement End "End" ;
+param_list     = identifier { "," identifier End ;
 
 return_stmt    = "Return" [ expression ] ;
 
 class_def_stmt = "Define" "Class" identifier
-                 { field_decl | method_decl } "End" ;
+                 { field_decl | method_decl End "End" ;
 field_decl     = "field" identifier "=" expression ;
 method_decl    = "Define" "Method" identifier [ "takes" param_list ]
-                 { statement } "End" ;
+                 { statement End "End" ;
 
-try_catch_stmt = "Try" { statement } "Catch" identifier { statement } "End" ;
+try_catch_stmt = "Try" { statement End "Catch" identifier { statement End "End" ;
 raise_stmt     = "Raise" expression ;
 
 break_stmt     = "Break" ;
@@ -3020,8 +3020,8 @@ expr_stmt      = expression ;
 <span class="cmt">Note: Expressions and operator precedence (lowest to highest)</span>
 expression     = assignment_expr ;
 assignment_expr= logical_or ;
-logical_or     = logical_and { "or" logical_and } ;
-logical_and    = logical_not { "and" logical_not } ;
+logical_or     = logical_and { "or" logical_and End ;
+logical_and    = logical_not { "and" logical_not End ;
 logical_not    = [ "not" ] comparison ;
 
 comparison     = term { ( "==" | "!=" | "<" | ">" | "<=" | ">="
@@ -3029,10 +3029,10 @@ comparison     = term { ( "==" | "!=" | "<" | ">" | "<=" | ">="
                         | "is" "not" "equal" "to"
                         | "is" "less" "than"
                         | "is" "greater" "than"
-                        | "in" ) term } ;
+                        | "in" ) term End ;
 
-term           = factor { ( "+" | "-" ) factor } ;
-factor         = power { ( "*" | "/" | "//" | "%" ) power } ;
+term           = factor { ( "+" | "-" ) factor End ;
+factor         = power { ( "*" | "/" | "//" | "%" ) power End ;
 power          = primary [ "**" power ] ;
 
 <span class="cmt">Note: Primary values — the atomic building blocks</span>
@@ -3049,9 +3049,9 @@ primary        = number
                | "(" expression ")" ;
 
 list_literal   = "[" [ expr_list ] "]" ;
-map_literal    = "{" [ key_val_list ] "}" ;
-key_val_list   = expression ":" expression { "," expression ":" expression } ;
-expr_list      = expression { "," expression } ;
+map_literal    = "{" [ key_val_list ] "End" ;
+key_val_list   = expression ":" expression { "," expression ":" expression End ;
+expr_list      = expression { "," expression End ;
 
 lambda_expr    = "lambda" param_list ":" expression ;
 
@@ -3059,9 +3059,9 @@ func_call      = "(" [ expr_list ] ")" ;
 index_access   = "[" expression "]" ;
 dot_access     = "." identifier [ func_call ] ;
 
-identifier     = letter { letter | digit | "_" } ;
-number         = [ "-" ] digit { digit } [ "." digit { digit } ] ;
-string         = '"' { any_char_except_quotes } '"' ;
+identifier     = letter { letter | digit | "_" End ;
+number         = [ "-" ] digit { digit End [ "." digit { digit End ] ;
+string         = '"' { any_char_except_quotes End '"' ;
 </pre></div>
 </section>
 
@@ -3078,7 +3078,7 @@ string         = '"' { any_char_except_quotes } '"' ;
 <div class="code-wrap"><div class="code-head"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><div class="code-lang">EPL</div><div class="code-file">game.epl</div></div><pre><span class="kw">Class</span> <span class="cls">Room</span>
     field name = <span class="str">""</span>
     field description = <span class="str">""</span>
-    field exits = {}
+    field exits = {End
     field items = []
 
     <span class="kw">Function</span> <span class="fn">setup</span> <span class="kw">takes</span> name, desc
@@ -3193,7 +3193,7 @@ game.start()</pre></div>
 <div class="ch-intro">A language is defined as much by what it omits as by what it includes. Why does EPL lack semicolons, curly braces, or type declarations? The answers trace back to EPL's core philosophy.</div>
 
 <h2>D.1 Readability Above All</h2>
-<p>Code is read ten times more often than it is written. Therefore, optimizing a language for the speed of <em>typing</em> (by using cryptic symbols like <code>{}</code>, <code>$</code>, or <code>=&gt;</code>) is a false economy. EPL optimizes for the speed of <em>comprehension</em> by a human reader. When a non-programmer can read an EPL file and roughly guess what it does, the language has succeeded.</p>
+<p>Code is read ten times more often than it is written. Therefore, optimizing a language for the speed of <em>typing</em> (by using cryptic symbols like <code>{End</code>, <code>$</code>, or <code>=&gt;</code>) is a false economy. EPL optimizes for the speed of <em>comprehension</em> by a human reader. When a non-programmer can read an EPL file and roughly guess what it does, the language has succeeded.</p>
 
 <h2>D.2 "No Magic" Execution</h2>
 <p>There is no variable hoisting. There are no implicit globals. Scope rules are lexical and strict. Functions must be explicitly called. By removing "magic" — the hidden rules that frameworks or runtimes invoke behind your back — debugging becomes an exercise in logic rather than an exercise in memorizing obscure edge-cases.</p>
@@ -3214,10 +3214,10 @@ const observer = new IntersectionObserver(entries => {
         const active = a.getAttribute('href') === '#'+e.target.id;
         a.style.borderBottomColor = active ? 'var(--accent)' : 'transparent';
         a.style.color = active ? '#fff' : 'rgba(255,255,255,.7)';
-      });
-    }
-  });
-}, { threshold: 0.1 });
+      End);
+    End
+  End);
+End, { threshold: 0.1 End);
 sections.forEach(s => observer.observe(s));
 </script>
 </body>

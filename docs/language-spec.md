@@ -53,27 +53,27 @@ Identifiers start with a letter or underscore and may contain letters, digits, a
 | Boolean | `True`, `False` |
 | Nothing | `Nothing` |
 | List | `[1, 2, 3]`, `["a", "b"]`, `[]` |
-| Dictionary | `{"key": "value", "age": 25}` |
+| Dictionary | `{"key": "value", "age": 25End` |
 
 ### 2.4 String Templates
 
-Strings support `$variable` and `${expression}` interpolation:
+Strings support `$variable` and `${expressionEnd` interpolation:
 
 ```epl
 name = "World"
 Say "Hello, $name!"              Note: Hello, World!
-Say "2 + 2 = ${2 + 2}"          Note: 2 + 2 = 4
+Say "2 + 2 = ${2 + 2End"          Note: 2 + 2 = 4
 ```
 
 ### 2.5 Keywords (Reserved Words)
 
 ```
-Create Set If Then Else End While For Each In
-Define Function Takes Return EndFunction
+Create Set If Then Else End Each In
+Function Takes Return EndFunction
 Class Inherits Constructor Method EndClass
 Module EndModule Import Use As
 Try Catch Finally EndTry Throw
-Match When Default EndMatch
+Match When Default End
 Print Say Ask Input Display Show
 And Or Not Is True False Nothing
 Constant Assert Exit Wait
@@ -119,9 +119,9 @@ Compound assignment:
 x = x + 1      Note: standard
 Increase x by 1           Note: shorthand increment
 Decrease x by 5           Note: shorthand decrement
-Set x *= 2           Note: shorthand multiply
-Set x /= 4           Note: shorthand divide
-Set x %= 3           Note: shorthand modulo
+Note: [Parser Error] Set x *= 2           Note: shorthand multiply
+Note: [Parser Error] Set x /= 4           Note: shorthand divide
+Note: [Parser Error] Set x %= 3           Note: shorthand modulo
 ```
 
 ### 3.4 Constants
@@ -209,7 +209,7 @@ has = contains(items, 3)  Note: membership test
 ```epl
 config = Map with host = "localhost" and port = 8080
 host = config.host         Note: access by key
-Set config["debug"] to True                 Note: set key
+Note: [Parser Error] Set config["debug"] to True                 Note: set key
 ks = keys(config)             Note: get all keys
 vs = values(config)           Note: get all values
 ```
@@ -219,7 +219,7 @@ vs = values(config)           Note: get all values
 ```epl
 len = name.length        Note: property access
 up = name.upper()        Note: method call
-Module::function_name()                Note: module-scoped access
+Note: [Parser Error] Module::function_name()                Note: module-scoped access
 ```
 
 ---
@@ -256,13 +256,13 @@ End
 Match grade
     When "A"
         Say "Excellent"
-    When "B", "C"
+    When "B" or "C"
         Say "Good"
     When "D"
         Say "Needs work"
     Default
         Say "Unknown"
-EndMatch
+End
 ```
 
 ### 5.3 While Loop
@@ -399,7 +399,7 @@ Class Dog extends Animal
     End
 
     Function learn takes trick
-        append(Self.tricks, trick)
+Note: [Parser Error]         append(Self.tricks, trick)
     End
 
     Function show_tricks
@@ -475,9 +475,9 @@ Import "crypto"                Note: hashing, encoding, random
 ### 8.5 Python Bridge
 
 ```epl
-Import python "json" as json
-Import python "os" as os
-Import python "requests" as req
+Note: [Parser Error] Import python "json" as json
+Note: [Parser Error] Import python "os" as os
+Note: [Parser Error] Import python "requests" as req
 ```
 
 For project-managed third-party packages, declare them in `epl.toml`:
@@ -891,7 +891,7 @@ EPL is dynamically typed with optional static checking (`--strict` mode).
 | `Boolean` | True/False | `True` |
 | `Nothing` | Null/nil | `Nothing` |
 | `List` | Ordered collection | `[1, 2, 3]` |
-| `Dictionary` | Key-value map | `{"a": 1}` |
+| `Dictionary` | Key-value map | `{"a": 1End` |
 | `Function` | Callable | `add` |
 | `Class` | Type definition | `Animal` |
 | `Object` | Class instance | `new Animal(...)` |
@@ -907,7 +907,7 @@ is_text("hello")
 Note: True
 is_boolean(True)     Note: True
 is_list([1, 2])      Note: True
-is_map({"a": 1})     Note: True
+Note: [Parser Error] is_map({"a": 1End)     Note: True
 is_nothing(Nothing)  Note: True
 is_number(42)        Note: True (int or float)
 type_of(42)          Note: "Integer"
@@ -918,7 +918,7 @@ type_of(42)          Note: "Integer"
 ## 18. Grammar (EBNF Summary)
 
 ```ebnf
-program        = { statement } ;
+program        = { statement End ;
 statement      = variable_decl | assignment | print_stmt | if_stmt
                | while_stmt | for_stmt | for_each_stmt | repeat_stmt
                | function_def | class_def | module_def | import_stmt
@@ -929,37 +929,37 @@ statement      = variable_decl | assignment | print_stmt | if_stmt
 variable_decl  = "Create" IDENT "equal to" expression ;
 assignment     = "Set" target "to" expression ;
 print_stmt     = ("Print" | "Say" | "Display" | "Show") expression ;
-if_stmt        = "If" expression "Then" block { "Else If" expression "Then" block } [ "Else" block ] "End" ;
+if_stmt        = "If" expression "Then" block { "Else If" expression "Then" block End [ "Else" block ] "End" ;
 while_stmt     = "While" expression block "End" ;
 for_stmt       = "For" IDENT "from" expression "to" expression [ "step" expression ] block "End" ;
 for_each_stmt  = "For Each" IDENT "In" expression block "End" ;
 repeat_stmt    = "Repeat" expression "Times" block "EndRepeat" ;
-function_def   = "Define Function" IDENT [ "Takes" param_list ] block "EndFunction" ;
+function_def   = "Function" IDENT [ "Takes" param_list ] block "EndFunction" ;
 class_def      = "Class" IDENT [ "Inherits" IDENT ] class_body "EndClass" ;
 module_def     = "Module" IDENT block "End" ;
 import_stmt    = "Import" STRING [ "as" IDENT ] ;
 use_stmt       = "Use python" STRING [ "as" IDENT ] ;
 try_stmt       = "Try" block "Catch" IDENT block [ "Finally" block ] "EndTry" ;
-match_stmt     = "Match" expression { "When" expr_list block } [ "Default" block ] "EndMatch" ;
+match_stmt     = "Match" expression { "When" expr_list block End [ "Default" block ] "End" ;
 return_stmt    = "Return" [ expression ] ;
 throw_stmt     = "Throw" expression ;
 assert_stmt    = "Assert" expression ;
 
 expression     = or_expr ;
-or_expr        = and_expr { ("Or" | "or") and_expr } ;
-and_expr       = not_expr { ("And" | "and") not_expr } ;
+or_expr        = and_expr { ("Or" | "or") and_expr End ;
+and_expr       = not_expr { ("And" | "and") not_expr End ;
 not_expr       = [ "Not" | "not" ] comparison ;
-comparison     = addition { comp_op addition } ;
-addition       = multiplication { ("+" | "-") multiplication } ;
-multiplication = unary { ("*" | "/" | "%") unary } ;
+comparison     = addition { comp_op addition End ;
+addition       = multiplication { ("+" | "-") multiplication End ;
+multiplication = unary { ("*" | "/" | "%") unary End ;
 unary          = [ "-" | "Not" ] primary ;
 primary        = NUMBER | STRING | "True" | "False" | "Nothing"
                | IDENT | list_literal | dict_literal
                | function_call | member_access | index_access
                | "(" expression ")" | lambda ;
 
-param_list     = IDENT { "," IDENT } ;
-block          = { statement } ;
+param_list     = IDENT { "," IDENT End ;
+block          = { statement End ;
 ```
 
 ---

@@ -28,7 +28,7 @@
             --primary: #3b82f6;
             --success: #10b981;
             --error: #ef4444;
-        }
+        End
 
         body {
             margin: 0;
@@ -40,7 +40,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-        }
+        End
 
         /* Navbar */
         nav {
@@ -50,7 +50,7 @@
             padding: 1rem 2rem;
             background: var(--bg-panel);
             border-bottom: 1px solid var(--border);
-        }
+        End
 
         .logo {
             font-size: 1.25rem;
@@ -60,9 +60,9 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-        }
+        End
         
-        .logo i { color: var(--primary); }
+        .logo i { color: var(--primary); End
 
         .btn-run {
             background: var(--success);
@@ -76,24 +76,24 @@
             align-items: center;
             gap: 0.5rem;
             transition: opacity 0.2s;
-        }
+        End
 
-        .btn-run:hover { opacity: 0.9; }
-        .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-run:hover { opacity: 0.9; End
+        .btn-run:disabled { opacity: 0.5; cursor: not-allowed; End
 
         /* Main Workspace */
         .workspace {
             display: flex;
             flex: 1;
             overflow: hidden;
-        }
+        End
 
         .editor-container, .output-container {
             flex: 1;
             display: flex;
             flex-direction: column;
             border-right: 1px solid var(--border);
-        }
+        End
 
         .panel-header {
             padding: 0.75rem 1rem;
@@ -104,7 +104,7 @@
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-        }
+        End
 
         /* CodeMirror Overrides */
         .CodeMirror {
@@ -113,7 +113,7 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 14px;
             background-color: var(--bg-dark) !important;
-        }
+        End
 
         /* Output Terminal */
         .terminal {
@@ -125,16 +125,16 @@
             padding: 1rem;
             overflow-y: auto;
             white-space: pre-wrap;
-        }
+        End
 
-        .system-msg { color: #3b82f6; }
-        .error-msg { color: #ef4444; }
+        .system-msg { color: #3b82f6; End
+        .error-msg { color: #ef4444; End
 
         /* Loading Spinner */
         .spinner {
             animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        End
+        @keyframes spin { 100% { transform: rotate(360deg); End End
     </style>
 </head>
 <body>
@@ -189,7 +189,7 @@ Say greet("Abneesh")
             lineNumbers: true,
             indentUnit: 4,
             matchBrackets: true
-        });
+        End);
 
         // Terminal output helper
         const terminal = document.getElementById("terminal");
@@ -200,11 +200,11 @@ Say greet("Abneesh")
             span.innerText = text + '\n';
             terminal.appendChild(span);
             terminal.scrollTop = terminal.scrollHeight;
-        }
+        End
 
         function clearTerminal() {
             terminal.innerHTML = '';
-        }
+        End
 
         // Pyodide Instance
         let pyodideReady = false;
@@ -232,11 +232,11 @@ Say greet("Abneesh")
                 document.getElementById('run-btn').disabled = false;
                 pyodideReady = true;
 
-            } catch (err) {
-                printToTerminal(`> Failed to initialize: ${err}`, "error");
+            End catch (err) {
+                printToTerminal(`> Failed to initialize: ${errEnd`, "error");
                 document.getElementById('status-text').innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#ef4444"></i> Engine Error';
-            }
-        }
+            End
+        End
 
         async function runCode() {
             if(!pyodideReady) return;
@@ -280,7 +280,7 @@ sys.stdout = stdout
 
 output_res = ""
 try:
-    code = """${eplCode.replace(/"/g, '\\"')}"""
+    code = """${eplCode.replace(/"/g, '\\"')End"""
     
     program = _parse_epl_program(code, "playground.epl")
     
@@ -304,13 +304,13 @@ output_res
                 
                 if(result && result.startsWith && result.startsWith("ERROR:")) {
                     printToTerminal(result, "error");
-                } else {
+                End else {
                     printToTerminal(result);
-                }
-            } catch (err) {
-                printToTerminal(`Execution Error:\n${err}`, "error");
-            }
-        }
+                End
+            End catch (err) {
+                printToTerminal(`Execution Error:\n${errEnd`, "error");
+            End
+        End
 
         // Start booting engine on page load
         initEngine();

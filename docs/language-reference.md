@@ -169,9 +169,9 @@ End
 
 ```epl
 If x > 10 then
-    label = "big"
+Note: [Parser Error]     label = "big"
 Otherwise
-    label = "small"
+Note: [Parser Error]     label = "small"
 End
 ```
 
@@ -201,7 +201,7 @@ End
 
 ```epl
 items = [1, 2, 3]
-For each item in items
+For Each item in items
     Print item
 End
 ```
@@ -249,7 +249,7 @@ Function add takes a, b
 End
 
 Note: With arrow syntax
-Function double takes x -> Return x * 2
+Note: [Parser Error] Function double takes x -> Return x * 2
 ```
 
 ### Calling Functions
@@ -344,7 +344,7 @@ Print length(items)     Note: 5
 
 Note: Slicing
 Print items[1:3]        Note: [2, 3]
-Print items[::2]        Note: [1, 3, 5]
+Print items[0:2]        Note: [1, 3, 5]
 ```
 
 ### Maps (Dictionaries)
@@ -359,11 +359,11 @@ Print keys(person)      Note: [name, age]
 ### Enums
 
 ```epl
-Enum Color
+Note: [Parser Error] Enum Color
     Red = 0
     Green = 1
     Blue = 2
-End
+Note: [Parser Error] End
 
 Print Color.Red         Note: 0
 ```
@@ -525,7 +525,7 @@ Print s.to_list()             Note: ["H","e","l","l","o"," ","W","o","r","l","d"
 ```epl
 items = [3, 1, 4, 1, 5]
 
-items.append(9)               Note: [3, 1, 4, 1, 5, 9]
+Note: [Parser Error] items.append(9)               Note: [3, 1, 4, 1, 5, 9]
 items.remove(1)               Note: removes first 1
 Print items.contains(4)       Note: true
 Print items.index_of(4)       Note: 2
@@ -581,5 +581,5 @@ Print content
 ```epl
 name = "World"
 age = 25
-Print "Hello, {name}! You are {age} years old."
+Print "Hello, {nameEnd! You are {ageEnd years old."
 ```

@@ -85,12 +85,12 @@ Create WebApp called app
 db = db_open("todos.db")
 db_create_table(db, "todos", Map with id = "INTEGER PRIMARY KEY AUTOINCREMENT" and title = "TEXT NOT NULL" and done = "INTEGER DEFAULT 0")
 
-Route GET "/api/todos" responds with
+Route "/api/todos" responds with
     todos = db_query(db, "SELECT * FROM todos")
     Return Map with success = True and data = todos
 End
 
-Route POST "/api/todos" responds with
+Route "/api/todos" responds with
     body = request_body()
     db_execute(db, "INSERT INTO todos (title) VALUES (?)", [body.get("title")])
     Return Map with success = True

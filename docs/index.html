@@ -26,13 +26,13 @@
             --border-color: rgba(255, 255, 255, 0.1);
             --gradient-1: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
             --glass-bg: rgba(17, 17, 17, 0.6);
-        }
+        End
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
+        End
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -41,7 +41,7 @@
             line-height: 1.6;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
-        }
+        End
 
         /* Abstract Background Glow */
         .glow-bg {
@@ -57,7 +57,7 @@
             z-index: -1;
             border-radius: 50%;
             pointer-events: none;
-        }
+        End
 
         /* Navbar */
         nav {
@@ -73,7 +73,7 @@
             -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-color);
             z-index: 100;
-        }
+        End
 
         .logo {
             font-size: 1.5rem;
@@ -83,13 +83,13 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-decoration: none;
-        }
+        End
 
         .nav-links {
             display: flex;
             gap: 2rem;
             align-items: center;
-        }
+        End
 
         .nav-links a {
             color: var(--text-secondary);
@@ -97,11 +97,11 @@
             font-size: 0.95rem;
             font-weight: 500;
             transition: color 0.2s;
-        }
+        End
 
         .nav-links a:hover {
             color: var(--text-primary);
-        }
+        End
 
         .btn-primary {
             background: var(--text-primary);
@@ -114,12 +114,12 @@
             transition: transform 0.2s, box-shadow 0.2s;
             border: none;
             cursor: pointer;
-        }
+        End
 
         .btn-primary:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(255,255,255,0.15);
-        }
+        End
 
         .btn-outline {
             background: transparent;
@@ -131,12 +131,12 @@
             font-weight: 500;
             font-size: 0.9rem;
             transition: all 0.2s;
-        }
+        End
 
         .btn-outline:hover {
             background: var(--bg-surface-hover);
             border-color: var(--text-secondary);
-        }
+        End
 
         /* Hero Section */
         .hero {
@@ -149,7 +149,7 @@
             padding: 8rem 2rem 4rem;
             max-width: 1200px;
             margin: 0 auto;
-        }
+        End
 
         .hero h1 {
             font-size: clamp(3rem, 6vw, 5rem);
@@ -158,13 +158,13 @@
             letter-spacing: -2px;
             margin-bottom: 1.5rem;
             max-width: 900px;
-        }
+        End
 
         .hero h1 span {
             background: var(--gradient-1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-        }
+        End
 
         .hero p {
             font-size: clamp(1.1rem, 2vw, 1.4rem);
@@ -172,13 +172,13 @@
             max-width: 600px;
             margin-bottom: 3rem;
             font-weight: 400;
-        }
+        End
 
         .hero-cta {
             display: flex;
             gap: 1rem;
             margin-bottom: 4rem;
-        }
+        End
 
         /* Terminal Window */
         .terminal {
@@ -191,13 +191,13 @@
             overflow: hidden;
             text-align: left;
             animation: float 6s ease-in-out infinite;
-        }
+        End
 
         @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
+            0% { transform: translateY(0px); End
+            50% { transform: translateY(-10px); End
+            100% { transform: translateY(0px); End
+        End
 
         .terminal-header {
             display: flex;
@@ -205,22 +205,22 @@
             padding: 1rem;
             background: #1a1a1a;
             border-bottom: 1px solid var(--border-color);
-        }
+        End
 
         .terminal-dots {
             display: flex;
             gap: 8px;
-        }
+        End
 
         .dot {
             width: 12px;
             height: 12px;
             border-radius: 50%;
-        }
+        End
 
-        .dot.red { background: #ff5f56; }
-        .dot.yellow { background: #ffbd2e; }
-        .dot.green { background: #27c93f; }
+        .dot.red { background: #ff5f56; End
+        .dot.yellow { background: #ffbd2e; End
+        .dot.green { background: #27c93f; End
 
         .terminal-title {
             flex: 1;
@@ -229,7 +229,7 @@
             font-size: 0.85rem;
             font-family: 'JetBrains Mono', monospace;
             margin-right: 44px; /* to balance the dots */
-        }
+        End
 
         .terminal-body {
             padding: 1.5rem;
@@ -237,12 +237,12 @@
             font-size: 0.95rem;
             line-height: 1.6;
             overflow-x: auto;
-        }
+        End
 
-        .code-keyword { color: #3b82f6; font-weight: 500; }
-        .code-string { color: #22c55e; }
-        .code-comment { color: #6b7280; font-style: italic; }
-        .code-var { color: #eab308; }
+        .code-keyword { color: #3b82f6; font-weight: 500; End
+        .code-string { color: #22c55e; End
+        .code-comment { color: #6b7280; font-style: italic; End
+        .code-var { color: #eab308; End
 
         /* Install Command Box */
         .install-box {
@@ -254,13 +254,13 @@
             padding: 0.5rem 0.5rem 0.5rem 1.2rem;
             gap: 1.5rem;
             margin-bottom: 2rem;
-        }
+        End
 
         .install-box code {
             font-family: 'JetBrains Mono', monospace;
             color: var(--text-primary);
             font-size: 0.95rem;
-        }
+        End
 
         .copy-btn {
             background: var(--bg-surface-hover);
@@ -274,18 +274,18 @@
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
-        }
+        End
 
         .copy-btn:hover {
             background: #2a2a2a;
-        }
+        End
 
         /* Features Section */
         .features {
             padding: 5rem 2rem;
             max-width: 1200px;
             margin: 0 auto;
-        }
+        End
 
         .section-title {
             text-align: center;
@@ -293,13 +293,13 @@
             font-weight: 700;
             margin-bottom: 3rem;
             letter-spacing: -1px;
-        }
+        End
 
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
-        }
+        End
 
         .card {
             background: var(--bg-surface);
@@ -307,13 +307,13 @@
             border-radius: 16px;
             padding: 2rem;
             transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
-        }
+        End
 
         .card:hover {
             transform: translateY(-5px);
             border-color: rgba(255,255,255,0.2);
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+        End
 
         .card-icon {
             width: 48px;
@@ -326,18 +326,18 @@
             justify-content: center;
             font-size: 1.5rem;
             margin-bottom: 1.5rem;
-        }
+        End
 
         .card h3 {
             font-size: 1.25rem;
             font-weight: 600;
             margin-bottom: 0.75rem;
-        }
+        End
 
         .card p {
             color: var(--text-secondary);
             font-size: 0.95rem;
-        }
+        End
 
         /* Installation Section */
         .getting-started {
@@ -345,13 +345,13 @@
             border-top: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
             padding: 5rem 2rem;
-        }
+        End
 
         .getting-started-content {
             max-width: 800px;
             margin: 0 auto;
             text-align: center;
-        }
+        End
 
         /* Footer */
         footer {
@@ -359,7 +359,7 @@
             text-align: center;
             color: var(--text-secondary);
             font-size: 0.9rem;
-        }
+        End
         
         .footer-links {
             display: flex;
@@ -367,32 +367,32 @@
             gap: 1.5rem;
             margin-top: 1.5rem;
             margin-bottom: 1rem;
-        }
+        End
 
         .footer-links a {
             color: var(--text-secondary);
             text-decoration: none;
             font-size: 1.25rem;
             transition: color 0.2s;
-        }
+        End
 
         .footer-links a:hover {
             color: var(--text-primary);
-        }
+        End
 
         @media (max-width: 768px) {
             .nav-links {
                 display: none;
-            }
+            End
             .hero h1 {
                 font-size: 2.5rem;
-            }
+            End
             .hero-cta {
                 flex-direction: column;
                 width: 100%;
                 max-width: 300px;
-            }
-        }
+            End
+        End
     </style>
 </head>
 <body>
@@ -443,10 +443,10 @@
                 <div style="padding-left: 4rem;"><span class="code-keyword">Set</span> <span class="code-var">name</span> <span class="code-keyword">to</span> Get Query Param <span class="code-string">"name"</span></div>
                 <div style="padding-left: 4rem;"><span class="code-keyword">If</span> <span class="code-var">name</span> <span class="code-keyword">is empty then</span></div>
                 <div style="padding-left: 6rem;"><span class="code-keyword">Set</span> <span class="code-var">name</span> <span class="code-keyword">to</span> <span class="code-string">"World"</span></div>
-                <div style="padding-left: 4rem;"><span class="code-keyword">End If</span></div>
-                <div style="padding-left: 4rem;"><span class="code-keyword">Send JSON</span> { <span class="code-string">"message"</span>: <span class="code-string">"Hello, "</span> + <span class="code-var">name</span> }</div>
-                <div style="padding-left: 2rem;"><span class="code-keyword">End Route</span></div>
-                <div><span class="code-keyword">End Server</span></div>
+                <div style="padding-left: 4rem;"><span class="code-keyword">End</span></div>
+                <div style="padding-left: 4rem;"><span class="code-keyword">Send JSON</span> { <span class="code-string">"message"</span>: <span class="code-string">"Hello, "</span> + <span class="code-var">name</span> End</div>
+                <div style="padding-left: 2rem;"><span class="code-keyword">End</span></div>
+                <div><span class="code-keyword">End</span></div>
             </div>
         </div>
     </section>
@@ -521,9 +521,9 @@
                 setTimeout(() => {
                     icon.className = 'fa-regular fa-copy';
                     icon.style.color = '';
-                }, 2000);
-            });
-        }
+                End, 2000);
+            End);
+        End
     </script>
 </body>
 </html>

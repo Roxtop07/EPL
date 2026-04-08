@@ -17,7 +17,7 @@
             --border: #e2e8f0;
             --code-bg: #1e293b;
             --code-fg: #f8fafc;
-        }
+        End
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -29,14 +29,14 @@
             max-width: 960px;
             margin-left: auto;
             margin-right: auto;
-        }
+        End
 
         header {
             text-align: center;
             margin-bottom: 4rem;
             padding-bottom: 3rem;
             border-bottom: 3px solid var(--primary);
-        }
+        End
 
         .tagline {
             display: inline-block;
@@ -49,7 +49,7 @@
             margin-bottom: 1rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-        }
+        End
 
         h1 {
             font-size: 3rem;
@@ -57,7 +57,7 @@
             margin-bottom: 1rem;
             font-weight: 800;
             line-height: 1.2;
-        }
+        End
 
         h2 {
             font-size: 2.2rem;
@@ -66,26 +66,26 @@
             border-bottom: 2px solid var(--border);
             padding-bottom: 0.75rem;
             font-weight: 700;
-        }
+        End
 
         h3 {
             font-size: 1.4rem;
             color: var(--text-heading);
             margin-top: 2rem;
             font-weight: 600;
-        }
+        End
 
         p {
             font-size: 1.1rem;
             margin-bottom: 1.5rem;
-        }
+        End
 
         .lead-text {
             font-size: 1.25rem;
             color: var(--text-muted);
             max-width: 800px;
             margin: 0 auto;
-        }
+        End
 
         /* Callout Boxes */
         .callout {
@@ -95,10 +95,10 @@
             border-radius: 0 12px 12px 0;
             margin: 2rem 0;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
+        End
 
-        .callout.problem { border-left-color: #ef4444; }
-        .callout.solution { border-left-color: #10b981; }
+        .callout.problem { border-left-color: #ef4444; End
+        .callout.solution { border-left-color: #10b981; End
 
         /* Syntax Boxes */
         pre {
@@ -110,12 +110,12 @@
             font-family: 'JetBrains Mono', 'Fira Code', monospace;
             font-size: 0.95rem;
             box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
-        }
+        End
 
         /* Q&A Accordions / Cards */
         .qa-container {
             margin-top: 2rem;
-        }
+        End
 
         .qa-card {
             background: var(--card-bg);
@@ -125,7 +125,7 @@
             margin-bottom: 2rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             page-break-inside: avoid;
-        }
+        End
 
         .qa-question {
             font-size: 1.3rem;
@@ -135,22 +135,22 @@
             display: flex;
             align-items: flex-start;
             gap: 0.75rem;
-        }
+        End
 
         .qa-question::before {
             content: "Q.";
             color: var(--primary);
             font-size: 1.5rem;
             line-height: 1;
-        }
+        End
 
         .qa-answer {
             color: var(--text-main);
-        }
+        End
 
         .qa-answer p:last-child {
             margin-bottom: 0;
-        }
+        End
 
         /* Grid for features */
         .features-grid {
@@ -158,7 +158,7 @@
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 2rem;
             margin: 3rem 0;
-        }
+        End
 
         .feature-card {
             background: white;
@@ -166,12 +166,12 @@
             border-radius: 12px;
             border: 1px solid var(--border);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-        }
+        End
 
         .feature-card h3 {
             margin-top: 0;
             color: var(--primary-dark);
-        }
+        End
 
         .footer {
             margin-top: 5rem;
@@ -180,7 +180,7 @@
             border-top: 1px solid var(--border);
             color: var(--text-muted);
             font-size: 0.9rem;
-        }
+        End
 
         .btn-print {
             display: inline-block;
@@ -195,29 +195,29 @@
             font-size: 1rem;
             margin-top: 2rem;
             transition: background 0.2s;
-        }
+        End
 
-        .btn-print:hover { background: #334155; }
+        .btn-print:hover { background: #334155; End
 
         @media print {
             body {
                 background: white;
                 max-width: 100%;
                 padding: 0;
-            }
+            End
             .qa-card, .feature-card, .callout {
                 box-shadow: none;
                 border: 1px solid #ccc;
-            }
+            End
             .no-print {
                 display: none;
-            }
+            End
             pre {
                 border: 1px solid #333;
                 background: #f8fafc;
                 color: #0f172a;
-            }
-        }
+            End
+        End
     </style>
 </head>
 <body>
@@ -237,7 +237,7 @@
     <h2>2. The Problem Statement</h2>
     <div class="callout problem">
         <strong>The Barrier of Cryptic Math Frameworks</strong><br>
-        Traditional programming languages (like C++, Python, and Javascript) were built in an era strictly defined by hardware resource constraints. As a result, syntax relies heavily on abstract mathematical shorthand, arbitrary brackets <code>{}</code>, unintuitive keywords (<code>function</code>, <code>fn</code>, <code>def</code>, <code>struct</code>), and strictly defined pointer operations. This creates an artificial barrier to entry. For non-engineers, product managers, or educators attempting to parse business logic, traditional codebases read like alien hieroglyphs, disconnecting the "logic" from the "human."
+        Traditional programming languages (like C++, Python, and Javascript) were built in an era strictly defined by hardware resource constraints. As a result, syntax relies heavily on abstract mathematical shorthand, arbitrary brackets <code>{End</code>, unintuitive keywords (<code>function</code>, <code>fn</code>, <code>def</code>, <code>struct</code>), and strictly defined pointer operations. This creates an artificial barrier to entry. For non-engineers, product managers, or educators attempting to parse business logic, traditional codebases read like alien hieroglyphs, disconnecting the "logic" from the "human."
     </div>
 
     <h2>3. The EPL Solution</h2>
@@ -273,7 +273,7 @@
 Note: Initializing the inventory
 Create swords as 15
 
-Define Function calculate_loot takes multiplier
+Function calculate_loot takes multiplier
     Try
         Return swords * multiplier
     Catch error
@@ -385,7 +385,7 @@ End
             <div class="qa-question">English can sometimes be wordy. What if I want to type code faster?</div>
             <div class="qa-answer">
                 <p>You are never locked into "novel-writing". The EPL Lexer allows for high <strong>semantic brevity</strong>.</p>
-                <p>While <code>Create username as "Admin"</code> is the standard for maximum readability, the compiler fully supports universally recognized shorthand operators like <code>Set username to "Admin"</code> or even <code>=</code> for mathematical assignments. EPL provides a sliding scale between hyper-explicit readability (for sharing with non-technical teams) and rapid development speed (for solo engineers).</p>
+                <p>While <code>Create username as "Admin"</code> is the standard for maximum readability, the compiler fully supports universally recognized shorthand operators like <code>username = "Admin"</code> or even <code>=</code> for mathematical assignments. EPL provides a sliding scale between hyper-explicit readability (for sharing with non-technical teams) and rapid development speed (for solo engineers).</p>
             </div>
         </div>
 
