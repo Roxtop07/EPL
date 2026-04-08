@@ -788,10 +788,14 @@ The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom 
                 let replyText = "I encountered a neural synchronization block. Please try again.";
                 
                 if (data && data.choices && data.choices.length > 0) {
-                    replyText = data.choices[0].message.content;
+                    replyText = data.choices[0].message.content || replyText;
                 }
+                
+                // Coerce to string safely to prevent replace undefined errors
+                replyText = String(replyText);
 
-                document.getElementById(typingId).remove();
+                const loader = document.getElementById(typingId);
+                if (loader) loader.remove();
                 
                 // Save AI original response to history
                 chatHistory.push({ role: "assistant", content: replyText });
@@ -816,11 +820,15 @@ The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom 
                 }
                 
                 // Render ONLY conversational text inside chatbot UI
-                appendMessage(parseMarkdown(conversationalText), 'bot');
+                if (conversationalText.trim()) {
+                    appendMessage(parseMarkdown(conversationalText), 'bot');
+                }
 
             } catch (err) {
-                document.getElementById(typingId).remove();
-                appendMessage("API Connection interrupted. Please ensure network access and try again.", 'bot');
+                console.error("Agent Error:", err);
+                const loader = document.getElementById(typingId);
+                if (loader) loader.remove();
+                appendMessage("API Connection interrupted or timeout. Please check your network and try again.", 'bot error');
             }
         };
     </script>
