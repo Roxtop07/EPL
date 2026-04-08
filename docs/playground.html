@@ -789,6 +789,11 @@ The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom 
                 
                 if (data && data.choices && data.choices.length > 0) {
                     replyText = data.choices[0].message.content || replyText;
+                } else if (data && data.error) {
+                    replyText = `API Error: ${data.error.message || data.error}`;
+                } else {
+                    // Dump unknown JSON structure for debugging instead of silent fallback
+                    replyText = `Unexpected API Schema: \n\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\``;
                 }
                 
                 // Coerce to string safely to prevent replace undefined errors
