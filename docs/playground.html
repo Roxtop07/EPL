@@ -149,6 +149,7 @@
             flex-direction: column;
             box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.5);
             transition: transform 0.2s;
+            min-width: 0;
         }
         
         .panel:hover {
@@ -812,11 +813,7 @@ The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom 
                 // Filter out the code blocks from conversational text
                 let conversationalText = replyText.replace(codeBlockRegex, (match, code) => {
                     codeChunks.push(code.trim());
-                    return `<div class="ai-block" style="border-left: 3px solid #0f0;">
-                        <div class="ai-actions" style="background: rgba(0, 255, 0, 0.05); color: #0f0; padding: 0.6rem; text-align: center; font-weight: bold;">
-                            <i class="fa-solid fa-bolt"></i> Auto-Typed Extracted Code Directly into Workspace
-                        </div>
-                    </div>`;
+                    return `[[AI_AUTO_TYPED_CODE]]`;
                 });
 
                 // Directly type the code into the CodeMirror editor!
@@ -826,7 +823,13 @@ The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom 
                 
                 // Render ONLY conversational text inside chatbot UI
                 if (conversationalText.trim()) {
-                    appendMessage(parseMarkdown(conversationalText), 'bot');
+                    let finalHtml = parseMarkdown(conversationalText);
+                    finalHtml = finalHtml.replace(/\[\[AI_AUTO_TYPED_CODE\]\]/g, `<div class="ai-block" style="border-left: 3px solid #0f0; margin-top: 10px; margin-bottom: 10px;">
+                        <div class="ai-actions" style="background: rgba(0, 255, 0, 0.05); color: #0f0; padding: 0.6rem; text-align: center; font-weight: bold; border-radius: 4px;">
+                            <i class="fa-solid fa-bolt"></i> Code Extracted & Typed into Workspace
+                        </div>
+                    </div>`);
+                    appendMessage(finalHtml, 'bot');
                 }
 
             } catch (err) {
