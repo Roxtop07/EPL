@@ -764,6 +764,10 @@ The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom 
             chatBody.appendChild(msgDiv);
             chatBody.scrollTop = chatBody.scrollHeight;
 
+            // Lock UI to prevent user from sending multiple requests and flooding the IP Queue
+            chatInput.disabled = true;
+            chatInput.placeholder = "Neural inference in progress...";
+
             try {
                 // Dynamically compile the Agent's Workspace Reality Payload
                 const dynamicContext = `\n\n--- ENVIRONMENT STATE ---\n[CURRENT WORKSPACE EPL CODE]\n\`\`\`epl\n${editor.getValue()}\n\`\`\`\n\n[LAST TERMINAL OUTPUT]\n\`\`\`\n${lastTerminalOutput}\n\`\`\``;
@@ -774,18 +778,29 @@ The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom 
                     ...chatHistory
                 ];
 
-                // Free public LLM API endpoint
-                const response = await fetch("https://text.pollinations.ai/openai", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        messages: apiPayload,
-                        model: "openai",
-                        jsonMode: false
-                    })
-                });
+                let data = null;
+                // Transparent auto-retry mechanism to bypass Pollinations API queueing locks
+                for (let attempts = 0; attempts < 3; attempts++) {
+                    const response = await fetch("https://text.pollinations.ai/openai", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            messages: apiPayload,
+                            model: "openai",
+                            jsonMode: false,
+                            seed: Math.floor(Math.random() * 1000000) // randomized seed bypass
+                        })
+                    });
+                    data = await response.json();
+                    
+                    // If queue is full, wait 2 seconds and try again instead of annoying the user
+                    if (data && data.error && String(data.error).includes("Queue full")) {
+                        await new Promise(r => setTimeout(r, 2500));
+                        continue;
+                    }
+                    break;
+                }
                 
-                const data = await response.json();
                 let replyText = "I encountered a neural synchronization block. Please try again.";
                 
                 if (data && data.choices && data.choices.length > 0) {
@@ -837,6 +852,11 @@ The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom 
                 const loader = document.getElementById(typingId);
                 if (loader) loader.remove();
                 appendMessage("API Connection interrupted or timeout. Please check your network and try again.", 'bot error');
+            } finally {
+                // Always unlock the UI
+                chatInput.disabled = false;
+                chatInput.placeholder = "Ask about macros, routing, loops...";
+                chatInput.focus();
             }
         };
     </script>
