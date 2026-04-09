@@ -525,7 +525,7 @@ Print s.to_list()             Note: ["H","e","l","l","o"," ","W","o","r","l","d"
 ```epl
 items = [3, 1, 4, 1, 5]
 
-Note: [Parser Error] items.append(9)               Note: [3, 1, 4, 1, 5, 9]
+Add 9 to items                Note: [3, 1, 4, 1, 5, 9]
 items.remove(1)               Note: removes first 1
 Print items.contains(4)       Note: true
 Print items.index_of(4)       Note: 2
