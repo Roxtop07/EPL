@@ -814,7 +814,12 @@ The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom 
                 let replyText = "I encountered a neural synchronization block. Please try again.";
                 
                 if (data && data.choices && data.choices.length > 0) {
-                    replyText = data.choices[0].message.content || replyText;
+                    const content = data.choices[0].message?.content;
+                    if (content === "" || content === null) {
+                        replyText = "[API Returned Empty String - LLM inference failed to generate tokens]";
+                    } else {
+                        replyText = content || replyText;
+                    }
                 } else if (data && data.error) {
                     let errObj = typeof data.error === 'object' ? JSON.stringify(data.error) : data.error;
                     replyText = `API Error: ${errObj}`;
