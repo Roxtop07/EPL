@@ -116,3 +116,16 @@ spark.db
 
 # AI config with API keys - never commit
 epl/.ai_config.json
+
+# --- ENFORCED REPO CLEANUP ---
+# Blocks all test_* files in root
+/test_*.py
+/test.js
+
+# Blocks build release folders (e.g., epl_lang-7.0.0, eplang-7.4.3)
+/eplang-*/
+/epl_lang-*/
+
+# Blocks root logs
+/build_output.log
+/test_output.log
