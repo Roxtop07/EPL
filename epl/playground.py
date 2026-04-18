@@ -11,9 +11,13 @@ import sys
 import json
 import html
 import traceback
-import threading
+import subprocess
 import contextlib
 from epl.errors import EPLError
+
+PLAYGROUND_MAX_BODY_BYTES = 1_000_000
+PLAYGROUND_EXEC_TIMEOUT_SECONDS = 10
+_PLAYGROUND_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 def _safe_error(e):
     """Return error message, sanitizing non-EPL exceptions."""
@@ -23,7 +27,7 @@ def _safe_error(e):
 
 def start_playground(port: int = 8080, open_browser: bool = True):
     """Start the EPL Web Playground server."""
-    from http.server import HTTPServer, BaseHTTPRequestHandler
+    from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
     class PlaygroundHandler(BaseHTTPRequestHandler):
         def do_GET(self):
@@ -50,6 +54,7 @@ def start_playground(port: int = 8080, open_browser: bool = True):
             self.send_response(200)
             self.send_header('Content-Type', 'text/html; charset=utf-8')
             self.send_header('X-Content-Type-Options', 'nosniff')
+            self.send_header('Cache-Control', 'no-store')
             self.end_headers()
             self.wfile.write(_PLAYGROUND_HTML.encode('utf-8'))
 
@@ -65,7 +70,7 @@ def start_playground(port: int = 8080, open_browser: bool = True):
 
         def _run_code(self):
             length = int(self.headers.get('Content-Length', 0))
-            if length > 1_000_000:
+            if length > PLAYGROUND_MAX_BODY_BYTES:
                 self._json_response(400, {'error': 'Code too large (max 1MB)'})
                 return
             body = self.rfile.read(length)
@@ -83,7 +88,7 @@ def start_playground(port: int = 8080, open_browser: bool = True):
 
         def _transpile_code(self):
             length = int(self.headers.get('Content-Length', 0))
-            if length > 1_000_000:
+            if length > PLAYGROUND_MAX_BODY_BYTES:
                 self._json_response(400, {'error': 'Code too large (max 1MB)'})
                 return
             body = self.rfile.read(length)
@@ -102,7 +107,7 @@ def start_playground(port: int = 8080, open_browser: bool = True):
 
         def _assist_code(self):
             length = int(self.headers.get('Content-Length', 0))
-            if length > 1_000_000:
+            if length > PLAYGROUND_MAX_BODY_BYTES:
                 self._json_response(400, {'error': 'Request too large (max 1MB)'})
                 return
             body = self.rfile.read(length)
@@ -123,14 +128,17 @@ def start_playground(port: int = 8080, open_browser: bool = True):
             self._json_response(200, result)
 
         def _json_response(self, status, data):
+            encoded = json.dumps(data).encode('utf-8')
             self.send_response(status)
             self.send_header('Content-Type', 'application/json')
             self.send_header('X-Content-Type-Options', 'nosniff')
             self.send_header('X-Frame-Options', 'DENY')
+            self.send_header('Cache-Control', 'no-store')
+            self.send_header('Content-Length', str(len(encoded)))
             self.end_headers()
-            self.wfile.write(json.dumps(data).encode('utf-8'))
+            self.wfile.write(encoded)
 
-    server = HTTPServer(('127.0.0.1', port), PlaygroundHandler)
+    server = ThreadingHTTPServer(('127.0.0.1', port), PlaygroundHandler)
     print(f"  EPL Web Playground running at http://127.0.0.1:{port}")
     print("  Press Ctrl+C to stop")
 
@@ -150,57 +158,87 @@ def start_playground(port: int = 8080, open_browser: bool = True):
 
 # ── EPL Execution Engine ─────────────────────────────────
 
-def _execute_epl(code: str) -> dict:
-    """Execute EPL code and capture output (sandboxed with timeout)."""
-    output = io.StringIO()
-    error = None
+def _worker_environment():
+    env = os.environ.copy()
+    pythonpath = env.get('PYTHONPATH')
+    if pythonpath:
+        env['PYTHONPATH'] = os.pathsep.join([_PLAYGROUND_ROOT, pythonpath])
+    else:
+        env['PYTHONPATH'] = _PLAYGROUND_ROOT
+    return env
+
+
+def _execute_epl_worker_payload(code: str) -> dict:
+    """Execute EPL code in an isolated worker process."""
     try:
         from epl.lexer import Lexer
         from epl.parser import Parser
         from epl.interpreter import Interpreter
-        from epl.environment import Environment
 
         lexer = Lexer(code)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         program = parser.parse()
 
-        env = Environment()
+        captured = io.StringIO()
         interp = Interpreter(safe_mode=True)
-
-        result = {'output': '', 'error': None}
-        done = threading.Event()
-
-        def _run():
-            nonlocal result
-            old_stdout = sys.stdout
-            old_stderr = sys.stderr
-            captured = io.StringIO()
-            sys.stdout = captured
-            sys.stderr = captured
+        with contextlib.redirect_stdout(captured), contextlib.redirect_stderr(captured):
             try:
                 interp.execute(program)
-                result['output'] = captured.getvalue()
+                return {'output': captured.getvalue(), 'error': None}
             except SystemExit:
-                result['output'] = captured.getvalue()
-            except Exception as e:
-                result['output'] = captured.getvalue()
-                result['error'] = _safe_error(e)
-            finally:
-                sys.stdout = old_stdout
-                sys.stderr = old_stderr
-                done.set()
+                return {'output': captured.getvalue(), 'error': None}
+            except Exception as exc:
+                return {'output': captured.getvalue(), 'error': _safe_error(exc)}
+    except Exception as exc:
+        return {'output': '', 'error': _safe_error(exc)}
 
-        t = threading.Thread(target=_run, daemon=True)
-        t.start()
-        t.join(timeout=10)  # 10 second timeout
 
-        if not done.is_set():
-            result = {'output': '', 'error': 'Execution timed out (10s limit)'}
-        return result
+def _playground_worker_main() -> int:
+    """Subprocess entrypoint for isolated code execution."""
+    try:
+        payload = json.loads(sys.stdin.read() or '{}')
+        result = _execute_epl_worker_payload(payload.get('code', ''))
+    except Exception as exc:
+        result = {'output': '', 'error': _safe_error(exc)}
+    sys.stdout.write(json.dumps(result))
+    sys.stdout.flush()
+    return 0
 
-    except Exception as e:
-        return {'output': '', 'error': _safe_error(e)}
+def _execute_epl(code: str) -> dict:
+    """Execute EPL code in a subprocess so timeout is a real kill boundary."""
+    if not code.strip():
+        return {'output': '', 'error': None}
+
+    try:
+        completed = subprocess.run(
+            [sys.executable, '-m', 'epl.playground', '--worker-run'],
+            input=json.dumps({'code': code}),
+            capture_output=True,
+            text=True,
+            timeout=PLAYGROUND_EXEC_TIMEOUT_SECONDS,
+            cwd=_PLAYGROUND_ROOT,
+            env=_worker_environment(),
+        )
+    except subprocess.TimeoutExpired:
+        return {'output': '', 'error': f'Execution timed out ({PLAYGROUND_EXEC_TIMEOUT_SECONDS}s limit)'}
+    except Exception as exc:
+        return {'output': '', 'error': _safe_error(exc)}
+
+    if not completed.stdout.strip():
+        return {'output': '', 'error': 'Internal error'}
+
+    try:
+        result = json.loads(completed.stdout)
+    except json.JSONDecodeError:
+        return {'output': '', 'error': 'Internal error'}
+
+    if not isinstance(result, dict):
+        return {'output': '', 'error': 'Internal error'}
+    return {
+        'output': result.get('output', ''),
+        'error': result.get('error'),
+    }
 
 
 def _transpile_epl(code: str, target: str) -> dict:
@@ -1033,3 +1071,8 @@ loadSyntaxGuide();
 </body>
 </html>
 '''
+
+
+if __name__ == '__main__':
+    if '--worker-run' in sys.argv:
+        raise SystemExit(_playground_worker_main())

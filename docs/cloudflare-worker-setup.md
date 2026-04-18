@@ -121,25 +121,21 @@ export default {
 
 ## 2. Connect Your Playground to the Secure Gateway
 
-Now that your Cloudflare Worker is humming, you need to point your Playground to it.
+Now that your Cloudflare Worker is deployed, point the browser playground at it through the built-in assistant routing controls.
 
-1. Cloudflare will give you a unique URL for your worker. It will look like:
+1. Copy your Worker URL. It will look like:
    `https://epl-gateway.<your-cloudflare-username>.workers.dev`
-2. Copy that URL.
-3. Open `docs/playground.html`.
-4. Go to **Line 796** (inside the `try { ... fetch(...) }` block).
-5. **REPLACE** the old Pollinations URL with your securely deployed proxy:
+2. Open `docs/playground.html`.
+3. Open the assistant panel.
+4. In the provider selector, choose **Secure Proxy**.
+5. Paste your Worker URL into the config field.
 
-**BEFORE:**
-```javascript
-const response = await fetch("https://text.pollinations.ai/openai", {
-    method: "POST",
-```
+If you leave the field blank, the playground will call same-origin `/chat` instead. That is useful when you serve the docs site behind your own backend.
 
-**AFTER:**
-```javascript
-const response = await fetch("https://epl-gateway.<your-cloudflare-username>.workers.dev", {
-    method: "POST",
-```
+The browser playground now supports three explicit modes:
 
-**That's it!** You now have a hyper-scalable, double-fallback AI Architecture that secures your API keys perfectly!
+- **Secure Proxy**: recommended for public deployments
+- **Groq API**: direct browser call with your own Groq key
+- **Gemini API**: direct browser call with your own Gemini key
+
+There is no anonymous fallback service anymore. Requests go only to the route you configure.

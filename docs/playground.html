@@ -410,7 +410,45 @@
             border-top: 2px solid var(--border);
             background: #000;
             display: flex;
+            flex-direction: column;
             gap: 8px;
+        }
+
+        .chat-provider-row,
+        .chat-send-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-provider,
+        .chat-config-input {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.65rem 0.75rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-provider {
+            min-width: 130px;
+        }
+
+        .chat-config-input {
+            flex: 1;
+        }
+
+        .chat-provider:focus,
+        .chat-config-input:focus {
+            border-color: var(--accent);
+        }
+
+        .chat-provider-hint {
+            color: var(--text-dim);
+            font-size: 0.72rem;
+            line-height: 1.4;
         }
 
         .chat-input {
@@ -604,14 +642,33 @@ Say greet("Abneesh")
         </div>
         <div class="chat-body" id="chat-body">
             <div class="chat-msg bot">
-                System Initialized. I am the EPL Code Assistant. How can I help you write English Programming Language today? ⚡
+                Assistant ready. Choose Secure Proxy, Groq, or Gemini below. I will stay grounded in EPL syntax and the live AST diagnostics from this editor.
             </div>
         </div>
         <div class="chat-input-area">
-            <input type="text" class="chat-input" id="chat-input" placeholder="Ask about macros, routing, loops..." onkeypress="handleChatEnter(event)">
-            <button class="chat-send-btn" onclick="sendChatMessage()">
-                <i class="fa-solid fa-paper-plane"></i>
-            </button>
+            <div class="chat-provider-row">
+                <select class="chat-provider" id="chat-provider" onchange="applyAiConfig()">
+                    <option value="proxy">Secure Proxy</option>
+                    <option value="groq">Groq API</option>
+                    <option value="gemini">Gemini API</option>
+                </select>
+                <input
+                    type="password"
+                    class="chat-config-input"
+                    id="chat-config-input"
+                    placeholder="Worker URL or API key"
+                    onblur="applyAiConfig()"
+                >
+            </div>
+            <div class="chat-provider-hint" id="chat-provider-hint">
+                Proxy mode keeps keys out of the public page. Direct Groq/Gemini mode uses your own key in this browser only.
+            </div>
+            <div class="chat-send-row">
+                <input type="text" class="chat-input" id="chat-input" placeholder="Ask about macros, routing, loops..." onkeypress="handleChatEnter(event)">
+                <button class="chat-send-btn" onclick="sendChatMessage()">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -964,6 +1021,9 @@ json.dumps(result)
         const chatWindow = document.getElementById('chatbot-window');
         const chatBody = document.getElementById('chat-body');
         const chatInput = document.getElementById('chat-input');
+        const chatProvider = document.getElementById('chat-provider');
+        const chatConfigInput = document.getElementById('chat-config-input');
+        const chatProviderHint = document.getElementById('chat-provider-hint');
 
         const baseSystemPrompt = `You are the OMNISCIENT AI Copilot for EPL (English Programming Language), a language exclusively designed, authored, and developed by visionary engineer Abneesh Singh.
 You have ABSOLUTE KNOWLEDGE of the comprehensive 'EPL Book', syntax, standard library, and internal AST architecture.
@@ -1072,6 +1132,160 @@ You MUST fulfill ANY user request (e-commerce sites, snake games, complex math) 
 The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom of the system prompt to give you exact context.`;
 
         let chatHistory = [];
+        const AI_CONFIG_STORAGE_KEY = 'epl-playground-ai-config-v1';
+
+        function loadAiConfig() {
+            try {
+                return JSON.parse(localStorage.getItem(AI_CONFIG_STORAGE_KEY) || '{}');
+            } catch {
+                return {};
+            }
+        }
+
+        function saveAiConfig(config) {
+            localStorage.setItem(AI_CONFIG_STORAGE_KEY, JSON.stringify(config));
+        }
+
+        function getAiConfig() {
+            return {
+                provider: chatProvider.value || 'proxy',
+                value: chatConfigInput.value.trim(),
+            };
+        }
+
+        function updateAiConfigUi() {
+            const provider = chatProvider.value || 'proxy';
+            if (provider === 'proxy') {
+                chatConfigInput.type = 'text';
+                chatConfigInput.placeholder = 'Worker URL (blank = same-origin /chat)';
+                chatProviderHint.textContent = 'Secure Proxy mode is recommended for production deployments. Point this at your Cloudflare Worker, or leave it blank to use same-origin /chat.';
+            } else if (provider === 'groq') {
+                chatConfigInput.type = 'password';
+                chatConfigInput.placeholder = 'Groq API key (gsk_...)';
+                chatProviderHint.textContent = 'Direct Groq mode sends editor context straight to api.groq.com from this browser. If CORS or policy blocks it, switch back to Secure Proxy mode.';
+            } else {
+                chatConfigInput.type = 'password';
+                chatConfigInput.placeholder = 'Gemini API key';
+                chatProviderHint.textContent = 'Direct Gemini mode sends editor context straight to generativelanguage.googleapis.com from this browser. If CORS or policy blocks it, use Secure Proxy mode.';
+            }
+        }
+
+        function bootstrapAiConfig() {
+            const config = loadAiConfig();
+            chatProvider.value = config.provider || 'proxy';
+            chatConfigInput.value = config.value || '';
+            updateAiConfigUi();
+        }
+
+        window.applyAiConfig = function() {
+            saveAiConfig(getAiConfig());
+            updateAiConfigUi();
+        };
+
+        function normalizeAssistantContent(raw) {
+            if (typeof raw === 'string') {
+                return raw;
+            }
+            if (raw === null || raw === undefined) {
+                return '';
+            }
+            return String(raw);
+        }
+
+        async function requestProxyAssistant(messages, endpoint) {
+            const target = endpoint || '/chat';
+            const response = await fetch(target, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages })
+            });
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`Proxy request failed (${response.status}): ${text.slice(0, 160)}`);
+            }
+            return await response.json();
+        }
+
+        async function requestGroqAssistant(messages, apiKey) {
+            if (!apiKey) {
+                throw new Error('Enter a Groq API key first.');
+            }
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: 'llama-3.3-70b-versatile',
+                    messages,
+                    temperature: 0.2
+                })
+            });
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`Groq request failed (${response.status}): ${text.slice(0, 160)}`);
+            }
+            return await response.json();
+        }
+
+        async function requestGeminiAssistant(messages, apiKey) {
+            if (!apiKey) {
+                throw new Error('Enter a Gemini API key first.');
+            }
+
+            const systemMessage = messages.find(msg => msg.role === 'system')?.content || '';
+            const contents = messages
+                .filter(msg => msg.role !== 'system')
+                .map(msg => ({
+                    role: msg.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: msg.content }]
+                }));
+
+            const payload = {
+                contents,
+                generationConfig: {
+                    temperature: 0.2,
+                    maxOutputTokens: 2048
+                }
+            };
+            if (systemMessage) {
+                payload.systemInstruction = { parts: [{ text: systemMessage }] };
+            }
+
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`Gemini request failed (${response.status}): ${text.slice(0, 160)}`);
+            }
+
+            const data = await response.json();
+            const replyText = (data.candidates || [])
+                .flatMap(candidate => candidate.content?.parts || [])
+                .map(part => part.text || '')
+                .join('\n')
+                .trim();
+
+            return {
+                choices: [{ message: { content: replyText || 'Gemini returned an empty response.' } }],
+                raw: data,
+            };
+        }
+
+        async function requestConfiguredAssistant(messages) {
+            const config = getAiConfig();
+            if (config.provider === 'groq') {
+                return await requestGroqAssistant(messages, config.value);
+            }
+            if (config.provider === 'gemini') {
+                return await requestGeminiAssistant(messages, config.value);
+            }
+            return await requestProxyAssistant(messages, config.value);
+        }
 
         window.toggleChat = function() {
             chatWindow.classList.toggle('active');
@@ -1105,7 +1319,7 @@ The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom 
 
         window.clearChat = function() {
             chatHistory = [];
-            chatBody.innerHTML = '<div class="chat-msg bot">Agent Memory Wiped. Code context synchronized. I am ready! ⚡</div>';
+            chatBody.innerHTML = '<div class="chat-msg bot">Conversation cleared. Assistant routing and EPL syntax context are still ready.</div>';
         };
 
         window.sendChatMessage = async function() {
@@ -1122,7 +1336,7 @@ The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom 
             const msgDiv = document.createElement('div');
             msgDiv.className = `chat-msg bot`;
             msgDiv.id = typingId;
-            msgDiv.innerHTML = '<i class="fa-solid fa-circle-notch spinner"></i> Analyzing Workspace & Neural Inference...';
+            msgDiv.innerHTML = '<i class="fa-solid fa-circle-notch spinner"></i> Analyzing syntax, AST, and assistant route...';
             chatBody.appendChild(msgDiv);
             chatBody.scrollTop = chatBody.scrollHeight;
 
@@ -1150,69 +1364,25 @@ The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom 
                     ...chatHistory
                 ];
 
-                let data = null;
-                // Transparent auto-retry mechanism: Tries secure edge backend first, falls back to Pollinations on GitHub Pages
-                for (let attempts = 0; attempts < 3; attempts++) {
-                    try {
-                        // Attempt to hit the Cloudflare Edge Function natively (works when deployed on Cloudflare Pages)
-                        let response = await fetch("/chat", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ messages: apiPayload })
-                        });
-                        
-                        if (!response.ok) {
-                            // If /chat doesn't exist (e.g. running locally or on GitHub Pages), fallback to Pollinations!
-                            console.log("Edge proxy not detected, falling back to Pollinations AI...");
-                            response = await fetch("https://text.pollinations.ai/openai", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({
-                                    messages: apiPayload,
-                                    model: "openai",
-                                    jsonMode: false,
-                                    seed: Math.floor(Math.random() * 1000000)
-                                })
-                            });
-                        }
-                        
-                        data = await response.json();
-                        
-                        // If queue is full or other transient API error, wait 2.5 seconds and try again
-                        if (data && data.error) {
-                            await new Promise(r => setTimeout(r, 2500));
-                            continue;
-                        }
-                        
-                        // If perfectly successful, break retry loop natively
-                        if (data && data.choices) {
-                            break;
-                        }
-                    } catch (fetchErr) {
-                        // Catch 502 Bad Gateway / Timeout
-                        await new Promise(r => setTimeout(r, 2500));
-                    }
-                }
-                
-                let errReason = (data && data.error) ? (typeof data.error === 'object' ? JSON.stringify(data.error) : data.error) : "API Timeout / 403 Forbidden";
-                let replyText = `Neural Synchronization Block. [Diagnostic: Edge Proxy '/chat' Unreachable -> Fallback AI Proxy Failed (${errReason})]. Try running via 'npx wrangler pages dev docs' for the local API proxy.`;
-                
+                const data = await requestConfiguredAssistant(apiPayload);
+                let replyText = 'Assistant returned no content.';
+
                 if (data && data.choices && data.choices.length > 0) {
                     const content = data.choices[0].message?.content;
                     if (content === "" || content === null) {
-                        replyText = "[API Returned Empty String - LLM inference failed to generate tokens]";
+                        replyText = "[Assistant returned an empty string]";
                     } else {
-                        replyText = content || replyText;
+                        replyText = content;
                     }
                 } else if (data && data.error) {
-                    replyText = `API Error: ${errReason}`;
+                    const errReason = typeof data.error === 'object' ? JSON.stringify(data.error) : data.error;
+                    replyText = `Assistant API error: ${errReason}`;
                 } else {
-                    // Dump unknown JSON structure for debugging instead of silent fallback
-                    replyText = `Unexpected API Schema: \n\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\``;
+                    replyText = `Unexpected assistant response schema:\n\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\``;
                 }
                 
                 // Coerce to string safely to prevent replace undefined errors
-                replyText = String(replyText);
+                replyText = normalizeAssistantContent(replyText);
 
                 const loader = document.getElementById(typingId);
                 if (loader) loader.remove();
@@ -1266,7 +1436,7 @@ The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom 
                 console.error("Agent Error:", err);
                 const loader = document.getElementById(typingId);
                 if (loader) loader.remove();
-                appendMessage("API Connection interrupted or timeout. Please check your network and try again.", 'bot error');
+                appendMessage(`Assistant request failed. ${parseMarkdown(normalizeAssistantContent(err.message || err))}`, 'bot error');
             } finally {
                 // Always unlock the UI
                 chatInput.disabled = false;
@@ -1274,6 +1444,8 @@ The user's CURRENT CODE and LAST TERMINAL OUTPUT will be injected at the bottom 
                 chatInput.focus();
             }
         };
+
+        bootstrapAiConfig();
     </script>
 </body>
 </html>

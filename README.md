@@ -111,6 +111,20 @@ cd myapp
 epl serve
 ```
 
+### Production serving
+
+```bash
+pip install "eplang[server]"
+```
+
+EPL supports production WSGI and ASGI deployment through generated adapters and the `epl serve` runtime surface.
+
+- WSGI: Waitress and Gunicorn
+- ASGI: Uvicorn and Hypercorn
+- Adapter generation: WSGI / ASGI deploy entrypoints for external servers such as Daphne or other ASGI hosts
+
+For multi-worker ASGI deployment, use the generated `deploy/asgi.py` entrypoint with your server's import-string form rather than an in-process app object launch.
+
 ---
 
 ## 🆚 EPL vs Other Languages

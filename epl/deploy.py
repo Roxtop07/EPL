@@ -775,71 +775,143 @@ async def _asgi_websocket_handler(scope, receive, send, app):
 # Cross-Platform Server (Waitress on Windows, Gunicorn on Linux)
 # ═══════════════════════════════════════════════════════════
 
-def serve(app_or_wsgi, host='0.0.0.0', port=8000, workers=4, reload=False, engine=None):
-    """Start a production WSGI server — auto-detects platform.
+def _banner(engine, host, port, workers):
+    print(f'\n  EPL Production Server ({engine})')
+    print(f'  Listening on {host}:{port} (workers={workers})')
+    print(f'  Press Ctrl+C to stop\n')
+
+
+def _resolve_server_apps(app_or_wsgi, interpreter=None):
+    """Normalize EPL app/adapters into WSGI and ASGI adapters."""
+    from epl.web import EPLWebApp
+
+    if isinstance(app_or_wsgi, ASGIAdapter):
+        return app_or_wsgi.app, app_or_wsgi._wsgi, app_or_wsgi
+
+    if isinstance(app_or_wsgi, WSGIAdapter):
+        app = app_or_wsgi.app
+        asgi_app = ASGIAdapter(app, app_or_wsgi.interpreter)
+        return app, app_or_wsgi, asgi_app
+
+    if isinstance(app_or_wsgi, EPLWebApp):
+        wsgi_app = WSGIAdapter(app_or_wsgi, interpreter=interpreter)
+        asgi_app = ASGIAdapter(app_or_wsgi, interpreter=interpreter)
+        return app_or_wsgi, wsgi_app, asgi_app
+
+    # Generic WSGI callable fallback; ASGI runtimes are not available here.
+    return None, app_or_wsgi, None
+
+
+def _run_waitress(wsgi_app, host, port, workers):
+    import waitress
+
+    _banner('Waitress', host, port, workers)
+    waitress.serve(
+        wsgi_app,
+        host=host,
+        port=port,
+        threads=workers,
+        channel_timeout=120,
+        map_size=100000,
+        url_scheme='http',
+    )
+
+
+def _normalize_asgi_workers(engine, workers):
+    """ASGI object mode cannot safely promise multi-worker operation."""
+    worker_count = max(1, int(workers or 1))
+    if worker_count == 1:
+        return 1
+
+    message = (
+        f"{engine} multi-worker runtime requires an import string entrypoint. "
+        f"Use generated deploy/asgi.py with `{engine.lower()} asgi:application ...` "
+        f"for multi-worker production deployment."
+    )
+    _logger.warning("%s Falling back to a single worker for in-process launch.", message)
+    return 1
+
+
+def _run_uvicorn(asgi_app, host, port, workers, reload=False):
+    import uvicorn
+
+    effective_workers = _normalize_asgi_workers('Uvicorn', workers)
+    _banner('Uvicorn', host, port, effective_workers)
+    uvicorn.run(
+        asgi_app,
+        host=host,
+        port=port,
+        workers=effective_workers,
+        reload=bool(reload and effective_workers == 1),
+    )
+
+
+def _run_hypercorn(asgi_app, host, port, workers):
+    from hypercorn.asyncio import serve as hypercorn_serve
+    from hypercorn.config import Config
+    import asyncio
+
+    effective_workers = _normalize_asgi_workers('Hypercorn', workers)
+    config = Config()
+    config.bind = [f'{host}:{port}']
+    config.workers = effective_workers
+    config.accesslog = '-'
+    _banner('Hypercorn', host, port, effective_workers)
+    asyncio.run(hypercorn_serve(asgi_app, config))
+
+
+def serve(app_or_wsgi, host='0.0.0.0', port=8000, workers=4, reload=False, engine=None, interpreter=None):
+    """Start a production server using the best available EPL runtime adapter.
     
-    - Windows: Uses Waitress (pip install waitress)
-    - Linux/macOS: Uses Gunicorn if available, else Waitress
+    - Windows: Uses Waitress by default
+    - Linux/macOS: Uses Gunicorn by default when available
+    - ASGI engines (Uvicorn/Hypercorn): supported for in-process single-worker launch,
+      and multi-worker deployment through generated import-string entrypoints.
     - reload=True: Enables hot-reload via EPL's file watcher
     
     Args:
-        app_or_wsgi: EPLWebApp or WSGIAdapter instance
+        app_or_wsgi: EPLWebApp, WSGIAdapter, ASGIAdapter, or WSGI callable
         host: Bind address
         port: Port number
-        workers: Number of workers
+        workers: Desired worker/thread count
         reload: Enable hot-reload (dev mode)
-        engine: Force a specific server: 'waitress', 'gunicorn', 'uvicorn', 'builtin'
+        engine: Force a specific server: 'waitress', 'gunicorn', 'uvicorn', 'hypercorn', 'builtin'
+        interpreter: Optional interpreter used when wrapping a raw EPLWebApp
     """
-    import sys
     import platform
 
-    # Wrap EPLWebApp in WSGIAdapter if needed
-    from epl.web import EPLWebApp
-    if isinstance(app_or_wsgi, EPLWebApp):
-        wsgi_app = WSGIAdapter(app_or_wsgi)
-    else:
-        wsgi_app = app_or_wsgi
+    app, wsgi_app, asgi_app = _resolve_server_apps(app_or_wsgi, interpreter=interpreter)
+    selected_engine = (engine or 'auto').lower()
 
     def _start_server():
         is_windows = platform.system() == 'Windows'
 
         # If engine is explicitly specified, use that
-        if engine == 'builtin':
+        if selected_engine == 'builtin':
             _fallback_serve(wsgi_app, host, port)
             return
-        if engine == 'waitress':
-            import waitress
-            print(f'\n  EPL Production Server (Waitress)')
-            print(f'  Listening on {host}:{port} (workers={workers})')
-            print(f'  Press Ctrl+C to stop\n')
-            waitress.serve(wsgi_app, host=host, port=port,
-                          threads=workers, channel_timeout=120,
-                          map_size=100000, url_scheme='http')
+        if selected_engine == 'waitress':
+            _run_waitress(wsgi_app, host, port, workers)
             return
-        if engine == 'gunicorn':
+        if selected_engine == 'gunicorn':
             _run_gunicorn(wsgi_app, host, port, workers)
             return
-        if engine == 'uvicorn':
-            import uvicorn
-            from epl.deploy import ASGIAdapter
-            asgi_app = ASGIAdapter(app_or_wsgi) if not isinstance(app_or_wsgi, ASGIAdapter) else app_or_wsgi
-            print(f'\n  EPL Production Server (Uvicorn)')
-            print(f'  Listening on {host}:{port} (workers={workers})')
-            print(f'  Press Ctrl+C to stop\n')
-            uvicorn.run(asgi_app, host=host, port=port, workers=workers)
+        if selected_engine == 'uvicorn':
+            if asgi_app is None:
+                raise RuntimeError('Uvicorn requires an EPLWebApp or ASGIAdapter.')
+            _run_uvicorn(asgi_app, host, port, workers, reload=reload)
+            return
+        if selected_engine == 'hypercorn':
+            if asgi_app is None:
+                raise RuntimeError('Hypercorn requires an EPLWebApp or ASGIAdapter.')
+            _run_hypercorn(asgi_app, host, port, workers)
             return
 
         # Auto-detect best available server
         if is_windows:
             # Windows: Use Waitress
             try:
-                import waitress  # type: ignore[reportMissingModuleSource]
-                print(f'\n  EPL Production Server (Waitress)')
-                print(f'  Listening on {host}:{port} (workers={workers})')
-                print(f'  Press Ctrl+C to stop\n')
-                waitress.serve(wsgi_app, host=host, port=port,
-                              threads=workers, channel_timeout=120,
-                              map_size=100000, url_scheme='http')
+                _run_waitress(wsgi_app, host, port, workers)
             except ImportError:
                 print('  Waitress not installed. Install with: pip install waitress')
                 print('  Falling back to built-in server...')
@@ -848,18 +920,22 @@ def serve(app_or_wsgi, host='0.0.0.0', port=8000, workers=4, reload=False, engin
             # Linux/macOS: Try Gunicorn first
             try:
                 import gunicorn  # type: ignore[reportMissingModuleSource]
-                # Gunicorn needs to be run via command line, not imported
                 _run_gunicorn(wsgi_app, host, port, workers)
             except ImportError:
                 try:
-                    import waitress  # type: ignore[reportMissingModuleSource]
-                    print(f'\n  EPL Production Server (Waitress)')
-                    print(f'  Listening on {host}:{port} (workers={workers})')
-                    print(f'  Press Ctrl+C to stop\n')
-                    waitress.serve(wsgi_app, host=host, port=port,
-                                  threads=workers, channel_timeout=120)
+                    _run_waitress(wsgi_app, host, port, workers)
                 except ImportError:
-                    print('  No production server found. Install: pip install waitress')
+                    if asgi_app is not None:
+                        try:
+                            _run_uvicorn(asgi_app, host, port, workers, reload=reload)
+                            return
+                        except ImportError:
+                            try:
+                                _run_hypercorn(asgi_app, host, port, workers)
+                                return
+                            except ImportError:
+                                pass
+                    print('  No production server found. Install: pip install "eplang[server]"')
                     print('  Falling back to built-in server...')
                     _fallback_serve(wsgi_app, host, port)
 
@@ -891,44 +967,36 @@ def _fallback_serve(wsgi_app, host, port):
 
 
 def _run_gunicorn(wsgi_app, host, port, workers):
-    """Run Gunicorn programmatically."""
-    import sys
-    import tempfile
-    import textwrap
-    # SECURITY: Store app on module attribute (Gunicorn --preload shares memory).
-    # Eliminates pickle serialization which was a Remote Code Execution risk.
-    _mod = sys.modules[__name__]
-    _mod._gunicorn_app = wsgi_app
+    """Run Gunicorn in-process via BaseApplication."""
+    import gunicorn.app.base
 
-    # Write a temp WSGI entry module that workers can import
-    _entry = tempfile.NamedTemporaryFile(mode='w', suffix='_epl_wsgi.py', delete=False, dir='.')
-    _entry.write(textwrap.dedent("""\
-        import sys
-        sys.path.insert(0, '.')
-        from epl.deploy import _gunicorn_app as app
-    """))
-    _entry_name = _entry.name
-    _entry.close()
+    class EPLGunicornApp(gunicorn.app.base.BaseApplication):
+        def __init__(self, application, options=None):
+            self.options = options or {}
+            self.application = application
+            super().__init__()
 
-    import subprocess
-    cmd = [
-        sys.executable, '-m', 'gunicorn',
-        '--bind', f'{host}:{port}',
-        '--workers', str(workers),
-        '--timeout', '120',
-        '--preload',
-        'epl.deploy:_gunicorn_app'
-    ]
-    print(f'\n  EPL Production Server (Gunicorn)')
-    print(f'  Listening on {host}:{port} (workers={workers})')
-    print(f'  Press Ctrl+C to stop\n')
-    try:
-        subprocess.run(cmd)
-    finally:
-        try:
-            os.unlink(_entry_name)
-        except OSError:
-            pass
+        def load_config(self):
+            for key, value in self.options.items():
+                if key in self.cfg.settings and value is not None:
+                    self.cfg.set(key.lower(), value)
+
+        def load(self):
+            return self.application
+
+    options = {
+        'bind': f'{host}:{port}',
+        'workers': max(1, int(workers or 1)),
+        'worker_class': 'sync',
+        'timeout': 120,
+        'graceful_timeout': 30,
+        'keepalive': 5,
+        'accesslog': '-',
+        'errorlog': '-',
+        'preload_app': True,
+    }
+    _banner('Gunicorn', host, port, options['workers'])
+    EPLGunicornApp(wsgi_app, options).run()
 
 
 # Global reference for Gunicorn
@@ -1084,7 +1152,14 @@ def generate_requirements_txt(manifest=None, epl_requirement=None):
     if epl_requirement is None:
         epl_requirement = f'epl-lang>={epl_version}'
 
-    requirements = [str(epl_requirement).strip(), 'gunicorn>=21.2']
+    requirements = [
+        str(epl_requirement).strip(),
+        'gunicorn>=21.2',
+        'waitress>=2.1.0',
+        'uvicorn>=0.30.0',
+        'hypercorn>=0.16.0',
+        'daphne>=4.1.0',
+    ]
     python_deps = manifest.get('python-dependencies', {}) or {}
     for import_name, requirement in sorted(python_deps.items()):
         normalized = str(requirement).strip() if requirement is not None else ''

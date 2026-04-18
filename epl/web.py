@@ -2371,100 +2371,17 @@ def start_server(app, port=3000, interpreter=None, threaded=True, workers=32):
 
 def start_production_server(app, port=8000, host='0.0.0.0', interpreter=None,
                             workers=4, server_type='auto'):
-    """Start EPL with a production-grade WSGI/ASGI server.
+    """Start EPL with the authoritative deployment runtime from epl.deploy."""
+    from epl.deploy import serve as deploy_serve
 
-    Tries gunicorn (Linux/macOS) → waitress (Windows/cross-platform) → uvicorn (ASGI)
-    → falls back to built-in threaded server.
-
-    Args:
-        app: EPLWebApp instance
-        port: Port number (default 8000)
-        host: Bind address (default 0.0.0.0)
-        interpreter: EPL interpreter for dynamic evaluation
-        workers: Number of worker processes/threads
-        server_type: 'auto', 'gunicorn', 'waitress', 'uvicorn', or 'builtin'
-    """
-    from epl.wsgi import EPLWSGIApp
-    wsgi_app = EPLWSGIApp(app, interpreter)
-
-    def _banner(engine):
-        total = len(app.routes) + sum(len(v) for v in app.param_routes.values())
-        print(f"\n  ╔══════════════════════════════════════╗")
-        print(f"  ║  EPL Production Server v4.0          ║")
-        print(f"  ║  {app.name:<36} ║")
-        print(f"  ╠══════════════════════════════════════╣")
-        print(f"  ║  http://{host}:{port:<24} ║")
-        print(f"  ║  Engine: {engine:<28}║")
-        print(f"  ║  Workers: {workers:<27}║")
-        print(f"  ║  Routes: {total:<28}║")
-        print(f"  ║  Press Ctrl+C to stop               ║")
-        print(f"  ╚══════════════════════════════════════╝\n")
-
-    # --- Gunicorn (Linux/macOS, best for production) ---
-    if server_type in ('auto', 'gunicorn'):
-        try:
-            import gunicorn.app.base  # type: ignore[reportMissingImports]
-
-            class EPLGunicornApp(gunicorn.app.base.BaseApplication):
-                def __init__(self, application, options=None):
-                    self.options = options or {}
-                    self.application = application
-                    super().__init__()
-
-                def load_config(self):
-                    for key, value in self.options.items():
-                        if key in self.cfg.settings and value is not None:
-                            self.cfg.set(key.lower(), value)
-
-                def load(self):
-                    return self.application
-
-            options = {
-                'bind': f'{host}:{port}',
-                'workers': workers,
-                'worker_class': 'sync',
-                'timeout': 120,
-                'accesslog': '-',
-            }
-            _banner('gunicorn')
-            EPLGunicornApp(wsgi_app, options).run()
-            return
-        except ImportError:
-            if server_type == 'gunicorn':
-                raise RuntimeError('gunicorn not installed. Run: pip install gunicorn')
-
-    # --- Waitress (Windows-compatible, production-grade) ---
-    if server_type in ('auto', 'waitress'):
-        try:
-            import waitress  # type: ignore[reportMissingImports]
-            _banner('waitress')
-            waitress.serve(wsgi_app, host=host, port=port, threads=workers)
-            return
-        except ImportError:
-            if server_type == 'waitress':
-                raise RuntimeError('waitress not installed. Run: pip install waitress')
-
-    # --- Uvicorn (ASGI, async) ---
-    if server_type in ('auto', 'uvicorn'):
-        try:
-            import uvicorn  # type: ignore[reportMissingImports]
-            from epl.wsgi import EPLASGIApp
-            asgi_app = EPLASGIApp(app, interpreter)
-            _banner('uvicorn')
-            uvicorn.run(asgi_app, host=host, port=port, workers=workers)
-            return
-        except ImportError:
-            if server_type == 'uvicorn':
-                raise RuntimeError('uvicorn not installed. Run: pip install uvicorn')
-
-    # --- Builtin fallback ---
-    if server_type in ('auto', 'builtin'):
-        _access_logger.warning('No production server found. Using built-in threaded server.')
-        _access_logger.warning('For production, install: pip install waitress  (or gunicorn on Linux)')
-        start_server(app, port=port, interpreter=interpreter, threaded=True, workers=workers * 8)
-        return
-
-    raise RuntimeError(f'Unknown server_type: {server_type}. Choose: auto, gunicorn, waitress, uvicorn, builtin')
+    deploy_serve(
+        app,
+        host=host,
+        port=port,
+        workers=workers,
+        engine=None if server_type == 'auto' else server_type,
+        interpreter=interpreter,
+    )
 
 
 # ═══════════════════════════════════════════════════════════

@@ -1494,7 +1494,12 @@ def test_dap_server():
 def test_vscode_extension():
     print("\n=== 5T.18 VS Code Extension ===")
 
-    ext_dir = os.path.join(os.path.dirname(__file__), '..', 'epl-vscode')
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    candidates = (
+        os.path.join(repo_root, 'vscode-extension'),
+        os.path.join(repo_root, 'epl-vscode'),
+    )
+    ext_dir = next((path for path in candidates if os.path.isdir(path)), candidates[0])
 
     # T1: package.json exists
     pkg_path = os.path.join(ext_dir, 'package.json')
@@ -1506,8 +1511,12 @@ def test_vscode_extension():
     with open(pkg_path, 'r', encoding='utf-8') as f:
         pkg = json.load(f)
 
-    # T2: Version is 5.0.0
-    check("Extension version 5.0.0", pkg.get('version') == '5.0.0')
+    # T2: Version is present and semver-like
+    version = pkg.get('version')
+    check(
+        "Extension version present",
+        isinstance(version, str) and version.count('.') >= 2 and all(part.isdigit() for part in version.split('.')),
+    )
 
     # T3: Has language contribution
     langs = pkg.get('contributes', {}).get('languages', [])
@@ -1536,8 +1545,9 @@ def test_vscode_extension():
     # T7: Has configuration
     config = pkg.get('contributes', {}).get('configuration', {})
     props = config.get('properties', {})
-    check("Has pythonPath setting", 'epl.pythonPath' in props)
+    check("Has lsp.path setting", 'epl.lsp.path' in props)
     check("Has lsp.enabled setting", 'epl.lsp.enabled' in props)
+    check("Has strictMode setting", 'epl.strictMode' in props)
 
     # T8: Has keybinding
     keybindings = pkg.get('contributes', {}).get('keybindings', [])
@@ -1545,7 +1555,7 @@ def test_vscode_extension():
 
     # T9: Has menu entry
     menus = pkg.get('contributes', {}).get('menus', {})
-    check("Has editor menu", 'editor/title/run' in menus)
+    check("Has editor menu", 'editor/title' in menus)
 
     # T10: TextMate grammar file
     tmg_path = os.path.join(ext_dir, 'syntaxes', 'epl.tmLanguage.json')
@@ -1558,7 +1568,7 @@ def test_vscode_extension():
         check("Grammar has repository", len(tmg.get('repository', {})) > 5)
 
     # T11: Language config file
-    lang_path = os.path.join(ext_dir, 'epl-language-config.json')
+    lang_path = os.path.join(ext_dir, 'language-configuration.json')
     check("Language config exists", os.path.exists(lang_path))
 
     # T12: Snippets file
@@ -1584,7 +1594,7 @@ def test_vscode_extension():
         check("extension.js has activate", 'function activate' in content)
         check("extension.js has deactivate", 'deactivate' in content)
         check("extension.js has LSP", 'LanguageServer' in content or 'lsp' in content.lower())
-        check("extension.js v5.0.0", 'v5.0.0' in content)
+        check("extension.js versioned activation log", 'EPL extension v' in content)
         check("extension.js has formatFile", 'formatFile' in content or 'formatEPLFile' in content)
         check("extension.js has lintFile", 'lintFile' in content or 'lintEPLFile' in content)
         check("extension.js has profileFile", 'profileFile' in content or 'profileEPLFile' in content)

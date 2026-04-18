@@ -865,6 +865,8 @@ epl --version                    Show version
 epl --help                       Show help
 ```
 
+Production serving uses the `eplang[server]` extra and supports Waitress / Gunicorn for WSGI plus Uvicorn / Hypercorn for ASGI. For multi-worker ASGI deployment, use the generated `deploy/asgi.py` entrypoint with your server's import-string form.
+
 ### 16.1 Flags
 
 | Flag | Effect |

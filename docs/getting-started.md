@@ -179,6 +179,18 @@ No installation needed — try EPL instantly at:
 
 👉 **[EPL Online Playground](https://abneeshsingh21.github.io/EPL/playground.html)**
 
+The browser playground assistant can be routed through:
+
+- a secure proxy (`/chat` or a Cloudflare Worker URL)
+- Groq directly with your own key
+- Gemini directly with your own key
+
+For the full local playground server with isolated execution and the native `/api/assist` route:
+
+```bash
+epl playground
+```
+
 ---
 
 ## 9. Next Steps

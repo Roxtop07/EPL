@@ -1,5 +1,7 @@
 """Regression coverage for the playground assistant and syntax-aware copilot."""
 
+from pathlib import Path
+
 from epl.copilot import analyze_code, assist_request
 from epl.lexer import Lexer
 from epl.parser import Parser
@@ -61,3 +63,13 @@ def test_playground_html_exposes_assistant_ui():
     assert "Real EPL Syntax" in _PLAYGROUND_HTML
     assert "Apply To Editor" in _PLAYGROUND_HTML
 
+
+def test_docs_playground_routes_only_to_explicit_ai_providers():
+    html = Path("docs/playground.html").read_text(encoding="utf-8")
+
+    assert 'value="groq"' in html
+    assert 'value="gemini"' in html
+    assert "requestGroqAssistant" in html
+    assert "requestGeminiAssistant" in html
+    assert "requestProxyAssistant" in html
+    assert "text.pollinations.ai" not in html

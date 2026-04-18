@@ -37,6 +37,11 @@ Validation:
 - `EPL_RUN_DOCKER_DEPLOY_TESTS=1 python -m pytest tests/test_reference_apps.py -q`
 - optional deployed-service monitoring via `python scripts/monitor_reference_apps.py --fullstack-url <url>`
 
+Production server contract:
+- generated `deploy/wsgi.py` is the WSGI entrypoint for Waitress, Gunicorn, and compatible WSGI hosts
+- generated `deploy/asgi.py` is the ASGI entrypoint for Uvicorn, Hypercorn, Daphne, and compatible ASGI hosts
+- multi-worker ASGI deployments should use the generated import-string entrypoint, not an in-process object launch
+
 ### Android App Generator Input
 
 Path: `apps/reference-android`

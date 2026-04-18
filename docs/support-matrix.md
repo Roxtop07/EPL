@@ -52,9 +52,13 @@ AI tooling:
 
 - `pip install "epl-lang[ai]"`
 
-Production Windows serving:
+Production serving:
 
 - `pip install "epl-lang[server]"`
+- Waitress for cross-platform WSGI serving
+- Gunicorn for Linux/macOS WSGI serving
+- Uvicorn and Hypercorn for ASGI serving
+- generated `deploy/asgi.py` / `deploy/wsgi.py` entrypoints for external production hosts
 
 Redis-backed features:
 

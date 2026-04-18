@@ -146,7 +146,7 @@ HELP = f"""\
   --port N         Server port (default: 8000)
   --workers N      Number of workers (default: 4)
   --dev            Development mode (built-in server + hot-reload)
-  --engine ENGINE  Production server: auto|waitress|gunicorn|uvicorn|builtin
+  --engine ENGINE  Production server: auto|waitress|gunicorn|uvicorn|hypercorn|builtin
   --reload         Enable hot-reload
   --store TYPE     Store backend: memory|sqlite|redis
   --session TYPE   Session backend: memory|sqlite|redis
@@ -1701,7 +1701,7 @@ def _serve(args):
             continue
         if arg == '--engine' and i + 1 < len(args):
             engine = args[i + 1].lower()
-            valid_engines = ('auto', 'waitress', 'gunicorn', 'uvicorn', 'builtin')
+            valid_engines = ('auto', 'waitress', 'gunicorn', 'uvicorn', 'hypercorn', 'builtin')
             if engine not in valid_engines:
                 print(f"{_red('Error:')} Unknown engine: {engine}")
                 print(f"Valid engines: {', '.join(valid_engines)}")
@@ -1767,7 +1767,7 @@ def _serve(args):
 
 def _ensure_production_server():
     """Try to ensure at least one production WSGI server is available."""
-    for mod_name in ('waitress', 'gunicorn', 'uvicorn'):
+    for mod_name in ('waitress', 'gunicorn', 'uvicorn', 'hypercorn'):
         try:
             __import__(mod_name)
             return  # found one
@@ -1785,10 +1785,10 @@ def _ensure_production_server():
             print(f"  {_green('✓')} waitress installed successfully.")
         else:
             print(f"  {_yellow('⚠')} Could not install waitress. Using built-in server.")
-            print(f"  Install manually: pip install waitress")
+            print(f"  Install manually: pip install \"eplang[server]\"")
     except Exception:
         print(f"  {_yellow('⚠')} Could not install waitress. Using built-in server.")
-        print(f"  Install manually: pip install waitress")
+        print(f"  Install manually: pip install \"eplang[server]\"")
 
 
 def _deploy(args):

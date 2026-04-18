@@ -7,6 +7,22 @@ Try EPL directly in your browser — no installation required.
 !!! tip "Can't see the playground?"
     Open it directly: [playground.html](https://abneeshsingh21.github.io/EPL/playground.html)
 
+## Assistant Routing
+
+The browser playground assistant supports explicit provider routing:
+
+- `Secure Proxy` for a same-origin `/chat` endpoint or a Cloudflare Worker URL
+- `Groq API` for direct browser requests with your own Groq key
+- `Gemini API` for direct browser requests with your own Gemini key
+
+The page no longer uses an anonymous third-party fallback. You decide exactly where assistant traffic goes.
+
+For the full local playground server with isolated code execution and `/api/assist`, run:
+
+```bash
+epl playground
+```
+
 ## Example Snippets
 
 Try pasting these into the playground:
