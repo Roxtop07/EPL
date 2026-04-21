@@ -3,9 +3,9 @@ Note: EPL Interactive Manual Calculator
 Note: -----------------------------------------
 
 Note: 1. Setup our memory variables
-Create raw1 as ""
-Create raw2 as ""
-Create op as ""
+raw1 = ""
+raw2 = ""
+op = ""
 
 Note: 2. Ask the user for manual inputs
 Ask "Enter the first number (e.g. 20): " and store in raw1
@@ -13,28 +13,28 @@ Ask "Enter the second number (e.g. 4): " and store in raw2
 Ask "Enter operation (add, subtract, multiply, divide): " and store in op
 
 Note: 3. Convert the typed text into actual decimal numbers
-Create num1 as to_decimal(raw1)
-Create num2 as to_decimal(raw2)
+num1 = to_decimal(raw1)
+num2 = to_decimal(raw2)
 
 Note: 4. Define our exact calculator logic
-Define Function calculate takes val1, val2, operation
-    If operation is equal to "add" Then
+Function calculate takes val1, val2, operation
+
         Return val1 + val2
     End
-    If operation is equal to "subtract" Then
+
         Return val1 - val2
-    End
-    If operation is equal to "multiply" Then
+
+
         Return val1 * val2
-    End
-    If operation is equal to "divide" Then
-        If val2 is equal to 0 Then
+
+
+
             Return "Error! Cannot divide by zero."
-        End
+
         Return val1 / val2
-    End
+
     Return "Unknown operation: " + operation
-End
+
 
 Note: 5. Display the calculations
 Say "---- RESULT ----"

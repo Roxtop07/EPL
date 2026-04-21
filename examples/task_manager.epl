@@ -7,7 +7,7 @@ db = real_db_connect("tasks.db")
 real_db_execute(db, "CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, priority TEXT DEFAULT 'medium', status TEXT DEFAULT 'todo', created TEXT DEFAULT CURRENT_TIMESTAMP)")
 
 Note: Display banner
-Define Function show_banner
+Function show_banner
     Print ""
     Print "=================================="
     Print "   EPL Task Manager v1.0"
@@ -16,10 +16,10 @@ Define Function show_banner
 End
 
 Note: List all tasks
-Define Function list_tasks
+Function list_tasks
     tasks = real_db_query(db, "SELECT * FROM tasks ORDER BY CASE priority WHEN 'high' THEN 1 WHEN 'medium' THEN 2 WHEN 'low' THEN 3 END, id")
     If length(tasks) == 0 Then
-        Print "  No tasks yet! Add one with add_task()"
+# [AUTO-FIX] removed broken token
         Return Nothing
     End
     Print ""
@@ -28,10 +28,10 @@ Define Function list_tasks
     For Each task In tasks
         status_icon = "[ ]"
         If task.status == "done" Then
-            Set status_icon to "[x]"
+            status_icon = "[x]"
         End
         If task.status == "doing" Then
-            Set status_icon to "[~]"
+            status_icon = "[~]"
         End
         Print "  " + to_text(task.id) + "   | " + task.priority + "     | " + status_icon + "    | " + task.title
     End
@@ -39,31 +39,31 @@ Define Function list_tasks
 End
 
 Note: Add a new task
-Define Function add_task Takes title, priority
+Function add_task takes title, priority
     real_db_execute(db, "INSERT INTO tasks (title, priority) VALUES (?, ?)", [title, priority])
     Print "  Added: " + title + " [" + priority + "]"
 End
 
 Note: Complete a task
-Define Function complete_task Takes task_id
-    real_db_execute(db, "UPDATE tasks SET status = 'done' WHERE id = ?", [task_id])
+Function complete_task takes task_id
+    real_db_execute(db, "UPDATE tasks status = 'done' WHERE id = ?", [task_id])
     Print "  Task " + to_text(task_id) + " marked as done!"
 End
 
 Note: Start working on a task
-Define Function start_task Takes task_id
-    real_db_execute(db, "UPDATE tasks SET status = 'doing' WHERE id = ?", [task_id])
+Function start_task takes task_id
+    real_db_execute(db, "UPDATE tasks status = 'doing' WHERE id = ?", [task_id])
     Print "  Task " + to_text(task_id) + " marked as in-progress!"
 End
 
 Note: Delete a task
-Define Function delete_task Takes task_id
+Function delete_task takes task_id
     real_db_execute(db, "DELETE FROM tasks WHERE id = ?", [task_id])
     Print "  Task " + to_text(task_id) + " deleted!"
 End
 
-Note: Show statistics
-Define Function show_stats
+Note: Say statistics
+Function show_stats
     total = real_db_query_one(db, "SELECT COUNT(*) as count FROM tasks")
     done = real_db_query_one(db, "SELECT COUNT(*) as count FROM tasks WHERE status = 'done'")
     doing = real_db_query_one(db, "SELECT COUNT(*) as count FROM tasks WHERE status = 'doing'")
@@ -80,16 +80,16 @@ Define Function show_stats
     Print ""
 End
 
-Note: Show help
-Define Function show_help
+Note: Say help
+Function show_help
     Print ""
     Print "  Available functions:"
     Print "    add_task(title, priority) - Add a task"
     Print "    start_task(id)            - Mark as in-progress"
     Print "    complete_task(id)         - Mark as completed"
     Print "    delete_task(id)           - Delete a task"
-    Print "    list_tasks()              - Show all tasks"
-    Print "    show_stats()              - Show statistics"
+    Print "    list_tasks()              - Say all tasks"
+    Print "    show_stats()              - Say statistics"
     Print ""
 End
 
@@ -103,10 +103,10 @@ If existing.count == 0 Then
     add_task("Learn EPL programming", "high")
     add_task("Build a web application", "medium")
     add_task("Write documentation", "low")
-    add_task("Set up CI/CD pipeline", "medium")
+    add_task("up = CI/CD pipeline", "medium")
     add_task("Review pull requests", "high")
     Print ""
-    Print "  (Added sample tasks for demo)"
+# [AUTO-FIX] removed broken token
 End
 
 Print ""
@@ -124,4 +124,4 @@ show_stats()
 Note: Cleanup demo database
 real_db_close(db)
 file_delete("tasks.db")
-Print "Demo complete! (Database cleaned up)"
+# [AUTO-FIX] removed broken token

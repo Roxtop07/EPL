@@ -54,7 +54,9 @@ class WSGIAdapter:
         from epl.web import (
             _data_store, store_get, store_add, store_remove,
             db_store_add, db_store_get, db_store_remove,
-            _check_rate_limit, generate_html, Request, Response
+            _check_rate_limit, generate_html, Request, Response,
+            _build_route_env, _execute_route_block,
+            _resolve_page_def, _resolve_page_element,
         )
         self._data_store = _data_store
         self._store_get = store_get
@@ -67,6 +69,10 @@ class WSGIAdapter:
         self._generate_html = generate_html
         self._Request = Request
         self._Response = Response
+        self._build_route_env = _build_route_env
+        self._execute_route_block = _execute_route_block
+        self._resolve_page_def = _resolve_page_def
+        self._resolve_page_element = _resolve_page_element
 
     def __call__(self, environ, start_response):
         """WSGI entry point — translate environ to Request, route, return Response."""
@@ -164,9 +170,12 @@ class WSGIAdapter:
                     f'Route not found: {_html_mod.escape(clean_path)}')
 
         response_type, route_body, route_params = route
-        all_params = dict(urllib.parse.parse_qsl(query_string))
-        all_params.update(route_params)
+        request_params = dict(urllib.parse.parse_qsl(query_string))
+        request_params.update(route_params)
+        all_params = dict(request_params)
         all_params.update(form_data)
+        req.form = form_data
+        req.params = request_params
 
         # Build response
         try:
@@ -197,18 +206,18 @@ class WSGIAdapter:
                 else:
                     resp = self._html_response(start_response, 200, str(result) if result else '<p>OK</p>')
             elif response_type == 'json':
-                data = self._build_json(route_body, all_params)
+                data = self._build_json(route_body, form_data, request_params, method, clean_path, headers, req.session_id)
                 body = json.dumps(data, indent=2, default=str)
                 resp = self._json_response(start_response, 200, body)
             elif response_type == 'page':
-                html = self._build_page(route_body, form_data, all_params)
+                html = self._build_page(route_body, form_data, request_params, method, clean_path, headers, req.session_id)
                 if html.startswith('REDIRECT:'):
                     location = html[len('REDIRECT:'):]
                     resp = self._redirect_response(start_response, location)
                 else:
                     resp = self._html_response(start_response, 200, html)
             elif response_type == 'action':
-                result = self._exec_action(route_body, form_data)
+                result = self._exec_action(route_body, form_data, method, clean_path, headers, req.session_id)
                 if result and result.startswith('REDIRECT:'):
                     location = result[len('REDIRECT:'):]
                     resp = self._redirect_response(start_response, location)
@@ -224,61 +233,112 @@ class WSGIAdapter:
 
         return resp
 
-    def _build_page(self, body, form_data, params):
+    def _build_page(self, body, form_data, params, method, path, headers, session_id):
         """Build HTML page response."""
         from epl import ast_nodes as ast
         from epl.web import _data_store
+        route_env = self._build_route_env(
+            self.interpreter,
+            method,
+            path,
+            form_data=form_data,
+            params=params,
+            headers=headers,
+            session_id=session_id,
+        )
         for stmt in body:
             if isinstance(stmt, ast.StoreStatement):
-                self._exec_store(stmt, form_data)
+                self._exec_store(stmt, form_data, route_env)
             elif isinstance(stmt, ast.DeleteStatement):
-                self._exec_delete(stmt, form_data)
+                self._exec_delete(stmt, form_data, route_env)
             elif isinstance(stmt, ast.SendResponse) and stmt.response_type == 'redirect':
                 url = stmt.data.value if hasattr(stmt.data, 'value') else str(stmt.data)
                 return f'REDIRECT:{url}'
+        signal = self._execute_route_block(self.interpreter, body, route_env)
+        if signal is not None:
+            if signal.response_type == 'redirect':
+                url = self.interpreter._eval(signal.payload, route_env) if self.interpreter else signal.payload
+                return f'REDIRECT:{url}'
+            if signal.response_type == 'text' and self.interpreter is not None:
+                return str(self.interpreter._eval(signal.payload, route_env))
+            if signal.response_type == 'json' and self.interpreter is not None:
+                data = self._build_json(body, form_data, params, method, path, headers, session_id)
+                return f"<pre>{json.dumps(data, indent=2, default=str)}</pre>"
         for stmt in body:
             if isinstance(stmt, ast.PageDef):
-                return self._generate_html(stmt, data_store=_data_store, form_data=form_data)
+                page_def = self._resolve_page_def(stmt, self.interpreter, route_env)
+                return self._generate_html(page_def, data_store=_data_store, form_data=form_data)
         from epl import ast_nodes as ast
-        elements = [s for s in body if isinstance(s, ast.HtmlElement)]
+        elements = [
+            self._resolve_page_element(s, self.interpreter, route_env)
+            for s in body if isinstance(s, ast.HtmlElement)
+        ]
         if elements:
             page = ast.PageDef("EPL Page", elements)
             return self._generate_html(page, data_store=_data_store, form_data=form_data)
         return self._generate_html(ast.PageDef("EPL Page", []), data_store=_data_store)
 
-    def _build_json(self, body, params):
+    def _build_json(self, body, form_data, params, method, path, headers, session_id):
         """Build JSON response."""
-        from epl import ast_nodes as ast
-        from epl.web import store_get, _data_store
-        for stmt in body:
-            if isinstance(stmt, ast.FetchStatement):
-                items = store_get(stmt.collection)
-                return {"collection": stmt.collection, "count": len(items), "items": items}
-            if isinstance(stmt, ast.SendResponse):
-                if self.interpreter:
-                    try:
-                        result = self.interpreter._eval(stmt.data, self.interpreter.global_env)
-                        if hasattr(result, 'data'):
-                            result = result.data
-                        return result
-                    except Exception as e:
-                        return {"error": str(e)}
+        from epl.web import _data_store
+        route_env = self._build_route_env(
+            self.interpreter,
+            method,
+            path,
+            form_data=form_data,
+            params=params,
+            headers=headers,
+            session_id=session_id,
+        )
+        if self.interpreter and route_env:
+            try:
+                signal = self._execute_route_block(self.interpreter, body, route_env)
+                if signal is not None:
+                    if signal.response_type == 'fetch':
+                        return self._fetch_payload(signal.payload)
+                    if signal.response_type == 'redirect':
+                        return {"redirect": self.interpreter._eval(signal.payload, route_env)}
+                    result = self.interpreter._eval(signal.payload, route_env)
+                    if hasattr(result, 'data'):
+                        result = result.data
+                    return result
+            except Exception as e:
+                return {"error": str(e)}
+        legacy_result = self._legacy_json_fallback(body, form_data)
+        if legacy_result is not None:
+            return legacy_result
         return {"store": {k: list(v) for k, v in _data_store.items()}}
 
-    def _exec_action(self, body, form_data):
+    def _exec_action(self, body, form_data, method, path, headers, session_id):
         """Execute action route."""
         from epl import ast_nodes as ast
+        route_env = self._build_route_env(
+            self.interpreter,
+            method,
+            path,
+            form_data=form_data,
+            params={},
+            headers=headers,
+            session_id=session_id,
+        )
         for stmt in body:
             if isinstance(stmt, ast.StoreStatement):
-                self._exec_store(stmt, form_data)
+                self._exec_store(stmt, form_data, route_env)
             elif isinstance(stmt, ast.DeleteStatement):
-                self._exec_delete(stmt, form_data)
+                self._exec_delete(stmt, form_data, route_env)
             elif isinstance(stmt, ast.SendResponse) and stmt.response_type == 'redirect':
                 url = stmt.data.value if hasattr(stmt.data, 'value') else str(stmt.data)
                 return f'REDIRECT:{url}'
+        signal = self._execute_route_block(self.interpreter, body, route_env)
+        if signal is not None:
+            if signal.response_type == 'redirect':
+                url = self.interpreter._eval(signal.payload, route_env) if self.interpreter else signal.payload
+                return f'REDIRECT:{url}'
+            if signal.response_type == 'text' and self.interpreter is not None:
+                return str(self.interpreter._eval(signal.payload, route_env))
         return None
 
-    def _exec_store(self, stmt, form_data):
+    def _exec_store(self, stmt, form_data, route_env=None):
         from epl.web import store_add, db_store_add
         collection = stmt.collection
         if form_data and stmt.field_name:
@@ -289,7 +349,7 @@ class WSGIAdapter:
                 store_add(collection, value)
         elif stmt.value and self.interpreter:
             try:
-                val = self.interpreter._eval(stmt.value, self.interpreter.global_env)
+                val = self.interpreter._eval(stmt.value, route_env or self.interpreter.global_env)
                 if self.app.db_enabled:
                     db_store_add(collection, val)
                 else:
@@ -297,7 +357,7 @@ class WSGIAdapter:
             except Exception:
                 pass
 
-    def _exec_delete(self, stmt, form_data):
+    def _exec_delete(self, stmt, form_data, route_env=None):
         from epl.web import store_remove, db_store_remove
         collection = stmt.collection
         if form_data and 'index' in form_data:
@@ -309,6 +369,54 @@ class WSGIAdapter:
                     store_remove(collection, index)
             except (ValueError, IndexError):
                 pass
+        elif stmt.index is not None and self.interpreter:
+            try:
+                index = self.interpreter._eval(stmt.index, route_env or self.interpreter.global_env)
+                if self.app.db_enabled:
+                    db_store_remove(collection, int(index))
+                else:
+                    store_remove(collection, int(index))
+            except Exception:
+                pass
+
+    def _fetch_payload(self, collection):
+        items = self._store_get(collection)
+        return {"collection": collection, "count": len(items), "items": items}
+
+    def _legacy_json_fallback(self, body, form_data):
+        """Preserve legacy JSON-route behavior for Python-defined apps without an interpreter."""
+        from epl import ast_nodes as ast
+
+        for stmt in body:
+            if isinstance(stmt, ast.StoreStatement):
+                self._exec_store(stmt, form_data)
+                continue
+            if isinstance(stmt, ast.DeleteStatement):
+                self._exec_delete(stmt, form_data)
+                continue
+            if isinstance(stmt, ast.FetchStatement):
+                return self._fetch_payload(stmt.collection)
+            if isinstance(stmt, ast.SendResponse):
+                if stmt.response_type == 'redirect':
+                    return {"redirect": self._coerce_json_literal(stmt.data)}
+                if stmt.response_type in ('json', 'text'):
+                    return self._coerce_json_literal(stmt.data)
+        return None
+
+    def _coerce_json_literal(self, node):
+        """Evaluate simple AST literals for adapter-only JSON routes."""
+        from epl import ast_nodes as ast
+
+        if isinstance(node, ast.Literal):
+            return node.value
+        if isinstance(node, ast.ListLiteral):
+            return [self._coerce_json_literal(element) for element in node.elements]
+        if isinstance(node, ast.DictLiteral):
+            return {
+                key: self._coerce_json_literal(value)
+                for key, value in node.pairs
+            }
+        return str(node)
 
     def _serve_static(self, start_response, path, environ):
         """Serve static files via WSGI."""
@@ -667,71 +775,143 @@ async def _asgi_websocket_handler(scope, receive, send, app):
 # Cross-Platform Server (Waitress on Windows, Gunicorn on Linux)
 # ═══════════════════════════════════════════════════════════
 
-def serve(app_or_wsgi, host='0.0.0.0', port=8000, workers=4, reload=False, engine=None):
-    """Start a production WSGI server — auto-detects platform.
+def _banner(engine, host, port, workers):
+    print(f'\n  EPL Production Server ({engine})')
+    print(f'  Listening on {host}:{port} (workers={workers})')
+    print(f'  Press Ctrl+C to stop\n')
+
+
+def _resolve_server_apps(app_or_wsgi, interpreter=None):
+    """Normalize EPL app/adapters into WSGI and ASGI adapters."""
+    from epl.web import EPLWebApp
+
+    if isinstance(app_or_wsgi, ASGIAdapter):
+        return app_or_wsgi.app, app_or_wsgi._wsgi, app_or_wsgi
+
+    if isinstance(app_or_wsgi, WSGIAdapter):
+        app = app_or_wsgi.app
+        asgi_app = ASGIAdapter(app, app_or_wsgi.interpreter)
+        return app, app_or_wsgi, asgi_app
+
+    if isinstance(app_or_wsgi, EPLWebApp):
+        wsgi_app = WSGIAdapter(app_or_wsgi, interpreter=interpreter)
+        asgi_app = ASGIAdapter(app_or_wsgi, interpreter=interpreter)
+        return app_or_wsgi, wsgi_app, asgi_app
+
+    # Generic WSGI callable fallback; ASGI runtimes are not available here.
+    return None, app_or_wsgi, None
+
+
+def _run_waitress(wsgi_app, host, port, workers):
+    import waitress
+
+    _banner('Waitress', host, port, workers)
+    waitress.serve(
+        wsgi_app,
+        host=host,
+        port=port,
+        threads=workers,
+        channel_timeout=120,
+        map_size=100000,
+        url_scheme='http',
+    )
+
+
+def _normalize_asgi_workers(engine, workers):
+    """ASGI object mode cannot safely promise multi-worker operation."""
+    worker_count = max(1, int(workers or 1))
+    if worker_count == 1:
+        return 1
+
+    message = (
+        f"{engine} multi-worker runtime requires an import string entrypoint. "
+        f"Use generated deploy/asgi.py with `{engine.lower()} asgi:application ...` "
+        f"for multi-worker production deployment."
+    )
+    _logger.warning("%s Falling back to a single worker for in-process launch.", message)
+    return 1
+
+
+def _run_uvicorn(asgi_app, host, port, workers, reload=False):
+    import uvicorn
+
+    effective_workers = _normalize_asgi_workers('Uvicorn', workers)
+    _banner('Uvicorn', host, port, effective_workers)
+    uvicorn.run(
+        asgi_app,
+        host=host,
+        port=port,
+        workers=effective_workers,
+        reload=bool(reload and effective_workers == 1),
+    )
+
+
+def _run_hypercorn(asgi_app, host, port, workers):
+    from hypercorn.asyncio import serve as hypercorn_serve
+    from hypercorn.config import Config
+    import asyncio
+
+    effective_workers = _normalize_asgi_workers('Hypercorn', workers)
+    config = Config()
+    config.bind = [f'{host}:{port}']
+    config.workers = effective_workers
+    config.accesslog = '-'
+    _banner('Hypercorn', host, port, effective_workers)
+    asyncio.run(hypercorn_serve(asgi_app, config))
+
+
+def serve(app_or_wsgi, host='0.0.0.0', port=8000, workers=4, reload=False, engine=None, interpreter=None):
+    """Start a production server using the best available EPL runtime adapter.
     
-    - Windows: Uses Waitress (pip install waitress)
-    - Linux/macOS: Uses Gunicorn if available, else Waitress
+    - Windows: Uses Waitress by default
+    - Linux/macOS: Uses Gunicorn by default when available
+    - ASGI engines (Uvicorn/Hypercorn): supported for in-process single-worker launch,
+      and multi-worker deployment through generated import-string entrypoints.
     - reload=True: Enables hot-reload via EPL's file watcher
     
     Args:
-        app_or_wsgi: EPLWebApp or WSGIAdapter instance
+        app_or_wsgi: EPLWebApp, WSGIAdapter, ASGIAdapter, or WSGI callable
         host: Bind address
         port: Port number
-        workers: Number of workers
+        workers: Desired worker/thread count
         reload: Enable hot-reload (dev mode)
-        engine: Force a specific server: 'waitress', 'gunicorn', 'uvicorn', 'builtin'
+        engine: Force a specific server: 'waitress', 'gunicorn', 'uvicorn', 'hypercorn', 'builtin'
+        interpreter: Optional interpreter used when wrapping a raw EPLWebApp
     """
-    import sys
     import platform
 
-    # Wrap EPLWebApp in WSGIAdapter if needed
-    from epl.web import EPLWebApp
-    if isinstance(app_or_wsgi, EPLWebApp):
-        wsgi_app = WSGIAdapter(app_or_wsgi)
-    else:
-        wsgi_app = app_or_wsgi
+    app, wsgi_app, asgi_app = _resolve_server_apps(app_or_wsgi, interpreter=interpreter)
+    selected_engine = (engine or 'auto').lower()
 
     def _start_server():
         is_windows = platform.system() == 'Windows'
 
         # If engine is explicitly specified, use that
-        if engine == 'builtin':
+        if selected_engine == 'builtin':
             _fallback_serve(wsgi_app, host, port)
             return
-        if engine == 'waitress':
-            import waitress
-            print(f'\n  EPL Production Server (Waitress)')
-            print(f'  Listening on {host}:{port} (workers={workers})')
-            print(f'  Press Ctrl+C to stop\n')
-            waitress.serve(wsgi_app, host=host, port=port,
-                          threads=workers, channel_timeout=120,
-                          map_size=100000, url_scheme='http')
+        if selected_engine == 'waitress':
+            _run_waitress(wsgi_app, host, port, workers)
             return
-        if engine == 'gunicorn':
+        if selected_engine == 'gunicorn':
             _run_gunicorn(wsgi_app, host, port, workers)
             return
-        if engine == 'uvicorn':
-            import uvicorn
-            from epl.deploy import ASGIAdapter
-            asgi_app = ASGIAdapter(app_or_wsgi) if not isinstance(app_or_wsgi, ASGIAdapter) else app_or_wsgi
-            print(f'\n  EPL Production Server (Uvicorn)')
-            print(f'  Listening on {host}:{port} (workers={workers})')
-            print(f'  Press Ctrl+C to stop\n')
-            uvicorn.run(asgi_app, host=host, port=port, workers=workers)
+        if selected_engine == 'uvicorn':
+            if asgi_app is None:
+                raise RuntimeError('Uvicorn requires an EPLWebApp or ASGIAdapter.')
+            _run_uvicorn(asgi_app, host, port, workers, reload=reload)
+            return
+        if selected_engine == 'hypercorn':
+            if asgi_app is None:
+                raise RuntimeError('Hypercorn requires an EPLWebApp or ASGIAdapter.')
+            _run_hypercorn(asgi_app, host, port, workers)
             return
 
         # Auto-detect best available server
         if is_windows:
             # Windows: Use Waitress
             try:
-                import waitress  # type: ignore[reportMissingModuleSource]
-                print(f'\n  EPL Production Server (Waitress)')
-                print(f'  Listening on {host}:{port} (workers={workers})')
-                print(f'  Press Ctrl+C to stop\n')
-                waitress.serve(wsgi_app, host=host, port=port,
-                              threads=workers, channel_timeout=120,
-                              map_size=100000, url_scheme='http')
+                _run_waitress(wsgi_app, host, port, workers)
             except ImportError:
                 print('  Waitress not installed. Install with: pip install waitress')
                 print('  Falling back to built-in server...')
@@ -740,18 +920,22 @@ def serve(app_or_wsgi, host='0.0.0.0', port=8000, workers=4, reload=False, engin
             # Linux/macOS: Try Gunicorn first
             try:
                 import gunicorn  # type: ignore[reportMissingModuleSource]
-                # Gunicorn needs to be run via command line, not imported
                 _run_gunicorn(wsgi_app, host, port, workers)
             except ImportError:
                 try:
-                    import waitress  # type: ignore[reportMissingModuleSource]
-                    print(f'\n  EPL Production Server (Waitress)')
-                    print(f'  Listening on {host}:{port} (workers={workers})')
-                    print(f'  Press Ctrl+C to stop\n')
-                    waitress.serve(wsgi_app, host=host, port=port,
-                                  threads=workers, channel_timeout=120)
+                    _run_waitress(wsgi_app, host, port, workers)
                 except ImportError:
-                    print('  No production server found. Install: pip install waitress')
+                    if asgi_app is not None:
+                        try:
+                            _run_uvicorn(asgi_app, host, port, workers, reload=reload)
+                            return
+                        except ImportError:
+                            try:
+                                _run_hypercorn(asgi_app, host, port, workers)
+                                return
+                            except ImportError:
+                                pass
+                    print('  No production server found. Install: pip install "eplang[server]"')
                     print('  Falling back to built-in server...')
                     _fallback_serve(wsgi_app, host, port)
 
@@ -783,44 +967,36 @@ def _fallback_serve(wsgi_app, host, port):
 
 
 def _run_gunicorn(wsgi_app, host, port, workers):
-    """Run Gunicorn programmatically."""
-    import sys
-    import tempfile
-    import textwrap
-    # SECURITY: Store app on module attribute (Gunicorn --preload shares memory).
-    # Eliminates pickle serialization which was a Remote Code Execution risk.
-    _mod = sys.modules[__name__]
-    _mod._gunicorn_app = wsgi_app
+    """Run Gunicorn in-process via BaseApplication."""
+    import gunicorn.app.base
 
-    # Write a temp WSGI entry module that workers can import
-    _entry = tempfile.NamedTemporaryFile(mode='w', suffix='_epl_wsgi.py', delete=False, dir='.')
-    _entry.write(textwrap.dedent("""\
-        import sys
-        sys.path.insert(0, '.')
-        from epl.deploy import _gunicorn_app as app
-    """))
-    _entry_name = _entry.name
-    _entry.close()
+    class EPLGunicornApp(gunicorn.app.base.BaseApplication):
+        def __init__(self, application, options=None):
+            self.options = options or {}
+            self.application = application
+            super().__init__()
 
-    import subprocess
-    cmd = [
-        sys.executable, '-m', 'gunicorn',
-        '--bind', f'{host}:{port}',
-        '--workers', str(workers),
-        '--timeout', '120',
-        '--preload',
-        'epl.deploy:_gunicorn_app'
-    ]
-    print(f'\n  EPL Production Server (Gunicorn)')
-    print(f'  Listening on {host}:{port} (workers={workers})')
-    print(f'  Press Ctrl+C to stop\n')
-    try:
-        subprocess.run(cmd)
-    finally:
-        try:
-            os.unlink(_entry_name)
-        except OSError:
-            pass
+        def load_config(self):
+            for key, value in self.options.items():
+                if key in self.cfg.settings and value is not None:
+                    self.cfg.set(key.lower(), value)
+
+        def load(self):
+            return self.application
+
+    options = {
+        'bind': f'{host}:{port}',
+        'workers': max(1, int(workers or 1)),
+        'worker_class': 'sync',
+        'timeout': 120,
+        'graceful_timeout': 30,
+        'keepalive': 5,
+        'accesslog': '-',
+        'errorlog': '-',
+        'preload_app': True,
+    }
+    _banner('Gunicorn', host, port, options['workers'])
+    EPLGunicornApp(wsgi_app, options).run()
 
 
 # Global reference for Gunicorn
@@ -976,7 +1152,14 @@ def generate_requirements_txt(manifest=None, epl_requirement=None):
     if epl_requirement is None:
         epl_requirement = f'epl-lang>={epl_version}'
 
-    requirements = [str(epl_requirement).strip(), 'gunicorn>=21.2']
+    requirements = [
+        str(epl_requirement).strip(),
+        'gunicorn>=21.2',
+        'waitress>=2.1.0',
+        'uvicorn>=0.30.0',
+        'hypercorn>=0.16.0',
+        'daphne>=4.1.0',
+    ]
     python_deps = manifest.get('python-dependencies', {}) or {}
     for import_name, requirement in sorted(python_deps.items()):
         normalized = str(requirement).strip() if requirement is not None else ''

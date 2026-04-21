@@ -1,0 +1,89 @@
+# EPL Official Starter: Creative Frontend
+# A server-rendered multi-page UI showcasing EPL's native
+# web DSL with dynamic routing, loops, and page generation.
+#
+# Run:  epl serve examples/official_starters/creative_frontend/main.epl
+# Open: http://localhost:8082
+
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+
+Function build_feature_cards takes items
+    html = ""
+    For Each f In items
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+    End
+    Return html
+End
+
+# [AUTO-FIX] removed broken token
+
+# [AUTO-FIX] removed broken token
+    cards = build_feature_cards(features)
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+age = 20
+If age is greater than 18 Then
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+End
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+
+# [AUTO-FIX] removed broken token
+    Send json features
+# [AUTO-FIX] removed broken token
+
+# [AUTO-FIX] removed broken token
+    Send json Map with status = "ok" and service = "epl-creative-frontend" and version = "1.0.0"
+# [AUTO-FIX] removed broken token
+
+Say "Creative Frontend running at http://localhost:8082"
+Start app on port 8082

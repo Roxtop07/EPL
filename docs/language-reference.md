@@ -25,14 +25,14 @@ Complete reference for the English Programming Language (EPL) v7.0.
 ### Creating Variables
 
 ```epl
-Create name as Text equal to "Alice"
-Create age as Integer equal to 25
-Create pi as Decimal equal to 3.14
-Create active as Boolean equal to true
+name = "Alice"
+age = 25
+pi = 3.14
+active = true
 
 Note: Type inference (type is optional)
-Create score equal to 100
-Create greeting equal to "Hello"
+score = 100
+greeting = "Hello"
 ```
 
 ### Short Form
@@ -45,8 +45,8 @@ Remember age as 25
 ### Setting Variables
 
 ```epl
-Set name to "Bob"
-Set age to 30
+name = "Bob"
+age = 30
 Increase age by 1
 Decrease age by 1
 ```
@@ -54,16 +54,16 @@ Decrease age by 1
 ### Constants
 
 ```epl
-Constant PI equal to 3.14159
+Constant PI = 3.14159
 Note: Attempting to change PI will raise an error
 ```
 
 ### Augmented Assignment
 
 ```epl
-Set x to 10
-Set x to x + 5    Note: x is now 15
-Set x to x * 2    Note: x is now 30
+x = 10
+x = x + 5    Note: x is now 15
+x = x * 2    Note: x is now 30
 ```
 
 ---
@@ -84,8 +84,10 @@ Set x to x * 2    Note: x is now 30
 
 ```epl
 Print type_of(42)          Note: "integer"
-Print is_integer(42)       Note: true
-Print is_text("hello")     Note: true
+Print is_integer(42)
+Note: true
+Print is_text("hello")
+Note: true
 Print is_list([1, 2])      Note: true
 Print is_number(3.14)      Note: true
 Print is_nothing(nothing)  Note: true
@@ -131,7 +133,7 @@ Print is_nothing(nothing)  Note: true
 **Note:** `and`/`or` use short-circuit evaluation. The right side is only evaluated if needed.
 
 ```epl
-Create items equal to []
+items = []
 If length(items) > 0 and items[0] == "hello" Then
     Note: items[0] is never accessed because length(items) > 0 is false
 End
@@ -157,8 +159,8 @@ End
 
 ```epl
 Match day
-    When "Monday" Then Print "Start of week"
-    When "Friday" Then Print "Almost weekend"
+    When "Monday" Print "Start of week"
+    When "Friday" Print "Almost weekend"
     Default Print "Regular day"
 End
 ```
@@ -166,7 +168,7 @@ End
 ### Ternary
 
 ```epl
-Create label equal to "big" if x > 10 otherwise "small"
+result = "big" if x > 10 otherwise "small"
 ```
 
 ---
@@ -184,7 +186,7 @@ End
 ### While
 
 ```epl
-Create i equal to 0
+i = 0
 While i < 10
     Print i
     Increase i by 1
@@ -194,8 +196,8 @@ End
 ### For Each
 
 ```epl
-Create items equal to [1, 2, 3]
-For each item in items
+items = [1, 2, 3]
+For Each item in items
     Print item
 End
 ```
@@ -242,25 +244,25 @@ Function add takes a, b
     Return a + b
 End
 
-Note: With arrow syntax
-Function double takes x -> Return x * 2
+Note: With arrow syntax (lambdas only)
+double = lambda x -> x * 2
 ```
 
 ### Calling Functions
 
 ```epl
 greet()
-Create result equal to add(3, 4)
+result = add(3, 4)
 Print double(5)
 ```
 
 ### Lambda Functions
 
 ```epl
-Create square equal to lambda x -> x * x
+square = lambda x -> x * x
 Print square(5)    Note: 25
 
-Create add equal to lambda a, b -> a + b
+add = lambda a, b -> a + b
 Print add(3, 4)    Note: 7
 ```
 
@@ -271,7 +273,7 @@ Function apply takes fn, x
     Return fn(x)
 End
 
-Create result equal to apply(lambda x -> x * 2, 5)
+result = apply(lambda x -> x * 2, 5)
 Print result    Note: 10
 ```
 
@@ -283,16 +285,16 @@ Print result    Note: 10
 
 ```epl
 Class Dog
-    Set name to ""
-    Set breed to ""
+    name = ""
+    breed = ""
 
-    Method speak
+    Function speak
         Print name + " says Woof!"
     End
 End
 
-Create rex equal to new Dog
-Set rex.name to "Rex"
+rex = new Dog
+rex.name = "Rex"
 rex.speak()
 ```
 
@@ -300,14 +302,14 @@ rex.speak()
 
 ```epl
 Class Animal
-    Set name to ""
-    Method speak
+    name = ""
+    Function speak
         Print name + " makes a sound"
     End
 End
 
-Class Dog inherits Animal
-    Method speak
+Class Dog extends Animal
+    Function speak
         Print name + " says Woof!"
     End
 End
@@ -317,8 +319,8 @@ End
 
 ```epl
 Class Circle
-    Set radius to 0
-    Method area
+    radius = 0
+    Function area
         Return 3.14159 * radius * radius
     End
 End
@@ -331,32 +333,29 @@ End
 ### Lists
 
 ```epl
-Create items equal to [1, 2, 3, 4, 5]
-Print items[0]          Note: 1
+items = [1, 2, 3, 4, 5]
+Print items[0]
+Note: 1
 Print length(items)     Note: 5
 
 Note: Slicing
 Print items[1:3]        Note: [2, 3]
-Print items[::2]        Note: [1, 3, 5]
+Print items[0:2]        Note: [1, 3, 5]
 ```
 
 ### Maps (Dictionaries)
 
 ```epl
-Create person equal to Map with name = "Alice" and age = 30
+person = Map with name = "Alice" and age = 30
 Print person.name       Note: Alice
-Set person.age to 31
+person.age = 31
 Print keys(person)      Note: [name, age]
 ```
 
 ### Enums
 
 ```epl
-Enum Color
-    Red equal to 0
-    Green equal to 1
-    Blue equal to 2
-End
+Enum Color Red, Green, Blue
 
 Print Color.Red         Note: 0
 ```
@@ -369,7 +368,7 @@ Print Color.Red         Note: 0
 
 ```epl
 Try
-    Create result equal to 10 / 0
+    result = 10 / 0
 Catch error
     Print "Error: " + error
 End
@@ -413,7 +412,7 @@ Import "math_helpers.epl"
 ### Using Built-in Modules
 
 ```epl
-Use Math
+Import "math" As Math
 Print Math.PI
 Print Math.sqrt(16)
 ```
@@ -492,7 +491,7 @@ Print Math.sqrt(16)
 ## String Methods
 
 ```epl
-Create s equal to "Hello World"
+s = "Hello World"
 Print s.length()              Note: 11
 Print s.upper()               Note: "HELLO WORLD"
 Print s.lower()               Note: "hello world"
@@ -516,9 +515,9 @@ Print s.to_list()             Note: ["H","e","l","l","o"," ","W","o","r","l","d"
 ## List Methods
 
 ```epl
-Create items equal to [3, 1, 4, 1, 5]
+items = [3, 1, 4, 1, 5]
 
-items.append(9)               Note: [3, 1, 4, 1, 5, 9]
+Add 9 to items                Note: [3, 1, 4, 1, 5, 9]
 items.remove(1)               Note: removes first 1
 Print items.contains(4)       Note: true
 Print items.index_of(4)       Note: 2
@@ -530,7 +529,7 @@ Print items.pop()             Note: removes & returns last
 items.clear()                 Note: empties the list
 
 Note: Functional methods
-Create nums equal to [1, 2, 3, 4, 5]
+nums = [1, 2, 3, 4, 5]
 Print nums.map(lambda x -> x * 2)       Note: [2, 4, 6, 8, 10]
 Print nums.filter(lambda x -> x > 3)    Note: [4, 5]
 Print nums.reduce(lambda a, b -> a + b) Note: 15
@@ -544,7 +543,7 @@ Print nums.some(lambda x -> x > 4)      Note: true
 ## Map Methods
 
 ```epl
-Create m equal to Map with x = 1 and y = 2
+m = Map with x = 1 and y = 2
 Print keys(m)          Note: [x, y]
 Print values(m)        Note: [1, 2]
 Print m.has("x")       Note: true
@@ -563,7 +562,7 @@ Note: Writing
 write_file("output.txt", "Hello, World!")
 
 Note: Reading
-Create content equal to read_file("output.txt")
+content = read_file("output.txt")
 Print content
 ```
 
@@ -572,7 +571,7 @@ Print content
 ## Templates
 
 ```epl
-Create name equal to "World"
-Create age equal to 25
+name = "World"
+age = 25
 Print "Hello, {name}! You are {age} years old."
 ```

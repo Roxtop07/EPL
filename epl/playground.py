@@ -11,9 +11,13 @@ import sys
 import json
 import html
 import traceback
-import threading
+import subprocess
 import contextlib
 from epl.errors import EPLError
+
+PLAYGROUND_MAX_BODY_BYTES = 1_000_000
+PLAYGROUND_EXEC_TIMEOUT_SECONDS = 10
+_PLAYGROUND_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 def _safe_error(e):
     """Return error message, sanitizing non-EPL exceptions."""
@@ -23,7 +27,7 @@ def _safe_error(e):
 
 def start_playground(port: int = 8080, open_browser: bool = True):
     """Start the EPL Web Playground server."""
-    from http.server import HTTPServer, BaseHTTPRequestHandler
+    from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
     class PlaygroundHandler(BaseHTTPRequestHandler):
         def do_GET(self):
@@ -31,6 +35,8 @@ def start_playground(port: int = 8080, open_browser: bool = True):
                 self._serve_html()
             elif self.path == '/api/examples':
                 self._serve_examples()
+            elif self.path == '/api/syntax':
+                self._serve_syntax()
             else:
                 self.send_error(404)
 
@@ -39,6 +45,8 @@ def start_playground(port: int = 8080, open_browser: bool = True):
                 self._run_code()
             elif self.path == '/api/transpile':
                 self._transpile_code()
+            elif self.path == '/api/assist':
+                self._assist_code()
             else:
                 self.send_error(404)
 
@@ -46,6 +54,7 @@ def start_playground(port: int = 8080, open_browser: bool = True):
             self.send_response(200)
             self.send_header('Content-Type', 'text/html; charset=utf-8')
             self.send_header('X-Content-Type-Options', 'nosniff')
+            self.send_header('Cache-Control', 'no-store')
             self.end_headers()
             self.wfile.write(_PLAYGROUND_HTML.encode('utf-8'))
 
@@ -56,9 +65,12 @@ def start_playground(port: int = 8080, open_browser: bool = True):
             self.end_headers()
             self.wfile.write(json.dumps(examples).encode('utf-8'))
 
+        def _serve_syntax(self):
+            self._json_response(200, _get_syntax_reference())
+
         def _run_code(self):
             length = int(self.headers.get('Content-Length', 0))
-            if length > 1_000_000:
+            if length > PLAYGROUND_MAX_BODY_BYTES:
                 self._json_response(400, {'error': 'Code too large (max 1MB)'})
                 return
             body = self.rfile.read(length)
@@ -76,7 +88,7 @@ def start_playground(port: int = 8080, open_browser: bool = True):
 
         def _transpile_code(self):
             length = int(self.headers.get('Content-Length', 0))
-            if length > 1_000_000:
+            if length > PLAYGROUND_MAX_BODY_BYTES:
                 self._json_response(400, {'error': 'Code too large (max 1MB)'})
                 return
             body = self.rfile.read(length)
@@ -93,15 +105,40 @@ def start_playground(port: int = 8080, open_browser: bool = True):
             result = _transpile_epl(code, target)
             self._json_response(200, result)
 
+        def _assist_code(self):
+            length = int(self.headers.get('Content-Length', 0))
+            if length > PLAYGROUND_MAX_BODY_BYTES:
+                self._json_response(400, {'error': 'Request too large (max 1MB)'})
+                return
+            body = self.rfile.read(length)
+            try:
+                data = json.loads(body)
+            except json.JSONDecodeError:
+                self._json_response(400, {'error': 'Invalid JSON'})
+                return
+
+            message = data.get('message', '')
+            code = data.get('code', '')
+            mode = data.get('mode', 'auto')
+            if not message.strip() and not code.strip():
+                self._json_response(400, {'error': 'Provide a prompt or some EPL code.'})
+                return
+
+            result = _assist_playground(message, code=code, mode=mode)
+            self._json_response(200, result)
+
         def _json_response(self, status, data):
+            encoded = json.dumps(data).encode('utf-8')
             self.send_response(status)
             self.send_header('Content-Type', 'application/json')
             self.send_header('X-Content-Type-Options', 'nosniff')
             self.send_header('X-Frame-Options', 'DENY')
+            self.send_header('Cache-Control', 'no-store')
+            self.send_header('Content-Length', str(len(encoded)))
             self.end_headers()
-            self.wfile.write(json.dumps(data).encode('utf-8'))
+            self.wfile.write(encoded)
 
-    server = HTTPServer(('127.0.0.1', port), PlaygroundHandler)
+    server = ThreadingHTTPServer(('127.0.0.1', port), PlaygroundHandler)
     print(f"  EPL Web Playground running at http://127.0.0.1:{port}")
     print("  Press Ctrl+C to stop")
 
@@ -121,57 +158,87 @@ def start_playground(port: int = 8080, open_browser: bool = True):
 
 # ── EPL Execution Engine ─────────────────────────────────
 
-def _execute_epl(code: str) -> dict:
-    """Execute EPL code and capture output (sandboxed with timeout)."""
-    output = io.StringIO()
-    error = None
+def _worker_environment():
+    env = os.environ.copy()
+    pythonpath = env.get('PYTHONPATH')
+    if pythonpath:
+        env['PYTHONPATH'] = os.pathsep.join([_PLAYGROUND_ROOT, pythonpath])
+    else:
+        env['PYTHONPATH'] = _PLAYGROUND_ROOT
+    return env
+
+
+def _execute_epl_worker_payload(code: str) -> dict:
+    """Execute EPL code in an isolated worker process."""
     try:
         from epl.lexer import Lexer
         from epl.parser import Parser
         from epl.interpreter import Interpreter
-        from epl.environment import Environment
 
         lexer = Lexer(code)
         tokens = lexer.tokenize()
         parser = Parser(tokens)
         program = parser.parse()
 
-        env = Environment()
+        captured = io.StringIO()
         interp = Interpreter(safe_mode=True)
-
-        result = {'output': '', 'error': None}
-        done = threading.Event()
-
-        def _run():
-            nonlocal result
-            old_stdout = sys.stdout
-            old_stderr = sys.stderr
-            captured = io.StringIO()
-            sys.stdout = captured
-            sys.stderr = captured
+        with contextlib.redirect_stdout(captured), contextlib.redirect_stderr(captured):
             try:
                 interp.execute(program)
-                result['output'] = captured.getvalue()
+                return {'output': captured.getvalue(), 'error': None}
             except SystemExit:
-                result['output'] = captured.getvalue()
-            except Exception as e:
-                result['output'] = captured.getvalue()
-                result['error'] = _safe_error(e)
-            finally:
-                sys.stdout = old_stdout
-                sys.stderr = old_stderr
-                done.set()
+                return {'output': captured.getvalue(), 'error': None}
+            except Exception as exc:
+                return {'output': captured.getvalue(), 'error': _safe_error(exc)}
+    except Exception as exc:
+        return {'output': '', 'error': _safe_error(exc)}
 
-        t = threading.Thread(target=_run, daemon=True)
-        t.start()
-        t.join(timeout=10)  # 10 second timeout
 
-        if not done.is_set():
-            result = {'output': '', 'error': 'Execution timed out (10s limit)'}
-        return result
+def _playground_worker_main() -> int:
+    """Subprocess entrypoint for isolated code execution."""
+    try:
+        payload = json.loads(sys.stdin.read() or '{}')
+        result = _execute_epl_worker_payload(payload.get('code', ''))
+    except Exception as exc:
+        result = {'output': '', 'error': _safe_error(exc)}
+    sys.stdout.write(json.dumps(result))
+    sys.stdout.flush()
+    return 0
 
-    except Exception as e:
-        return {'output': '', 'error': _safe_error(e)}
+def _execute_epl(code: str) -> dict:
+    """Execute EPL code in a subprocess so timeout is a real kill boundary."""
+    if not code.strip():
+        return {'output': '', 'error': None}
+
+    try:
+        completed = subprocess.run(
+            [sys.executable, '-m', 'epl.playground', '--worker-run'],
+            input=json.dumps({'code': code}),
+            capture_output=True,
+            text=True,
+            timeout=PLAYGROUND_EXEC_TIMEOUT_SECONDS,
+            cwd=_PLAYGROUND_ROOT,
+            env=_worker_environment(),
+        )
+    except subprocess.TimeoutExpired:
+        return {'output': '', 'error': f'Execution timed out ({PLAYGROUND_EXEC_TIMEOUT_SECONDS}s limit)'}
+    except Exception as exc:
+        return {'output': '', 'error': _safe_error(exc)}
+
+    if not completed.stdout.strip():
+        return {'output': '', 'error': 'Internal error'}
+
+    try:
+        result = json.loads(completed.stdout)
+    except json.JSONDecodeError:
+        return {'output': '', 'error': 'Internal error'}
+
+    if not isinstance(result, dict):
+        return {'output': '', 'error': 'Internal error'}
+    return {
+        'output': result.get('output', ''),
+        'error': result.get('error'),
+    }
 
 
 def _transpile_epl(code: str, target: str) -> dict:
@@ -199,48 +266,69 @@ def _transpile_epl(code: str, target: str) -> dict:
         return {'code': '', 'error': _safe_error(e)}
 
 
+def _assist_playground(message: str, code: str = "", mode: str = "auto") -> dict:
+    """Run the syntax-aware playground assistant."""
+    from epl.copilot import assist_request
+
+    return assist_request(message, current_code=code, mode=mode)
+
+
+def _get_syntax_reference() -> dict:
+    """Return the authoritative syntax guide used by the playground assistant."""
+    from epl.syntax_reference import get_syntax_sections, get_syntax_text
+
+    return {
+        'sections': get_syntax_sections(),
+        'text': get_syntax_text(),
+    }
+
+
 def _get_examples() -> list:
     """Return a curated list of EPL examples."""
     return [
         {
             'name': 'Hello World',
-            'code': 'display "Hello, World!"\ndisplay "Welcome to EPL!"'
+            'code': 'Say "Hello, World!"\nSay "Welcome to EPL!"'
         },
         {
             'name': 'Variables & Math',
-            'code': 'set name to "Alice"\nset age to 25\nset score to 95.5\ndisplay "Name: " + name\ndisplay "Age: " + age\ndisplay "Score: " + score'
+            'code': 'Create name = "Alice"\nCreate age = 25\nCreate score = 95.5\nSay "Name: " + name\nSay "Age: " + age\nSay "Score: " + score'
         },
         {
             'name': 'If/Else',
-            'code': 'set score to 85\n\nif score > 90 then\n    display "Grade: A"\notherwise if score > 80 then\n    display "Grade: B"\notherwise\n    display "Grade: C"\nend'
+            'code': 'Create score = 85\n\nIf score > 90 Then\n    Say "Grade: A"\nOtherwise If score > 80 Then\n    Say "Grade: B"\nOtherwise\n    Say "Grade: C"\nEnd'
         },
         {
             'name': 'Loops',
-            'code': 'display "Counting:"\nrepeat 5 times\n    display "Hello!"\nend\n\nfor i from 1 to 5\n    display "Number: " + i\nend'
+            'code': 'Say "Counting:"\nRepeat 5 times\n    Say "Hello!"\nEnd\n\nFor i from 1 to 5\n    Say "Number: " + i\nEnd'
         },
         {
             'name': 'Functions',
-            'code': 'function greet takes name\n    display "Hello, " + name + "!"\nend\n\ngreet("Alice")\ngreet("Bob")\n\nfunction add takes a and b\n    return a + b\nend\n\nset result to add(10, 20)\ndisplay "10 + 20 = " + result'
+            'code': 'Function greet takes name\n    Return "Hello, " + name + "!"\nEnd\n\nSay greet("Alice")\nSay greet("Bob")\n\nFunction add(a, b)\n    Return a + b\nEnd\n\nCreate result = add(10, 20)\nSay "10 + 20 = " + result'
         },
         {
             'name': 'Lists',
-            'code': 'set fruits to ["apple", "banana", "cherry"]\ndisplay "Fruits: " + fruits\ndisplay "First: " + fruits[0]\n\nfor each fruit in fruits\n    display "I like " + fruit\nend'
+            'code': 'Create fruits = ["apple", "banana", "cherry"]\nSay "Fruits: " + fruits\nSay "First: " + fruits[0]\n\nFor each fruit in fruits\n    Say "I like " + fruit\nEnd'
         },
         {
             'name': 'Classes',
-            'code': 'class Animal\n    set name to "Unknown"\n    set sound to "..."\n\n    function speak\n        display name + " says " + sound\n    end\nend\n\nset dog to new Animal\ndog.name = "Rex"\ndog.sound = "Woof!"\ndog.speak()'
+            'code': 'Class Animal\n    Set name to "Unknown"\n    Set sound to "..."\n\n    Function speak\n        Return name + " says " + sound\n    End\nEnd\n\nCreate dog = new Animal()\ndog.name = "Rex"\ndog.sound = "Woof!"\nSay dog.speak()'
         },
         {
             'name': 'Try/Catch',
-            'code': 'try\n    set result to 10 / 0\ncatch error\n    display "Caught error: " + error\nend\n\ndisplay "Program continues!"'
+            'code': 'Try\n    Create result = 10 / 0\nCatch error\n    Say "Caught error: " + error\nEnd\n\nSay "Program continues!"'
         },
         {
             'name': 'Fibonacci',
-            'code': 'function fibonacci takes n\n    if n <= 1 then\n        return n\n    end\n    return fibonacci(n - 1) + fibonacci(n - 2)\nend\n\nfor i from 0 to 10\n    display "fib(" + i + ") = " + fibonacci(i)\nend'
+            'code': 'Function fibonacci takes n\n    If n <= 1 Then\n        Return n\n    End\n    Return fibonacci(n - 1) + fibonacci(n - 2)\nEnd\n\nFor i from 0 to 10\n    Say "fib(" + i + ") = " + fibonacci(i)\nEnd'
         },
         {
             'name': 'FizzBuzz',
-            'code': 'for i from 1 to 30\n    if i % 15 == 0 then\n        display "FizzBuzz"\n    otherwise if i % 3 == 0 then\n        display "Fizz"\n    otherwise if i % 5 == 0 then\n        display "Buzz"\n    otherwise\n        display i\n    end\nend'
+            'code': 'For i from 1 to 30\n    If i % 15 == 0 Then\n        Say "FizzBuzz"\n    Otherwise If i % 3 == 0 Then\n        Say "Fizz"\n    Otherwise If i % 5 == 0 Then\n        Say "Buzz"\n    Otherwise\n        Say i\n    End\nEnd'
+        },
+        {
+            'name': 'Maps',
+            'code': 'Create profile = Map with name = "Ada" and role = "builder"\nSay profile.name\nSay profile.role'
         }
     ]
 
@@ -439,6 +527,115 @@ main {
     display: none;
 }
 
+/* Assistant */
+#assistant {
+    flex: 1;
+    padding: 14px;
+    background: var(--bg);
+    overflow: auto;
+    display: none;
+}
+.assistant-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 100%;
+}
+.assistant-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: 12px;
+}
+.assistant-card h4 {
+    font-size: 0.82em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+}
+.assistant-card p,
+.assistant-card li,
+.assistant-card pre,
+.assistant-card textarea {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+}
+.assistant-card textarea {
+    width: 100%;
+    min-height: 88px;
+    resize: vertical;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+}
+.assistant-card textarea:focus { border-color: var(--accent); }
+.assistant-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+.assistant-actions .btn { font-size: 0.8em; }
+.assistant-reply {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.assistant-diagnostics {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.assistant-diagnostic {
+    border-left: 3px solid var(--border);
+    padding-left: 10px;
+}
+.assistant-diagnostic.error { border-left-color: var(--red); }
+.assistant-diagnostic.warning { border-left-color: var(--orange); }
+.assistant-diagnostic.info,
+.assistant-diagnostic.hint { border-left-color: var(--accent); }
+.assistant-diagnostic strong {
+    display: block;
+    margin-bottom: 2px;
+}
+.assistant-code {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.syntax-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+}
+.syntax-section {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.02);
+    padding: 10px;
+}
+.syntax-section h5 {
+    font-size: 0.82em;
+    color: var(--accent);
+    margin-bottom: 4px;
+}
+.syntax-section p {
+    font-family: var(--font-sans);
+    font-size: 0.78em;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+}
+.syntax-section code {
+    display: block;
+    white-space: pre-wrap;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 11px;
+}
+
 /* Sidebar */
 .sidebar {
     width: 240px;
@@ -510,6 +707,7 @@ main {
     </div>
     <div class="actions">
         <button class="btn" onclick="clearOutput()" title="Clear output">Clear</button>
+        <button class="btn" onclick="switchTab('assistant')" title="Open syntax-aware assistant">Assist</button>
         <select class="btn" id="transpileTarget" title="Transpile target">
             <option value="python">Python</option>
             <option value="javascript">JavaScript</option>
@@ -545,11 +743,43 @@ Example:
             <div class="tabs">
                 <div class="tab active" data-tab="output" onclick="switchTab('output')">Output</div>
                 <div class="tab" data-tab="transpiled" onclick="switchTab('transpiled')">Transpiled</div>
+                <div class="tab" data-tab="assistant" onclick="switchTab('assistant')">Assistant</div>
             </div>
             <span id="execTime"></span>
         </div>
         <div id="output"><span class="output-info">Press Run or Ctrl+Enter to execute your code.</span></div>
         <div id="transpiled"></div>
+        <div id="assistant">
+            <div class="assistant-stack">
+                <div class="assistant-card">
+                    <h4>Assistant Prompt</h4>
+                    <textarea id="assistantPrompt" spellcheck="false" placeholder="Ask for help, for example: build a chatbot API, explain this code, fix this syntax, improve this route..."></textarea>
+                    <div class="assistant-actions">
+                        <button class="btn btn-primary" onclick="askAssistant('generate')">Generate</button>
+                        <button class="btn" onclick="askAssistant('fix')">Fix</button>
+                        <button class="btn" onclick="askAssistant('explain')">Explain</button>
+                        <button class="btn" onclick="askAssistant('improve')">Improve</button>
+                        <button class="btn" id="applyAssistantBtn" onclick="applyAssistantCode()" style="display:none;">Apply To Editor</button>
+                    </div>
+                </div>
+                <div class="assistant-card">
+                    <h4>Assistant Reply</h4>
+                    <div id="assistantReply" class="assistant-reply">The assistant uses the real EPL parser and syntax guide, then checks generated code before returning it.</div>
+                </div>
+                <div class="assistant-card">
+                    <h4>Suggested Code</h4>
+                    <pre id="assistantCode" class="assistant-code">No suggestion yet.</pre>
+                </div>
+                <div class="assistant-card">
+                    <h4>Diagnostics</h4>
+                    <div id="assistantDiagnostics" class="assistant-diagnostics"><span class="output-info">Diagnostics will appear here.</span></div>
+                </div>
+                <div class="assistant-card">
+                    <h4>Real EPL Syntax</h4>
+                    <div id="syntaxGuide" class="syntax-grid"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Examples Sidebar -->
@@ -568,9 +798,24 @@ Example:
 const editor = document.getElementById('editor');
 const output = document.getElementById('output');
 const transpiled = document.getElementById('transpiled');
+const assistant = document.getElementById('assistant');
 const statusDot = document.getElementById('statusDot');
 const statusText = document.getElementById('statusText');
 const execTime = document.getElementById('execTime');
+const assistantPrompt = document.getElementById('assistantPrompt');
+const assistantReply = document.getElementById('assistantReply');
+const assistantCode = document.getElementById('assistantCode');
+const assistantDiagnostics = document.getElementById('assistantDiagnostics');
+const applyAssistantBtn = document.getElementById('applyAssistantBtn');
+
+let latestAssistantCode = '';
+
+assistantPrompt.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && e.ctrlKey) {
+        e.preventDefault();
+        askAssistant('auto');
+    }
+});
 
 // Update line/col info
 editor.addEventListener('keyup', updateLineInfo);
@@ -661,6 +906,73 @@ async function transpileCode() {
     }
 }
 
+async function askAssistant(mode = 'auto') {
+    const message = assistantPrompt.value.trim();
+    const code = editor.value;
+    if (!message && !code.trim()) return;
+
+    switchTab('assistant');
+    setStatus('running', 'Assistant...');
+    assistantReply.textContent = 'Thinking with the real EPL syntax guide...';
+    assistantCode.textContent = 'No suggestion yet.';
+    assistantDiagnostics.innerHTML = '<span class="output-info">Analyzing...</span>';
+    applyAssistantBtn.style.display = 'none';
+    latestAssistantCode = '';
+
+    try {
+        const res = await fetch('/api/assist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message, code, mode })
+        });
+        const data = await res.json();
+
+        assistantReply.textContent = data.reply || 'No reply returned.';
+        latestAssistantCode = data.code || '';
+        assistantCode.textContent = latestAssistantCode || 'No code suggestion returned.';
+        applyAssistantBtn.style.display = latestAssistantCode ? 'inline-flex' : 'none';
+        renderDiagnostics(data.diagnostics || []);
+        renderSyntaxGuide(data.syntax_sections || []);
+        setStatus(data.syntax_ok === false ? 'error' : 'ready', data.syntax_ok === false ? 'Needs Review' : 'Assistant Ready');
+    } catch (err) {
+        assistantReply.textContent = 'Assistant error: ' + err.message;
+        assistantDiagnostics.innerHTML = `<div class="assistant-diagnostic error"><strong>Request failed</strong>${escapeHtml(err.message)}</div>`;
+        setStatus('error', 'Assistant Error');
+    }
+}
+
+function applyAssistantCode() {
+    if (!latestAssistantCode) return;
+    editor.value = latestAssistantCode;
+    updateLineInfo();
+    setStatus('ready', 'Suggestion Applied');
+}
+
+function renderDiagnostics(diagnostics) {
+    if (!diagnostics.length) {
+        assistantDiagnostics.innerHTML = '<span class="output-success">No syntax issues found.</span>';
+        return;
+    }
+    assistantDiagnostics.innerHTML = diagnostics.map(diag => {
+        const level = escapeHtml(diag.level || 'info');
+        const line = diag.line ? `Line ${diag.line}` : 'General';
+        const code = diag.code ? ` (${escapeHtml(String(diag.code))})` : '';
+        return `<div class="assistant-diagnostic ${level}"><strong>${line}${code}</strong>${escapeHtml(diag.message || '')}</div>`;
+    }).join('');
+}
+
+function renderSyntaxGuide(sections) {
+    const syntaxGuide = document.getElementById('syntaxGuide');
+    if (!sections.length) {
+        syntaxGuide.innerHTML = '<span class="output-info">Syntax guidance will appear here.</span>';
+        return;
+    }
+    syntaxGuide.innerHTML = sections.map(section => {
+        const examples = (section.examples || []).slice(0, 2).map(example => `<code>${escapeHtml(example)}</code>`).join('');
+        return `<div class="syntax-section"><h5>${escapeHtml(section.title || '')}</h5><p>${escapeHtml(section.summary || '')}</p>${examples}</div>`;
+    }).join('');
+}
+
 function clearOutput() {
     output.innerHTML = '<span class="output-info">Output cleared.</span>';
     transpiled.textContent = '';
@@ -672,6 +984,7 @@ function switchTab(tab) {
     document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
     output.style.display = tab === 'output' ? 'block' : 'none';
     transpiled.style.display = tab === 'transpiled' ? 'block' : 'none';
+    assistant.style.display = tab === 'assistant' ? 'block' : 'none';
 }
 
 function setStatus(state, text) {
@@ -703,6 +1016,16 @@ async function loadExamples() {
         });
     } catch (e) {
         console.error('Failed to load examples:', e);
+    }
+}
+
+async function loadSyntaxGuide() {
+    try {
+        const res = await fetch('/api/syntax');
+        const data = await res.json();
+        renderSyntaxGuide((data && data.sections) || []);
+    } catch (e) {
+        console.error('Failed to load syntax guide:', e);
     }
 }
 
@@ -743,7 +1066,13 @@ document.addEventListener('mouseup', () => {
 
 // Init
 loadExamples();
+loadSyntaxGuide();
 </script>
 </body>
 </html>
 '''
+
+
+if __name__ == '__main__':
+    if '--worker-run' in sys.argv:
+        raise SystemExit(_playground_worker_main())

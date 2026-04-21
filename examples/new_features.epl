@@ -3,9 +3,9 @@ Display "".
 
 Display "--- Default Parameters ---".
 Function greet takes name, greeting = "Hello"
-    Create msg equal to format("{} {}!", greeting, name).
+    msg = format("{} {}!", greeting, name).
     Display msg.
-End Function.
+End.
 
 Call greet with "Alice".
 Call greet with "Bob" and "Hi".
@@ -13,20 +13,20 @@ Call greet with "Charlie" and "Welcome".
 
 Display "".
 Display "--- String Interpolation ---".
-Create name equal to "EPL".
-Create version equal to "1.3".
+name = "EPL".
+version = "1.3".
 Display "Language: ${name} v${version}".
 
-Create x equal to 10.
-Create y equal to 20.
+x = 10.
+y = 20.
 Display "Sum of $x and $y is ${x + y}".
 
-Create items equal to ["apple", "banana", "cherry"].
+items = ["apple", "banana", "cherry"].
 Display "We have ${length(items)} items".
 
 Display "".
 Display "--- Multi-line Strings ---".
-Create poem equal to """Roses are red,
+poem = """Roses are red,
 Violets are blue,
 EPL is awesome,
 And so are you!""".
@@ -52,7 +52,7 @@ Function calculate takes a, b, operation = "add"
         Return a / b.
     End.
     Return 0.
-End Function.
+End.
 
 Display "10 + 5 = ".
 Display calculate(10, 5).
@@ -66,15 +66,15 @@ Display calculate(10, 5, "divide").
 Display "".
 Display "--- Builder Pattern with Defaults ---".
 Function build_config takes h = "localhost", p = 8080, d = false
-    Create config equal to Map with host = h and serverPort = p and debugMode = d.
+    config = Map with host = h and serverPort = p and debugMode = d.
     Return config.
-End Function.
+End.
 
-Create default_config equal to build_config().
+default_config = build_config().
 Display "Default: ".
 Display default_config.
 
-Create custom_config equal to build_config("0.0.0.0", 3000, true).
+custom_config = build_config("0.0.0.0", 3000, true).
 Display "Custom: ".
 Display custom_config.
 

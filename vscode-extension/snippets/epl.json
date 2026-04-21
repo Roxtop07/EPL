@@ -1,0 +1,66 @@
+{
+  "Display": {
+    "prefix": "display",
+    "body": [
+      "Say \"$1\""
+    ],
+    "description": "Print a line of EPL output"
+  },
+  "Function": {
+    "prefix": "function",
+    "body": [
+      "Function ${1:name} takes ${2:value}",
+      "    $0",
+      "End"
+    ],
+    "description": "Define an EPL function"
+  },
+  "Class": {
+    "prefix": "class",
+    "body": [
+      "Class ${1:Name}",
+      "    $0",
+      "End"
+    ],
+    "description": "Define an EPL class"
+  },
+  "Constant": {
+    "prefix": "const",
+    "body": [
+      "Constant ${1:NAME} = ${2:value}"
+    ],
+    "description": "Define an EPL constant"
+  },
+  "Module": {
+    "prefix": "module",
+    "body": [
+      "Module ${1:Name}",
+      "    $0",
+      "End"
+    ],
+    "description": "Define an EPL module"
+  },
+  "Web App": {
+    "prefix": "webapp",
+    "body": [
+      "Create WebApp called ${1:app}",
+      "",
+      "Route \"/\" shows",
+      "    Page \"${2:Home}\"",
+      "        Heading \"${3:Welcome}\"",
+      "        Text \"${4:Hello from EPL}\"",
+      "    End",
+      "End"
+    ],
+    "description": "Create a basic EPL web app"
+  },
+  "Test Function": {
+    "prefix": "test",
+    "body": [
+      "Test \"${1:name}\"",
+      "    $0",
+      "End"
+    ],
+    "description": "Create an EPL test block"
+  }
+}

@@ -227,6 +227,9 @@ class Parser:
         if tok.type == TokenType.ASK:
             return self._parse_ask()
 
+        if tok.type == TokenType.COMMENT:
+            return self._parse_comment()
+
         if tok.type == TokenType.IF:
             return self._parse_if()
 
@@ -943,9 +946,14 @@ class Parser:
             self._advance()
             self._expect(TokenType.TAKES, 'Expected "takes" after "that".')
             params = self._parse_param_list()
-        elif self._match(TokenType.TAKES):
+        elif self._match(TokenType.TAKES, TokenType.WITH):
             self._advance()
             params = self._parse_param_list()
+        elif self._match(TokenType.LPAREN):
+            self._advance()
+            if not self._match(TokenType.RPAREN):
+                params = self._parse_param_list()
+            self._expect(TokenType.RPAREN, 'Expected ")" after function parameters.')
 
         return_type = None
         if self._match(TokenType.AND):
@@ -985,9 +993,14 @@ class Parser:
         func_name = name_tok.value
 
         params = []
-        if self._match(TokenType.TAKES):
+        if self._match(TokenType.TAKES, TokenType.WITH):
             self._advance()
             params = self._parse_param_list()
+        elif self._match(TokenType.LPAREN):
+            self._advance()
+            if not self._match(TokenType.RPAREN):
+                params = self._parse_param_list()
+            self._expect(TokenType.RPAREN, 'Expected ")" after function parameters.')
 
         return_type = None
         if self._match(TokenType.AND):
@@ -1080,15 +1093,31 @@ class Parser:
         line = self._current().line
         self._advance()  # consume CALL
 
-        name_tok = self._expect_identifier('Expected function name after "Call".')
-        func_name = name_tok.value
+        callee = self._parse_postfix()
 
         arguments = []
         if self._match(TokenType.WITH):
             self._advance()
             arguments = self._parse_arg_list()
 
-        return ast.FunctionCall(func_name, arguments, line)
+        if isinstance(callee, ast.FunctionCall):
+            return callee
+
+        if isinstance(callee, ast.MethodCall):
+            return callee
+
+        if isinstance(callee, ast.Identifier):
+            return ast.FunctionCall(callee.name, arguments, line)
+
+        if isinstance(callee, ast.PropertyAccess):
+            return ast.MethodCall(callee.obj, callee.property_name, arguments, line)
+
+        if isinstance(callee, ast.ModuleAccess):
+            if callee.arguments is None:
+                return ast.ModuleAccess(callee.module_name, callee.member_name, arguments, line)
+            return callee
+
+        raise ParserError('Expected function or method name after "Call".', line)
 
     def _parse_arg_list(self) -> list:
         """Parse function arguments: 5 and 10"""
@@ -1846,6 +1875,14 @@ class Parser:
 
         return ast.ImportStatement(filepath_tok.value, line, alias=alias)
 
+    def _parse_comment(self):
+        """Comment "text" — compatibility alias for Note: comments."""
+        self._advance()  # consume COMMENT
+        while not self._match(TokenType.NEWLINE, TokenType.EOF, TokenType.DOT):
+            self._advance()
+        self._end_statement()
+        return None
+
     # ─── v0.3: Use python library ────────────────────────
 
     def _parse_use(self):
@@ -2046,11 +2083,38 @@ class Parser:
             self._end_statement()
             return ast.HtmlElement('subheading', content, line=tok.line)
 
-        if tok.type == TokenType.TYPE_TEXT:
-            self._advance()
-            content = self._expect(TokenType.STRING, "Expected text content").value
-            self._end_statement()
-            return ast.HtmlElement('text', content, line=tok.line)
+        if tok.type in (TokenType.TYPE_TEXT, TokenType.SAY, TokenType.DISPLAY, TokenType.SHOW):
+            is_store_list = (
+                tok.type in (TokenType.SAY, TokenType.DISPLAY, TokenType.SHOW)
+                and (
+                    (hasattr(TokenType, 'ITEMS') and self._peek().type == TokenType.ITEMS)
+                    or (
+                        self._peek().type in (TokenType.IDENTIFIER,) + self._SOFT_KEYWORDS
+                        and str(self._peek().value).lower() == 'items'
+                    )
+                )
+            )
+            if is_store_list:
+                self._advance()
+                if hasattr(TokenType, 'ITEMS'):
+                    self._optional(TokenType.ITEMS)
+                if self._match_identifier() and str(self._current().value).lower() == 'items':
+                    self._advance()
+                self._optional(TokenType.FROM)
+                collection_tok = self._expect(TokenType.STRING, 'Expected collection name after list output keyword.')
+                attrs = {'collection': collection_tok.value}
+                if self._match(TokenType.DELETE_KW):
+                    self._advance()
+                    del_tok = self._expect(TokenType.STRING, 'Expected delete action URL.')
+                    attrs['delete_action'] = del_tok.value
+                self._end_statement()
+                return ast.HtmlElement('store_list', None, attrs, line=tok.line)
+
+            if tok.type == TokenType.TYPE_TEXT or self._peek().type == TokenType.STRING:
+                self._advance()
+                content = self._expect(TokenType.STRING, "Expected text content").value
+                self._end_statement()
+                return ast.HtmlElement('text', content, line=tok.line)
 
         if tok.type == TokenType.LINK:
             self._advance()
@@ -2116,24 +2180,6 @@ class Parser:
             items = self._parse_expression()
             self._end_statement()
             return ast.HtmlElement('list', items, line=tok.line)
-
-        if tok.type == TokenType.SHOW or tok.type == TokenType.DISPLAY:
-            # Show items from "collection" delete "/path"
-            self._advance()
-            self._optional(TokenType.ITEMS) if hasattr(TokenType, 'ITEMS') else None
-            # Accept optional "items" as plain identifier
-            if self._match_identifier() and self._current().value.lower() == 'items':
-                self._advance()
-            self._optional(TokenType.FROM)
-            collection_tok = self._expect(TokenType.STRING, 'Expected collection name after "Show".')
-            attrs = {'collection': collection_tok.value}
-            # Optional "delete" action path
-            if self._match(TokenType.DELETE_KW):
-                self._advance()
-                del_tok = self._expect(TokenType.STRING, 'Expected delete action URL.')
-                attrs['delete_action'] = del_tok.value
-            self._end_statement()
-            return ast.HtmlElement('store_list', None, attrs, line=tok.line)
 
         if tok.type == TokenType.SCRIPT:
             return self._parse_script_element()

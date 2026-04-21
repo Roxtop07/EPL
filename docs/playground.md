@@ -7,6 +7,22 @@ Try EPL directly in your browser — no installation required.
 !!! tip "Can't see the playground?"
     Open it directly: [playground.html](https://abneeshsingh21.github.io/EPL/playground.html)
 
+## Assistant Routing
+
+The browser playground assistant supports explicit provider routing:
+
+- `Secure Proxy` for a same-origin `/chat` endpoint or a Cloudflare Worker URL
+- `Groq API` for direct browser requests with your own Groq key
+- `Gemini API` for direct browser requests with your own Gemini key
+
+The page no longer uses an anonymous third-party fallback. You decide exactly where assistant traffic goes.
+
+For the full local playground server with isolated code execution and `/api/assist`, run:
+
+```bash
+epl playground
+```
+
 ## Example Snippets
 
 Try pasting these into the playground:
@@ -18,27 +34,27 @@ Say "Hello from EPL!"
 
 ### Variables & Math
 ```epl
-Create x equal to 10
-Create y equal to 20
+x = 10
+y = 20
 Say "Sum: " + to_string(x + y)
 ```
 
 ### Functions
 ```epl
-Define Function factorial Takes n
+Function factorial takes n
     If n is less than 2 then
         Return 1
-    End If
+    End
     Return n * factorial(n - 1)
-End Function
+End
 
 Say "10! = " + to_string(factorial(10))
 ```
 
 ### Lists & Loops
 ```epl
-Create names equal to ["Alice", "Bob", "Charlie"]
+names = ["Alice", "Bob", "Charlie"]
 For Each name in names
     Say "Hello, " + name + "!"
-End For
+End
 ```

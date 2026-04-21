@@ -3,524 +3,518 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EPL - English Programming Language</title>
+    <title>EPL | English Programming Language</title>
     <meta name="description" content="Write code the way you think. EPL is a production-grade programming language where every keyword is natural English.">
     
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --bg-base: #050505;
-            --bg-surface: #111111;
-            --bg-surface-hover: #1a1a1a;
-            --text-primary: #ededed;
-            --text-secondary: #a1a1aa;
-            --accent: #2563eb;
-            --accent-glow: rgba(37, 99, 235, 0.4);
-            --border-color: rgba(255, 255, 255, 0.1);
-            --gradient-1: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
-            --glass-bg: rgba(17, 17, 17, 0.6);
+            --bg: #000000;
+            --surface: #0a0a0a;
+            --border: #333333;
+            --text: #ffffff;
+            --text-dim: #888888;
+            --accent: #ff4500; /* Pure Alert Orange */
+            --accent-hover: #ff571a;
+            --terminal-bg: #050505;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-base);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Abstract Background Glow */
-        .glow-bg {
-            position: absolute;
-            top: -10%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 800px;
-            height: 400px;
-            background: var(--accent);
-            filter: blur(150px);
-            opacity: 0.15;
-            z-index: -1;
-            border-radius: 50%;
-            pointer-events: none;
+        /* WebKit Scrollbar styling for that raw feel */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); border-left: 1px solid var(--border); }
+        ::-webkit-scrollbar-thumb { background: var(--border); }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 80px 80px;
+            background-position: -1px -1px;
+            background-attachment: fixed;
         }
 
-        /* Navbar */
+        /* BRUTALIST NAV */
         nav {
             position: fixed;
             top: 0;
             width: 100%;
-            padding: 1.25rem 2rem;
+            height: 70px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-color);
-            z-index: 100;
+            align-items: stretch;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--border);
+            z-index: 1000;
         }
 
         .logo {
+            font-family: 'JetBrains Mono', monospace;
             font-size: 1.5rem;
             font-weight: 800;
-            letter-spacing: -0.5px;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text);
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            border-right: 2px solid var(--border);
+            background: var(--surface);
+            transition: color 0.3s;
+        }
+
+        .logo span {
+            color: var(--accent);
+            margin-right: 10px;
+        }
+        
+        .logo:hover {
+            color: var(--accent);
         }
 
         .nav-links {
             display: flex;
-            gap: 2rem;
+            align-items: stretch;
+        }
+
+        .nav-link {
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
             align-items: center;
-        }
-
-        .nav-links a {
-            color: var(--text-secondary);
+            padding: 0 1.5rem;
+            color: var(--text-dim);
             text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .nav-links a:hover {
-            color: var(--text-primary);
-        }
-
-        .btn-primary {
-            background: var(--text-primary);
-            color: var(--bg-base);
-            padding: 0.6rem 1.2rem;
-            border-radius: 999px;
-            text-decoration: none;
+            font-size: 0.9rem;
             font-weight: 600;
-            font-size: 0.9rem;
-            transition: transform 0.2s, box-shadow 0.2s;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(255,255,255,0.15);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            padding: 0.6rem 1.2rem;
-            border-radius: 999px;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9rem;
+            border-left: 1px solid var(--border);
+            text-transform: uppercase;
             transition: all 0.2s;
         }
 
-        .btn-outline:hover {
-            background: var(--bg-surface-hover);
-            border-color: var(--text-secondary);
+        .nav-link:hover {
+            color: var(--text);
+            background: var(--surface);
+            box-shadow: inset 0 -2px 0 var(--accent);
         }
 
-        /* Hero Section */
+        .nav-link.primary {
+            color: #000;
+            background: var(--text);
+            font-weight: 800;
+        }
+
+        .nav-link.primary:hover {
+            background: var(--accent);
+            color: #000;
+            box-shadow: none;
+        }
+
+        /* MASSIVE TYPOGRAPHIC HERO */
         .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 8rem 2rem 4rem;
-            max-width: 1200px;
+            padding: 180px 2rem 100px;
+            max-width: 1400px;
             margin: 0 auto;
+            position: relative;
+        }
+
+        .badge {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #000;
+            background: var(--accent);
+            padding: 4px 12px;
+            margin-bottom: 2rem;
+            box-shadow: 4px 4px 0 rgba(255, 69, 0, 0.4);
+            transform: rotate(-1deg);
         }
 
         .hero h1 {
-            font-size: clamp(3rem, 6vw, 5rem);
-            font-weight: 800;
-            line-height: 1.1;
-            letter-spacing: -2px;
-            margin-bottom: 1.5rem;
-            max-width: 900px;
+            font-size: clamp(4rem, 10vw, 8rem);
+            font-weight: 900;
+            line-height: 0.95;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            max-width: 1200px;
         }
 
         .hero h1 span {
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: transparent;
+            -webkit-text-stroke: 2px var(--text);
         }
 
         .hero p {
-            font-size: clamp(1.1rem, 2vw, 1.4rem);
-            color: var(--text-secondary);
-            max-width: 600px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--text-dim);
+            max-width: 650px;
             margin-bottom: 3rem;
-            font-weight: 400;
+            border-left: 2px solid var(--accent);
+            padding-left: 1rem;
         }
 
-        .hero-cta {
+        .hero-actions {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 4rem;
+            gap: 1.5rem;
+            flex-wrap: wrap;
         }
 
-        /* Terminal Window */
-        .terminal {
-            width: 100%;
-            max-width: 800px;
-            background: #0d0d0d;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
-            overflow: hidden;
-            text-align: left;
-            animation: float 6s ease-in-out infinite;
+        .btn-solid {
+            background: var(--text);
+            color: #000;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            text-transform: uppercase;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border: 2px solid var(--text);
+            box-shadow: inset 0 0 0 0 var(--accent);
+            transition: all 0.3s ease;
         }
 
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
+        .btn-solid:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #000;
+            transform: translate(-4px, -4px);
+            box-shadow: 8px 8px 0 rgba(255,255,255,0.1);
+        }
+
+        .install-sh {
+            display: flex;
+            align-items: center;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            padding: 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .install-sh .prompt {
+            color: var(--accent);
+            padding: 1rem;
+            border-right: 2px solid var(--border);
+            font-weight: 800;
+        }
+
+        .install-sh .cmd {
+            padding: 1rem 1.5rem;
+            color: var(--text);
+        }
+
+        .install-sh button {
+            background: transparent;
+            border: none;
+            border-left: 2px solid var(--border);
+            color: var(--text-dim);
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .install-sh button:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
+        /* BRUTALIST TERMINAL */
+        .terminal-section {
+            padding: 0 2rem 100px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .terminal-container {
+            background: var(--terminal-bg);
+            border: 2px solid var(--border);
+            box-shadow: 20px 20px 0 rgba(0,0,0,1), 20px 20px 0 2px var(--border);
+            position: relative;
+            transform: rotate(0deg);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .terminal-container:hover {
+            transform: rotate(-0.5deg) translateY(-10px);
         }
 
         .terminal-header {
             display: flex;
-            align-items: center;
-            padding: 1rem;
-            background: #1a1a1a;
-            border-bottom: 1px solid var(--border-color);
+            justify-content: space-between;
+            align-items: stretch;
+            border-bottom: 2px solid var(--border);
+            height: 48px;
+            background: var(--surface);
         }
-
-        .terminal-dots {
-            display: flex;
-            gap: 8px;
-        }
-
-        .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
-        .dot.red { background: #ff5f56; }
-        .dot.yellow { background: #ffbd2e; }
-        .dot.green { background: #27c93f; }
 
         .terminal-title {
-            flex: 1;
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.85rem;
             font-family: 'JetBrains Mono', monospace;
-            margin-right: 44px; /* to balance the dots */
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: var(--text);
+            text-transform: uppercase;
+            padding: 0 1.5rem;
+            display: flex;
+            align-items: center;
+            border-right: 2px solid var(--border);
+        }
+
+        .terminal-actions {
+            display: flex;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            color: var(--text-dim);
+        }
+
+        .t-action {
+            padding: 0 1rem;
+            border-left: 2px solid var(--border);
+            display: flex;
+            align-items: center;
         }
 
         .terminal-body {
-            padding: 1.5rem;
+            padding: 2rem;
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.95rem;
-            line-height: 1.6;
+            font-size: 1.1rem;
+            line-height: 1.7;
             overflow-x: auto;
         }
 
-        .code-keyword { color: #3b82f6; font-weight: 500; }
-        .code-string { color: #22c55e; }
-        .code-comment { color: #6b7280; font-style: italic; }
-        .code-var { color: #eab308; }
+        .t-comment { color: var(--text-dim); }
+        .t-keyword { color: var(--accent); font-weight: 800; }
+        .t-string { color: #facc15; }
+        .t-var { color: #fff; }
+        
+        .indent-1 { padding-left: 2rem; border-left: 1px dashed var(--border); margin-left: 1rem; }
+        .indent-2 { padding-left: 4rem; border-left: 1px dashed var(--border); margin-left: 3rem; }
+        .indent-3 { padding-left: 6rem; border-left: 1px dashed var(--border); margin-left: 5rem; }
 
-        /* Install Command Box */
-        .install-box {
-            display: inline-flex;
-            align-items: center;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 0.5rem 0.5rem 0.5rem 1.2rem;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .install-box code {
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--text-primary);
-            font-size: 0.95rem;
-        }
-
-        .copy-btn {
-            background: var(--bg-surface-hover);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-
-        .copy-btn:hover {
-            background: #2a2a2a;
-        }
-
-        /* Features Section */
+        /* FRAGMENTED FEATURES */
         .features {
-            padding: 5rem 2rem;
-            max-width: 1200px;
+            padding: 100px 2rem;
+            max-width: 1400px;
             margin: 0 auto;
+            border-top: 2px solid var(--border);
         }
 
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 3rem;
-            letter-spacing: -1px;
+        .fw-title {
+            font-size: clamp(3rem, 6vw, 6rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.05em;
+            margin-bottom: 4rem;
+            max-width: 1000px;
+            line-height: 1;
         }
 
-        .grid {
+        .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 2rem;
         }
 
-        .card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 2rem;
-            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+        .feat-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            padding: 3rem 2rem;
+            position: relative;
+            transition: all 0.3s;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255,255,255,0.2);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        .feat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--accent);
+            z-index: -1;
+            transform: translate(0, 0);
+            transition: transform 0.3s;
         }
 
-        .card-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: rgba(59, 130, 246, 0.1);
-            color: #3b82f6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
+        .feat-card:hover {
+            transform: translate(-8px, -8px);
+            border-color: var(--text);
+        }
+
+        .feat-card:hover::before {
+            transform: translate(12px, 12px);
+        }
+
+        .feat-icon {
+            font-size: 2.5rem;
+            color: var(--accent);
             margin-bottom: 1.5rem;
         }
 
-        .card h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-        }
+        .feat-card:hover .feat-icon { color: var(--text); }
 
-        .card p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
-        /* Installation Section */
-        .getting-started {
-            background: var(--bg-surface);
-            border-top: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-            padding: 5rem 2rem;
-        }
-
-        .getting-started-content {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        /* Footer */
-        footer {
-            padding: 4rem 2rem;
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-        
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-top: 1.5rem;
+        .feat-card h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
             margin-bottom: 1rem;
         }
 
-        .footer-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 1.25rem;
-            transition: color 0.2s;
+        .feat-card p {
+            color: var(--text-dim);
+            font-size: 1.05rem;
         }
 
-        .footer-links a:hover {
-            color: var(--text-primary);
+        /* FOOTER */
+        footer {
+            border-top: 2px solid var(--border);
+            padding: 4rem 2rem;
+            text-align: center;
+            background: #000;
         }
 
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            .hero-cta {
-                flex-direction: column;
-                width: 100%;
-                max-width: 300px;
-            }
+        .footer-logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        .footer-logo span { color: var(--accent); }
+
+        .footer-text {
+            color: var(--text-dim);
+            margin-bottom: 2rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        @media (max-width: 900px) {
+            .nav-link.hide-mobile { display: none; }
+            .hero-actions { flex-direction: column; }
+            .terminal-container { transform: none !important; box-shadow: 10px 10px 0 var(--border) !important; }
         }
     </style>
 </head>
 <body>
-    <div class="glow-bg"></div>
 
     <nav>
-        <a href="/" class="logo">EPL</a>
+        <a href="/" class="logo">
+            <span>&#9632;</span> EPL
+        </a>
         <div class="nav-links">
-            <a href="playground.html" style="color: #3b82f6; font-weight: 600;"><i class="fa-solid fa-play"></i> Try in Browser</a>
-            <a href="epl_book.pdf" style="color: #06b6d4; font-weight: 600;"><i class="fa-solid fa-book"></i> Official Book</a>
-            <a href="https://github.com/abneeshsingh21/EPL/blob/main/docs/language-reference.md">Documentation</a>
-            <a href="https://pypi.org/project/eplang/"><i class="fa-brands fa-python"></i> PyPI</a>
-            <a href="https://marketplace.visualstudio.com/publishers/epl-lang"><i class="fa-solid fa-code"></i> VS Code</a>
-            <a href="https://github.com/abneeshsingh21/EPL" class="btn-outline"><i class="fa-brands fa-github"></i> GitHub</a>
+            <a href="intro/" class="nav-link hide-mobile">Docs</a>
+            <a href="https://github.com/abneeshsingh21/EPL" class="nav-link hide-mobile"><i class="fa-brands fa-github"></i> &nbsp;GitHub</a>
+            <a href="epl_book.pdf" class="nav-link hide-mobile">Official Book</a>
+            <a href="playground.html" class="nav-link primary">Browser Playground &#8594;</a>
         </div>
     </nav>
 
     <section class="hero">
-        <div class="install-box">
-            <code id="install-cmd">pip install eplang</code>
-            <button class="copy-btn" onclick="copyInstall()" title="Copy to clipboard">
-                <i class="fa-regular fa-copy" id="copy-icon"></i>
-            </button>
+        <div class="badge">EPL v7.4.4 IS LIVE!</div>
+        <h1>Zero Logic<br><span>Translations.</span><br>Just Code.</h1>
+        <p>EPL is a production-grade systems language where every keyword is natural English. Build web servers, APIs, and native tools without cryptic symbol soup. The browser playground now supports secure proxy, Groq, and Gemini assistant routing.</p>
+        
+        <div class="hero-actions">
+            <a href="intro/" class="btn-solid">Start Building</a>
+            
+            <div class="install-sh">
+                <span class="prompt">$</span>
+                <span class="cmd" id="install-txt">pip install eplang</span>
+                <button onclick="copyCmd()" title="Copy install command">
+                    <i class="fa-regular fa-copy" id="copy-icn"></i>
+                </button>
+            </div>
         </div>
+    </section>
 
-        <h1>Write code the way <span>you think.</span></h1>
-        <p>EPL is a production-grade programming language where every keyword is natural English. Build web servers, APIs, Android apps, and native tools without cryptic syntax.</p>
-
-        <div class="hero-cta">
-            <a href="https://github.com/abneeshsingh21/EPL#quick-start" class="btn-primary">Get Started in 5 min</a>
-            <a href="https://github.com/abneeshsingh21/EPL" class="btn-outline">View Source code</a>
-        </div>
-
-        <div class="terminal">
+    <section class="terminal-section">
+        <div class="terminal-container">
             <div class="terminal-header">
-                <div class="terminal-dots">
-                    <div class="dot red"></div>
-                    <div class="dot yellow"></div>
-                    <div class="dot green"></div>
+                <div class="terminal-title">server.epl</div>
+                <div class="terminal-actions">
+                    <div class="t-action">UTF-8</div>
+                    <div class="t-action">EPL Language</div>
                 </div>
-                <div class="terminal-title">hello.epl</div>
             </div>
             <div class="terminal-body">
-                <div><span class="code-comment">-- A simple HTTP Server in plain English</span></div>
+                <div><span class="t-comment">Note: Build a production API in English</span></div>
                 <br>
-                <div><span class="code-keyword">Start server on port</span> <span class="code-var">3000</span></div>
-                <div style="padding-left: 2rem;"><span class="code-keyword">Route GET</span> <span class="code-string">"/api/greet"</span></div>
-                <div style="padding-left: 4rem;"><span class="code-keyword">Set</span> <span class="code-var">name</span> <span class="code-keyword">to</span> Get Query Param <span class="code-string">"name"</span></div>
-                <div style="padding-left: 4rem;"><span class="code-keyword">If</span> <span class="code-var">name</span> <span class="code-keyword">is empty then</span></div>
-                <div style="padding-left: 6rem;"><span class="code-keyword">Set</span> <span class="code-var">name</span> <span class="code-keyword">to</span> <span class="code-string">"World"</span></div>
-                <div style="padding-left: 4rem;"><span class="code-keyword">End If</span></div>
-                <div style="padding-left: 4rem;"><span class="code-keyword">Send JSON</span> { <span class="code-string">"message"</span>: <span class="code-string">"Hello, "</span> + <span class="code-var">name</span> }</div>
-                <div style="padding-left: 2rem;"><span class="code-keyword">End Route</span></div>
-                <div><span class="code-keyword">End Server</span></div>
+                <div><span class="t-keyword">Create WebApp called</span> <span class="t-var">myApp</span></div>
+                <div class="indent-1"><span class="t-keyword">Route</span> <span class="t-string">"/api/greet"</span> <span class="t-keyword">responds with</span></div>
+                <div class="indent-2"><span class="t-keyword">Set</span> <span class="t-var">name</span> <span class="t-keyword">to</span> Get Query Param <span class="t-string">"name"</span></div>
+                <div class="indent-2"><span class="t-keyword">If</span> <span class="t-var">name</span> <span class="t-keyword">is empty then</span></div>
+                <div class="indent-3"><span class="t-keyword">Set</span> <span class="t-var">name</span> <span class="t-keyword">to</span> <span class="t-string">"World"</span></div>
+                <div class="indent-2"><span class="t-keyword">End</span></div>
+                <div class="indent-2"><span class="t-keyword">Send JSON</span> { <span class="t-string">"message"</span>: <span class="t-string">"Hello, "</span> + <span class="t-var">name</span> }</div>
+                <div class="indent-1"><span class="t-keyword">End</span></div>
+                <div><span class="t-keyword">Start</span> <span class="t-var">myApp</span> <span class="t-keyword">on port</span> <span class="t-var">3000</span></div>
             </div>
         </div>
     </section>
 
     <section class="features">
-        <h2 class="section-title">Zero logic translations. Just code.</h2>
-        <div class="grid">
-            <div class="card">
-                <div class="card-icon"><i class="fa-solid fa-language"></i></div>
-                <h3>100% English Syntax</h3>
-                <p>No semicolons. No curly braces. Replace arbitrary symbols with words you already know. <code>Repeat 5 times</code> instead of <code>for(let i=0;i<5;i++)</code>.</p>
+        <h2 class="fw-title">Architecture<br>Without the syntax.</h2>
+        
+        <div class="features-grid">
+            <div class="feat-card">
+                <i class="fa-solid fa-language feat-icon"></i>
+                <h3>Fluid English</h3>
+                <p>No semicolons. No brackets. Your business logic mirrors your source code exactly. <code>Repeat 5 times</code> instead of <code>for(let i=0;i<5;i++)</code>.</p>
             </div>
-            <div class="card">
-                <div class="card-icon"><i class="fa-solid fa-microchip"></i></div>
-                <h3>Lightning Fast</h3>
-                <p>EPL comes with a high-performance tree-walking interpreter, an optimized Bytecode VM, and a native LLVM compiler for raw metal execution speed.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon"><i class="fa-brands fa-android"></i></div>
-                <h3>Build Anything</h3>
-                <p>Compile your EPL code to native binaries (Windows/Mac/Linux), transpile to Android (Kotlin), or run it in the browser via WebAssembly (WASM).</p>
-            </div>
-            <div class="card">
-                <div class="card-icon"><i class="fa-solid fa-server"></i></div>
-                <h3>Production Web Built-in</h3>
-                <p>Forget setting up Express, Flask, or Spring. EPL has a production-grade ASGI web server, router, and SQLite ORM baked right into the standard library.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon"><i class="fa-solid fa-shield-halved"></i></div>
-                <h3>Military-grade Security</h3>
-                <p>Secure by design. Strict recursion limits, a sandboxed Foreign Function Interface (FFI), and safe serialization mean your enterprise apps stay safe.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon"><i class="fa-solid fa-bolt"></i></div>
-                <h3>Modern Tooling</h3>
-                <p>Complete with an official LSP server, a VS Code extension, a built-in test framework, code formatter, linter, and a smart package manager.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="getting-started">
-        <div class="getting-started-content">
-            <h2 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem;">Ready to write English code?</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Join the revolution of readable code. It takes literally seconds to start.</p>
             
-            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                <a href="https://github.com/abneeshsingh21/EPL" class="btn-primary" style="font-size: 1.1rem; padding: 0.8rem 2rem;">Read the Documentation</a>
-                <a href="epl_book.pdf" class="btn-outline" style="font-size: 1.1rem; padding: 0.8rem 2rem; border-color: rgba(6, 182, 212, 0.4);"><i class="fa-solid fa-download"></i> Download Book (PDF)</a>
+            <div class="feat-card">
+                <i class="fa-solid fa-microchip feat-icon"></i>
+                <h3>LLVM Metal</h3>
+                <p>EPL houses a high-octane tree-walking interpreter, an optimized Bytecode VM, and a native LLVM compiler for raw metal execution speed.</p>
+            </div>
+            
+            <div class="feat-card">
+                <i class="fa-brands fa-web-awesome feat-icon"></i>
+                <h3>Compile Anywhere</h3>
+                <p>Compile to native MachO/ELF/PE binaries, transpile directly to Android Kotlin, or run embedded in the browser via WebAssembly.</p>
+            </div>
+            
+            <div class="feat-card">
+                <i class="fa-solid fa-database feat-icon"></i>
+                <h3>ORM Included</h3>
+                <p>No more SQLAlchemy boilerplate. EPL features a SQLite-backed Object Relational Mapper and a high-performance ASGI web server natively.</p>
             </div>
         </div>
     </section>
 
     <footer>
-        <p>Copyright &copy; 2024-2026 <strong>Abneesh Singh</strong>. All rights reserved.</p>
-        <p style="margin-top: 0.5rem;">"EPL" and "English Programming Language" are trademarks of Abneesh Singh.</p>
-        
-        <div class="footer-links">
-            <a href="https://github.com/abneeshsingh21/EPL" title="GitHub"><i class="fa-brands fa-github"></i></a>
-            <a href="https://pypi.org/project/eplang/" title="PyPI"><i class="fa-brands fa-python"></i></a>
-            <a href="mailto:singhabneesh250@gmail.com" title="Email"><i class="fa-solid fa-envelope"></i></a>
+        <div class="footer-logo"><span>&#9632;</span> EPL</div>
+        <p class="footer-text">&copy; 2024-2026 Abneesh Singh. Forged with precision.</p>
+        <div>
+            <a href="https://github.com/abneeshsingh21/EPL" style="color: white; font-size: 1.5rem; margin: 0 10px;"><i class="fa-brands fa-github"></i></a>
+            <a href="https://pypi.org/project/eplang/" style="color: white; font-size: 1.5rem; margin: 0 10px;"><i class="fa-brands fa-python"></i></a>
         </div>
     </footer>
 
     <script>
-        function copyInstall() {
-            const cmd = document.getElementById('install-cmd').innerText;
-            navigator.clipboard.writeText(cmd).then(() => {
-                const icon = document.getElementById('copy-icon');
-                icon.className = 'fa-solid fa-check';
-                icon.style.color = '#22c55e';
-                
+        function copyCmd() {
+            navigator.clipboard.writeText("pip install eplang").then(() => {
+                const icn = document.getElementById('copy-icn');
+                icn.className = "fa-solid fa-check";
+                icn.style.color = "var(--accent)";
                 setTimeout(() => {
-                    icon.className = 'fa-regular fa-copy';
-                    icon.style.color = '';
+                    icn.className = "fa-regular fa-copy";
+                    icn.style.color = "";
                 }, 2000);
             });
         }

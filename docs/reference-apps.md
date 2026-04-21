@@ -37,6 +37,11 @@ Validation:
 - `EPL_RUN_DOCKER_DEPLOY_TESTS=1 python -m pytest tests/test_reference_apps.py -q`
 - optional deployed-service monitoring via `python scripts/monitor_reference_apps.py --fullstack-url <url>`
 
+Production server contract:
+- generated `deploy/wsgi.py` is the WSGI entrypoint for Waitress, Gunicorn, and compatible WSGI hosts
+- generated `deploy/asgi.py` is the ASGI entrypoint for Uvicorn, Hypercorn, Daphne, and compatible ASGI hosts
+- multi-worker ASGI deployments should use the generated import-string entrypoint, not an in-process object launch
+
 ### Android App Generator Input
 
 Path: `apps/reference-android`
@@ -96,6 +101,12 @@ The monitoring workflow reads these GitHub secrets when configured:
 
 - `EPL_REFERENCE_BACKEND_URL`
 - `EPL_REFERENCE_FULLSTACK_URL`
+
+You can also launch the workflow manually and pass `backend_url` / `fullstack_url`
+as `workflow_dispatch` inputs for one-off validation runs without changing repo secrets.
+
+Scheduled runs now treat missing URLs as a failure so the workflow can act as a real
+operational proof check once live endpoints are wired.
 
 The monitor checks:
 

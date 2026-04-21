@@ -1,0 +1,15 @@
+Note: EPL iOS Demo — SwiftUI-safe EPL source
+Note: Run: epl ios examples/official_starters/auth_api/ios_demo.epl --name "EPL Auth Demo" --bundle-id "com.epl.authdemo"
+
+Say "EPL Auth Demo v1.0.0"
+
+Function greet takes name
+    Return "Hello, " + name + "!"
+End
+
+Function make_greeting takes username
+    Return "Welcome to EPL Auth, " + username + "!"
+End
+
+Say greet("World")
+Say make_greeting("Abneesh")

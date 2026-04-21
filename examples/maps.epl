@@ -6,7 +6,7 @@ Print person.name
 Print person.age
 Print person.city
 
-Note: ─── Set Values ───
+Note: ─── Values = ───
 person.email = "alice@example.com"
 Print person.email
 
@@ -52,7 +52,7 @@ merged = defaults.merge(custom)
 Print merged.theme
 Print merged.lang
 
-Note: ─── Set with .set() method ───
+Note: ─── with = .set() method ───
 settings = Map with debug = false
 settings.set("verbose", true)
 Print settings.has("verbose")

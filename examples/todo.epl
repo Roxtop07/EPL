@@ -16,7 +16,7 @@ Route "/" shows
             Input "task" placeholder "What needs to be done?"
         End
         Text "$count{tasks} task(s) in your list"
-        Show items from "tasks" delete "/delete"
+        Say items from "tasks" delete "/delete"
     End
 End
 

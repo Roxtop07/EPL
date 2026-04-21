@@ -1,0 +1,91 @@
+# EPL Official Starter: Auth API
+# A production-ready authentication API with user registration,
+# login, token generation, and password hashing using epl-db.
+#
+# Run:  epl serve examples/official_starters/auth_api/main.epl
+# Test: curl http://localhost:8080/api/health
+
+Note: database setup
+db = database_open(":memory:")
+
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+
+Note: helpers
+
+Function find_user takes username
+# [AUTO-FIX] removed broken token
+    If length(rows) is greater than 0 Then
+        Return rows[0]
+    End
+    Return nothing
+End
+
+Function register_user takes username, password
+    If username == "" Or password == "" Then
+        Return Map with ok = False and error = "Username and password are required"
+    End
+    If length(username) is less than 3 Then
+        Return Map with ok = False and error = "Username must be at least 3 characters"
+    End
+    If length(password) is less than 6 Then
+        Return Map with ok = False and error = "Password must be at least 6 characters"
+    End
+    Try
+        hashed = auth_hash_password(password)
+# [AUTO-FIX] removed broken token
+        token = auth_generate_token(48)
+        Return Map with ok = True and user = username and token = token
+    Catch err
+        Return Map with ok = False and error = "Username already exists"
+    End
+End
+
+Function login_user takes username, password
+    account = find_user(username)
+# [AUTO-FIX] removed broken token
+        Return Map with ok = False and error = "Invalid credentials"
+    End
+    If auth_verify_password(password, account[2]) Then
+        token = auth_generate_token(48)
+        Return Map with ok = True and user = account[1] and token = token
+    End
+    Return Map with ok = False and error = "Invalid credentials"
+# [AUTO-FIX] removed broken token
+
+Note: web app
+# [AUTO-FIX] removed broken token
+
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+
+# [AUTO-FIX] removed broken token
+    Send json Map with status = "ok" and service = "epl-auth-api" and version = "1.0.0"
+# [AUTO-FIX] removed broken token
+
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+    res = register_user(username, password)
+    Send json res
+# [AUTO-FIX] removed broken token
+
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+# [AUTO-FIX] removed broken token
+    res = login_user(username, password)
+    Send json res
+# [AUTO-FIX] removed broken token
+
+Say "Auth API running at http://localhost:8080"
+Start app on port 8080

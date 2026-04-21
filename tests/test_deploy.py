@@ -10,6 +10,8 @@ import unittest
 import asyncio
 import tempfile
 import shutil
+import types
+from unittest import mock
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -20,7 +22,7 @@ from epl.deploy import (
     generate_nginx_config, generate_tomcat_config,
     generate_dockerfile, generate_docker_compose, generate_requirements_txt,
     generate_systemd_service, generate_asgi_entry,
-    deploy_generate, deploy_cli,
+    deploy_generate, deploy_cli, serve, _run_gunicorn,
 )
 
 
@@ -190,6 +192,32 @@ class TestWSGIAdapter(unittest.TestCase):
         result = adapter(environ, start_response)
         self.assertIn('200', status_holder['status'])
         self.assertIn('application/json', status_holder['headers'].get('Content-Type', ''))
+        body = json.loads(b''.join(result).decode('utf-8'))
+        self.assertEqual(body, 'hello')
+
+    def test_wsgi_fetch_route_without_interpreter_returns_collection_payload(self):
+        """WSGI keeps legacy FetchStatement JSON behavior for Python-defined apps."""
+        from epl import ast_nodes as ast
+        from epl.web import _data_store, store_add
+
+        _data_store.clear()
+        store_add('items', 'apple')
+        store_add('items', 'banana')
+        self.app.add_route('/api/items', 'json', [ast.FetchStatement('items')], method='GET')
+
+        adapter = WSGIAdapter(self.app)
+        environ = self._make_environ(path='/api/items')
+        status_holder = {}
+
+        def start_response(status, headers, exc_info=None):
+            status_holder['status'] = status
+
+        result = adapter(environ, start_response)
+        payload = json.loads(b''.join(result).decode('utf-8'))
+        self.assertIn('200', status_holder['status'])
+        self.assertEqual(payload['collection'], 'items')
+        self.assertEqual(payload['count'], 2)
+        self.assertEqual(payload['items'], ['apple', 'banana'])
 
     def test_wsgi_static_path_traversal(self):
         """WSGI prevents path traversal on static files."""
@@ -331,6 +359,40 @@ class TestASGIAdapter(unittest.TestCase):
         # Should get a response (404 since no route, but that's fine)
         self.assertTrue(len(received) >= 2)
 
+    def test_asgi_fetch_route_without_interpreter_returns_collection_payload(self):
+        """ASGI preserves legacy FetchStatement JSON behavior for Python-defined apps."""
+        from epl import ast_nodes as ast
+        from epl.web import _data_store, store_add
+
+        _data_store.clear()
+        store_add('pings', 'hello-asgi')
+        self.app.add_route('/api/ping', 'json', [ast.FetchStatement('pings')], method='GET')
+        adapter = ASGIAdapter(self.app)
+
+        scope = {
+            'type': 'http',
+            'method': 'GET',
+            'path': '/api/ping',
+            'query_string': b'',
+            'headers': [],
+            'client': ('127.0.0.1', 0),
+            'server': ('localhost', 8000),
+        }
+        received = []
+
+        async def receive():
+            return {'type': 'http.request', 'body': b'', 'more_body': False}
+
+        async def send(message):
+            received.append(message)
+
+        asyncio.run(adapter(scope, receive, send))
+        self.assertEqual(received[0]['status'], 200)
+        payload = json.loads(received[1]['body'].decode('utf-8'))
+        self.assertEqual(payload['collection'], 'pings')
+        self.assertEqual(payload['count'], 1)
+        self.assertEqual(payload['items'], ['hello-asgi'])
+
 
 class TestGunicornConfig(unittest.TestCase):
     """Test Gunicorn configuration generator."""
@@ -372,6 +434,52 @@ class TestGunicornConfig(unittest.TestCase):
         self.assertIn('def on_starting', config)
         self.assertIn('def post_fork', config)
         self.assertIn('def when_ready', config)
+
+    def test_run_gunicorn_uses_baseapplication(self):
+        """Gunicorn runtime uses in-process BaseApplication, not subprocess indirection."""
+        adapter = WSGIAdapter(EPLWebApp("GunicornApp"))
+        captured = {}
+
+        class FakeBaseApplication:
+            def __init__(self, *args, **kwargs):
+                captured['initialized'] = True
+                self.cfg = types.SimpleNamespace(settings={
+                    'bind': True,
+                    'workers': True,
+                    'worker_class': True,
+                    'timeout': True,
+                    'graceful_timeout': True,
+                    'keepalive': True,
+                    'accesslog': True,
+                    'errorlog': True,
+                    'preload_app': True,
+                })
+
+            def load_config(self):
+                pass
+
+            def load(self):
+                return None
+
+            def run(self):
+                captured['ran'] = True
+
+        fake_gunicorn = types.ModuleType('gunicorn')
+        fake_app = types.ModuleType('gunicorn.app')
+        fake_base = types.ModuleType('gunicorn.app.base')
+        fake_base.BaseApplication = FakeBaseApplication
+        fake_app.base = fake_base
+        fake_gunicorn.app = fake_app
+
+        with mock.patch.dict('sys.modules', {
+            'gunicorn': fake_gunicorn,
+            'gunicorn.app': fake_app,
+            'gunicorn.app.base': fake_base,
+        }):
+            _run_gunicorn(adapter, '127.0.0.1', 9000, 3)
+
+        self.assertTrue(captured.get('initialized'))
+        self.assertTrue(captured.get('ran'))
 
 
 class TestWSGIEntry(unittest.TestCase):
@@ -533,6 +641,10 @@ class TestDockerConfig(unittest.TestCase):
         requirements = generate_requirements_txt(manifest=manifest, epl_requirement='epl-lang==7.0.0')
         self.assertIn('epl-lang==7.0.0', requirements)
         self.assertIn('gunicorn>=21.2', requirements)
+        self.assertIn('waitress>=2.1.0', requirements)
+        self.assertIn('uvicorn>=0.30.0', requirements)
+        self.assertIn('hypercorn>=0.16.0', requirements)
+        self.assertIn('daphne>=4.1.0', requirements)
         self.assertIn('pyyaml>=6', requirements)
         self.assertIn('requests', requirements)
 
@@ -583,6 +695,35 @@ class TestASGIEntry(unittest.TestCase):
         self.assertIn('from epl.deploy import ASGIAdapter', asgi)
         self.assertIn('application = ASGIAdapter', asgi)
         self.assertIn('uvicorn', asgi.lower())
+        self.assertIn('hypercorn', asgi.lower())
+        self.assertIn('daphne', asgi.lower())
+
+
+class TestServeRuntime(unittest.TestCase):
+    """Runtime server launch safety checks."""
+
+    def test_uvicorn_runtime_normalizes_multiworker_object_mode(self):
+        app = EPLWebApp("ASGIServe")
+        captured = {}
+
+        fake_uvicorn = types.ModuleType('uvicorn')
+
+        def fake_run(application, host, port, workers, reload=False):
+            captured['application'] = application
+            captured['host'] = host
+            captured['port'] = port
+            captured['workers'] = workers
+            captured['reload'] = reload
+
+        fake_uvicorn.run = fake_run
+
+        with mock.patch.dict('sys.modules', {'uvicorn': fake_uvicorn}):
+            serve(app, host='127.0.0.1', port=9100, workers=4, engine='uvicorn')
+
+        self.assertIsInstance(captured['application'], ASGIAdapter)
+        self.assertEqual(captured['host'], '127.0.0.1')
+        self.assertEqual(captured['port'], 9100)
+        self.assertEqual(captured['workers'], 1)
 
 
 class TestDeployGenerate(unittest.TestCase):

@@ -17,7 +17,7 @@ Say "Str::capitalize('hello') = " + Str::capitalize("hello")
 Say "Str::reverse_string('abc') = " + Str::reverse_string("abc")
 
 Note: Access collection functions via Col::
-Create stack equal to Col::stack_new()
+stack = Col::stack_new()
 Col::stack_push(stack, 10)
 Col::stack_push(stack, 20)
 Say "Col::stack_pop = " + to_text(Col::stack_pop(stack))

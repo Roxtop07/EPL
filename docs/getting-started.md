@@ -48,8 +48,8 @@ Hello, World!
 ### Variables
 
 ```epl
-Create name equal to "Alice"
-Create age equal to 25
+name = "Alice"
+age = 25
 Say "Hello, " + name
 Say "You are " + age + " years old"
 ```
@@ -57,13 +57,13 @@ Say "You are " + age + " years old"
 ### Conditionals
 
 ```epl
-Create score equal to 85
+score = 85
 
 If score is greater than 90 then
     Say "Grade: A"
 Otherwise
     Say "Grade: B"
-End If
+End
 ```
 
 ### Loops
@@ -72,21 +72,21 @@ End If
 Note: Count from 1 to 5
 Repeat 5 times
     Say "Counting..."
-End Repeat
+End
 
 Note: Loop over a list
-Create fruits equal to ["apple", "banana", "mango"]
+fruits = ["apple", "banana", "mango"]
 For Each fruit in fruits
     Say fruit
-End For
+End
 ```
 
 ### Functions
 
 ```epl
-Define Function greet Takes name
+Function greet takes name
     Return "Hello, " + name + "!"
-End Function
+End
 
 Say greet("World")
 ```
@@ -95,17 +95,17 @@ Say greet("World")
 
 ```epl
 Class Animal
-    Define Function Begin Takes name
-        Set this.name equal to name
-    End Function
+    Function Begin takes name
+Note: [Parser Error]         this.name = name
+    End
 
-    Define Function speak
+    Function speak
         Say this.name + " makes a sound"
-    End Function
-End Class
+    End
+End
 
-Create dog equal to New Animal("Rex")
-Call dog.speak()
+dog = New Animal("Rex")
+dog.speak()
 ```
 
 ---
@@ -130,14 +130,14 @@ Useful REPL commands:
 
 ```epl
 Start server on port 8080
-    Route GET "/"
+    Route "/"
         Send "Welcome to my EPL web app!"
-    End Route
+    End
 
-    Route GET "/hello"
+    Route "/hello"
         Send "Hello from EPL!"
-    End Route
-End Server
+    End
+Note: [Parser Error] End
 ```
 
 Run it:
@@ -152,7 +152,8 @@ epl serve myapp.epl
 
 ```bash
 epl new myproject --template web
-epl serve myproject/main.epl
+cd myproject
+epl serve
 ```
 
 ---
@@ -177,6 +178,18 @@ epl install <package>    # Install a package
 No installation needed — try EPL instantly at:
 
 👉 **[EPL Online Playground](https://abneeshsingh21.github.io/EPL/playground.html)**
+
+The browser playground assistant can be routed through:
+
+- a secure proxy (`/chat` or a Cloudflare Worker URL)
+- Groq directly with your own key
+- Gemini directly with your own key
+
+For the full local playground server with isolated execution and the native `/api/assist` route:
+
+```bash
+epl playground
+```
 
 ---
 
